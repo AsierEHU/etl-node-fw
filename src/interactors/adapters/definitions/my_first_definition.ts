@@ -1,6 +1,6 @@
 import EventEmitter from "events";
 import { Entity, Register, RegisterDataAccess, RegisterStatusTag } from "../../registers/types";
-import { Adapter, AdapterStatus, AdapterDefinition, InputEntity, AdapterStatusTag, AdapterRunOptions, AdapterStatusSummary } from "../types"
+import { Adapter, AdapterStatus, AdapterDefinition, EntityWithMeta, AdapterStatusTag, AdapterRunOptions, AdapterStatusSummary } from "../types"
 
 
 abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
@@ -22,7 +22,7 @@ abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
             definitionId: this.adapterDefinition.id,
             definitionType: this.adapterDefinition.definitionType,
             outputType: this.adapterDefinition.outputType,
-            statusTag: AdapterStatusTag.pending,
+            statusTag: AdapterStatusTag.notProcessed,
             summary: null,
             meta: null,
         }
@@ -73,7 +73,7 @@ abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
         await this.registerDataAccess.saveAll(this.adapterRegisters, { apdaterId: this.adapterStatus.id })
     }
 
-    protected getMockedRegisters(inputEntities?: InputEntity<Entity>[]): Register<Entity>[] | null {
+    protected getMockedRegisters(inputEntities?: (EntityWithMeta<Entity> | null | Entity)[]): Register<Entity>[] | null {
 
         if (!inputEntities)
             return null;
@@ -115,15 +115,28 @@ export class MyExtractorAdapter<ad extends MyAdapterExtractorDefinition<Entity>>
         await this.fixRegisters();
     }
 
-    private async initRegisters(inputEntities: InputEntity<Entity>[]) {
-        for (const inputEntity of inputEntities) {
+    private async initRegisters(inputEntities: (EntityWithMeta<Entity> | null | Entity)[]) {
+        for (let inputEntity of inputEntities) {
+
+            if (!inputEntity)
+                inputEntity = {
+                    entity: null,
+                    meta: null,
+                }
+            else if (!inputEntity.entity) {
+                inputEntity = {
+                    entity: inputEntity,
+                    meta: null,
+                }
+            }
+
             // const inputEntityId = await this.adapterDefinition.generateID(inputEntity.entity)
             const inputEntityId = Math.random().toString();
             const adapterRegister: Register<Entity> = {
                 id: inputEntityId,
                 entityType: this.adapterDefinition.outputType,
                 source_id: null,
-                statusTag: RegisterStatusTag.pending,
+                statusTag: RegisterStatusTag.notProcessed,
                 statusMeta: null,
                 entity: inputEntity.entity,
                 meta: inputEntity.meta
@@ -189,7 +202,7 @@ export abstract class MyAdapterExtractorDefinition<input extends Entity> impleme
     abstract readonly outputType: string
     // generateID:(entity:input) => Promise<string | null>
     // getTrackFields: (entity:input) => Promise<string[]>
-    abstract entitiesGet: (options: any) => Promise<InputEntity<input>[]>
+    abstract entitiesGet: (options: any) => Promise<(EntityWithMeta<input> | null | input)[]>
     abstract entityValidate: (outputEntity: input | null) => Promise<ValidationResult> //data quality, error handling (error prevention), managin Bad Data-> triage or CleanUp
     abstract entityFix: (toFixEntity: ToFixEntity<input>) => Promise<FixedEntity<input> | null> //error handling (error response), managin Bad Data-> CleanUp
 }
@@ -264,7 +277,7 @@ export abstract class MyAdapterTransformerDefinition<input extends Entity, outpu
  * row-by-row
  * 1 input 1 output
  */
-export class MyConsumerAdapter<ad extends MyAdapterLoaderDefinition<Entity, Entity>> extends MyAdapter<ad>{
+export class MyConsumerAdapter<ad extends MyAdapterConsumerDefinition<Entity, Entity>> extends MyAdapter<ad>{
 
     constructor(dependencies: any) {
         super(dependencies)
@@ -309,7 +322,7 @@ export class MyConsumerAdapter<ad extends MyAdapterLoaderDefinition<Entity, Enti
     }
 }
 
-export abstract class MyAdapterLoaderDefinition<input extends Entity, output extends Entity> implements AdapterDefinition {
+export abstract class MyAdapterConsumerDefinition<input extends Entity, output extends Entity> implements AdapterDefinition {
     // readonly version: string
     abstract readonly id: string;
     abstract readonly inputType: string

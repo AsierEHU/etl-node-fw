@@ -15,11 +15,11 @@ export interface Adapter<AdapterDefinition> {
 }
 
 export type AdapterRunOptions = {
-    mockEntities?: InputEntity<Entity>[],
+    mockEntities?: (EntityWithMeta<Entity> | null | Entity)[],
     getOptions?: any //filters, skips...
 }
 
-export type InputEntity<input extends Entity> = {
+export type EntityWithMeta<input extends Entity> = {
     entity: input,
     meta: any,
 }
@@ -46,7 +46,7 @@ export type AdapterStatusSummary = { //Audit
 }
 
 export enum AdapterStatusTag {
-    pending = "pending", //not processed yet
+    notProcessed = "notProcessed", //not processed yet
     success = "success", //all records success
     successPartial = "successPartial", //records exitos y records in (failed, invalid)
     skipped = "skipped", //all records skipped

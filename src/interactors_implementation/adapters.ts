@@ -1,4 +1,4 @@
-import { MyAdapterLoaderDefinition, MyAdapterExtractorDefinition, MyAdapterTransformerDefinition, ToFixEntity, ValidationResult, ValidationStatusTag } from "../interactors/adapters/definitions/my_first_definition";
+import { MyAdapterExtractorDefinition, MyAdapterTransformerDefinition, ToFixEntity, ValidationStatusTag } from "../interactors/adapters/definitions/my_first_definition";
 
 
 type inputClass = {
@@ -24,13 +24,27 @@ export const testExtractor: MyAdapterExtractorDefinition<inputClass> = {
     definitionType: "MyAdapterExtractorDefinition",
     outputType: "inputClass",
     async entitiesGet(options: any) {
-        const rawMockedInput = [{
-            entity: {
-                field: "Raw Object text",
-                y: 23,
+        const rawMockedInput = [
+            {
+                entity: {
+                    field: "Raw Object text",
+                    y: 23,
+                },
+                meta: "rawMocked to success"
             },
-            meta: "rawMocked"
-        }];
+            null,
+            {
+                field: "Raw Object text 2",
+                y: 0,
+            },
+            {
+                entity: {
+                    field: "Raw Object text 3",
+                    y: -34,
+                },
+                meta: "rawMocked to skip"
+            }
+        ];
         return rawMockedInput;
     },
     async entityValidate(entity: inputClass | null) {
@@ -40,7 +54,7 @@ export const testExtractor: MyAdapterExtractorDefinition<inputClass> = {
                 meta: {
                     type: "null object",
                     action: "trigger alarm",
-                    severity: "low"
+                    severity: "high"
                 }
             };
         }
@@ -80,7 +94,7 @@ export const testExtractor: MyAdapterExtractorDefinition<inputClass> = {
                     note: "Fixed changing to 1"
                 }
             };
-        }else{
+        } else {
             return null;
         }
     },
