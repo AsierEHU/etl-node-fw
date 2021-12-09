@@ -99,7 +99,7 @@ abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
  * row-by-row
  * 1 input 1 output
  */
-export class MyExtractorAdapter<ad extends MyAdapterExtractorDefinition<any>> extends MyAdapter<ad>{
+export class MyExtractorAdapter<ad extends MyAdapterExtractorDefinition<Entity>> extends MyAdapter<ad>{
 
     constructor(dependencies: any) {
         super(dependencies)
@@ -112,11 +112,11 @@ export class MyExtractorAdapter<ad extends MyAdapterExtractorDefinition<any>> ex
         await this.fixRegisters();
     }
 
-    private async initRegisters(inputEntities: InputEntity<any>[]) {
+    private async initRegisters(inputEntities: InputEntity<Entity>[]) {
         for (const inputEntity of inputEntities) {
             // const inputEntityId = await this.adapterDefinition.generateID(inputEntity.entity)
             const inputEntityId = Math.random().toString();
-            const adapterRegister: Register<any> = {
+            const adapterRegister: Register<Entity> = {
                 id: inputEntityId,
                 entityType: this.adapterDefinition.outputType,
                 source_id: null,
@@ -187,7 +187,7 @@ export abstract class MyAdapterExtractorDefinition<input extends Entity> impleme
     // generateID:(entity:input) => Promise<string | null>
     // getTrackFields: (entity:input) => Promise<string[]>
     abstract entitiesGet: (options: any) => Promise<InputEntity<input>[]>
-    abstract entityValidate: (outputEntity: input) => Promise<ValidationResult> //data quality, error handling (error prevention), managin Bad Data-> triage or CleanUp
+    abstract entityValidate: (outputEntity: input | null) => Promise<ValidationResult> //data quality, error handling (error prevention), managin Bad Data-> triage or CleanUp
     abstract entityFix: (toFixEntity: ToFixEntity<input>) => Promise<FixedEntity<input> | null> //error handling (error response), managin Bad Data-> CleanUp
 }
 
@@ -200,7 +200,7 @@ export abstract class MyAdapterExtractorDefinition<input extends Entity> impleme
  * TODO: The ETL process is an incremental load, but the volume of data is significant enough that doing a row-by-row comparison in the transformation step does not perform well
  * TOOD: Map reduce
  */
-export class MyTransformerAdapter<ad extends MyAdapterTransformerDefinition<any, any>> extends MyAdapter<ad>{
+export class MyTransformerAdapter<ad extends MyAdapterTransformerDefinition<Entity, Entity>> extends MyAdapter<ad>{
 
     constructor(dependencies: any) {
         super(dependencies)
@@ -218,7 +218,7 @@ export class MyTransformerAdapter<ad extends MyAdapterTransformerDefinition<any,
             try {
                 const inputEntity = inputRegistry.entity;
                 const outputEntity = await this.adapterDefinition.entityProcess(inputEntity);
-                const adapterRegister: Register<any> = {
+                const adapterRegister: Register<Entity> = {
                     // id: await this.adapterDefinition.generateID(outputEntity),
                     id: Math.random().toString(),
                     entityType: this.adapterDefinition.outputType,
@@ -230,7 +230,7 @@ export class MyTransformerAdapter<ad extends MyAdapterTransformerDefinition<any,
                 }
                 this.adapterRegisters.push(adapterRegister)
             } catch (e: any) {
-                const adapterRegister: Register<any> = {
+                const adapterRegister: Register<Entity> = {
                     // id: inputRegistry.id,
                     id: Math.random().toString(),
                     entityType: this.adapterDefinition.outputType,
@@ -264,7 +264,7 @@ export abstract class MyAdapterTransformerDefinition<input extends Entity, outpu
  * row-by-row
  * 1 input 1 output
  */
-export class MyConsumerAdapter<ad extends MyAdapterConsumerDefinition<any, any>> extends MyAdapter<ad>{
+export class MyConsumerAdapter<ad extends MyAdapterConsumerDefinition<Entity, Entity>> extends MyAdapter<ad>{
 
     constructor(dependencies: any) {
         super(dependencies)
@@ -277,12 +277,12 @@ export class MyConsumerAdapter<ad extends MyAdapterConsumerDefinition<any, any>>
         await this.loadEntities(inputRegisters);
     }
 
-    private async loadEntities(inputRegisters: Register<any>[]) {
+    private async loadEntities(inputRegisters: Register<Entity>[]) {
         for (const inputRegistry of inputRegisters) {
             try {
                 const inputEntity = inputRegistry.entity;
                 const outputEntity = await this.adapterDefinition.entityLoad(inputEntity);
-                const adapterRegister: Register<any> = {
+                const adapterRegister: Register<Entity> = {
                     // id: await this.adapterDefinition.generateID(outputEntity),
                     id: Math.random().toString(),
                     entityType: this.adapterDefinition.outputType,
@@ -294,7 +294,7 @@ export class MyConsumerAdapter<ad extends MyAdapterConsumerDefinition<any, any>>
                 }
                 this.adapterRegisters.push(adapterRegister)
             } catch (e) {
-                const adapterRegister: Register<any> = {
+                const adapterRegister: Register<Entity> = {
                     id: Math.random().toString(),
                     entityType: this.adapterDefinition.outputType,
                     source_id: inputRegistry.id,
@@ -317,7 +317,7 @@ export abstract class MyAdapterConsumerDefinition<input extends Entity, output e
     abstract definitionType: string;
     // generateID:(entity:output) => Promise<string | null>
     // getTrackFields: (entity:output) => Promise<string[]>
-    abstract entityLoad: (entity: input) => Promise<output> //first time (success), on retry (failed entities)
+    abstract entityLoad: (entity: input | null) => Promise<output> //first time (success), on retry (failed entities)
 }
 
 
@@ -326,7 +326,7 @@ export abstract class MyAdapterConsumerDefinition<input extends Entity, output e
  * row-by-row
  * unknown input 1 output
  */
-export class MyFlexAdapter<ad extends MyAdapterFlexDefinition<any>> extends MyAdapter<ad>{
+export class MyFlexAdapter<ad extends MyAdapterFlexDefinition<Entity>> extends MyAdapter<ad>{
 
     constructor(dependencies: any) {
         super(dependencies)
@@ -337,12 +337,12 @@ export class MyFlexAdapter<ad extends MyAdapterFlexDefinition<any>> extends MyAd
         await this.processEntities(inputRegisters);
     }
 
-    private async processEntities(inputRegisters: Register<any>[]) {
+    private async processEntities(inputRegisters: Register<Entity>[]) {
         for (const inputRegistry of inputRegisters) {
             try {
                 const inputEntity = inputRegistry.entity;
                 const outputEntity = await this.adapterDefinition.entityProcess(inputEntity);
-                const adapterRegister: Register<any> = {
+                const adapterRegister: Register<Entity> = {
                     // id: await this.adapterDefinition.generateID(outputEntity),
                     id: Math.random().toString(),
                     entityType: this.adapterDefinition.outputType,
@@ -354,7 +354,7 @@ export class MyFlexAdapter<ad extends MyAdapterFlexDefinition<any>> extends MyAd
                 }
                 this.adapterRegisters.push(adapterRegister)
             } catch (e: any) {
-                const adapterRegister: Register<any> = {
+                const adapterRegister: Register<Entity> = {
                     id: Math.random().toString(),
                     entityType: this.adapterDefinition.outputType,
                     source_id: inputRegistry.id,
@@ -377,8 +377,8 @@ export abstract class MyAdapterFlexDefinition<output extends Entity> implements 
     abstract definitionType: string;
     // generateID:(entity:output) => Promise<string | null>
     // getTrackFields: (entity:output) => Promise<string[]>
-    abstract registersGet: (options: any) => Promise<Register<any>[]>
-    abstract entityProcess: (entity: any) => Promise<output> //first time (success), on retry (failed entities)
+    abstract registersGet: (options: Entity) => Promise<Register<Entity>[]>
+    abstract entityProcess: (entity: Entity | null) => Promise<output> //first time (success), on retry (failed entities)
 }
 
 
@@ -392,7 +392,7 @@ export abstract class MyAdapterFlexDefinition<output extends Entity> implements 
 export type AdapterDependencies<ad extends AdapterDefinition> = {
     adapterDefinition: ad
     // adapterPersistance: AdapterPersistance
-    registerDataAccess: RegisterDataAccess<any>
+    registerDataAccess: RegisterDataAccess<Entity>
 }
 
 export interface AdapterPersistance {
@@ -411,7 +411,7 @@ export type ValidationResult = {
 }
 
 export type ToFixEntity<input extends Entity> = {
-    entity: input,
+    entity: input | null,
     validationMeta: any
 }
 

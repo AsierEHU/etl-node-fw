@@ -13,7 +13,7 @@ export interface Adapter<AdapterDefinition> {
 }
 
 export type AdapterRunOptions = {
-    mockEntities?: InputEntity<any>[],
+    mockEntities?: InputEntity<Entity>[],
     getOptions?: any //filters, skips...
 }
 

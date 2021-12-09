@@ -4,7 +4,7 @@ export type Register<entity extends Entity> = {
     source_id: string | null //datalineage, [relative or absoulte]
     statusTag: RegisterStatusTag  //managing bad data
     statusMeta: any
-    entity: entity, //register itself
+    entity: entity | null, //register itself
     meta: any, //save here for example every info need for final step (Alerts, csv name...)
     // hash:string,
 }
