@@ -1,6 +1,6 @@
 import EventEmitter from "events";
 import { Entity, Register, RegisterDataAccess, RegisterStatusTag } from "../../registers/types";
-import { Adapter, AdapterStatus, AdapterDefinition, EntityWithMeta, AdapterStatusTag, AdapterRunOptions, AdapterStatusSummary } from "../types"
+import { Adapter, AdapterStatus, AdapterDefinition, EntityWithMeta, AdapterRunOptions, AdapterStatusSummary } from "../types"
 
 
 abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
@@ -22,47 +22,32 @@ abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
             definitionId: this.adapterDefinition.id,
             definitionType: this.adapterDefinition.definitionType,
             outputType: this.adapterDefinition.outputType,
-            statusTag: AdapterStatusTag.notProcessed,
-            summary: null,
+            statusSummary: null,
             meta: null,
         }
         this.adapterPresenter.emit("adapterStatus", this.adapterStatus)
     }
 
-    async start(runOptions?: AdapterRunOptions): Promise<AdapterStatusTag> {
+    async start(runOptions?: AdapterRunOptions): Promise<AdapterStatusSummary> {
         await this.run(runOptions);
         await this.saveRegisters();
-        this.adapterStatus.summary = this.calculateSummary();
-        this.adapterStatus.statusTag = this.calculateStatus(this.adapterStatus.summary)
+        this.adapterStatus.statusSummary = this.calculateSummary();
         this.adapterStatus.meta = { runOptions }
         this.adapterPresenter.emit("adapterStatus", this.adapterStatus)
-        return this.adapterStatus.statusTag;
+        return this.adapterStatus.statusSummary;
     }
 
     abstract run(runOptions?: AdapterRunOptions): Promise<void>
 
     private calculateSummary(): AdapterStatusSummary {
-        const summary = {
+        const statusSummary = {
             output_rows: this.adapterRegisters.length,
             rows_success: this.adapterRegisters.filter(register => register.statusTag == RegisterStatusTag.success).length,
             rows_failed: this.adapterRegisters.filter(register => register.statusTag == RegisterStatusTag.failed).length,
             rows_invalid: this.adapterRegisters.filter(register => register.statusTag == RegisterStatusTag.invalid).length,
             rows_skipped: this.adapterRegisters.filter(register => register.statusTag == RegisterStatusTag.skipped).length,
         };
-        return summary;
-    }
-
-    private calculateStatus(summary: AdapterStatusSummary): AdapterStatusTag {
-        if (summary.output_rows == summary.rows_success)
-            return AdapterStatusTag.success;
-        else if (summary.output_rows == summary.rows_failed)
-            return AdapterStatusTag.failed;
-        else if (summary.output_rows == summary.rows_skipped)
-            return AdapterStatusTag.skipped;
-        else if (summary.output_rows == summary.rows_invalid)
-            return AdapterStatusTag.invalid;
-        else
-            return AdapterStatusTag.successPartial;
+        return statusSummary;
     }
 
     // private async saveData() {
@@ -73,12 +58,14 @@ abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
         await this.registerDataAccess.saveAll(this.adapterRegisters, { apdaterId: this.adapterStatus.id })
     }
 
-    protected getMockedRegisters(inputEntities?: (EntityWithMeta<Entity> | null | Entity)[]): Register<Entity>[] | null {
+    protected getMockedRegisters(inputEntities?: any[]): Register<Entity>[] | null {
 
         if (!inputEntities)
             return null;
 
-        return inputEntities.map(inputEntity => {
+        const inputEntitiesWithMeta = this.getInputFormat(inputEntities);
+
+        return inputEntitiesWithMeta.map(inputEntity => {
             return {
                 id: Math.random().toString(),
                 entityType: "Mocked",
@@ -87,6 +74,28 @@ abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
                 statusMeta: null,
                 entity: inputEntity.entity,
                 meta: inputEntity.meta
+            }
+        })
+    }
+
+    protected getInputFormat(inputEntities: any[]): EntityWithMeta<Entity>[] {
+
+        return inputEntities.map(inputEntity => {
+            if (inputEntity?.entity && inputEntity?.meta) {
+                return inputEntity;
+
+            }
+            else if (inputEntity) {
+                return {
+                    entity: inputEntity,
+                    meta: null,
+                }
+            }
+            else {
+                return {
+                    entity: null,
+                    meta: null,
+                }
             }
         })
     }
@@ -110,26 +119,14 @@ export class MyExtractorAdapter<ad extends MyAdapterExtractorDefinition<Entity>>
 
     async run(runOptions?: AdapterRunOptions) {
         const inputEntities = runOptions?.mockEntities || (await this.adapterDefinition.entitiesGet(runOptions?.getOptions));
-        await this.initRegisters(inputEntities);
+        const inputEntitiesWithMeta = this.getInputFormat(inputEntities)
+        await this.initRegisters(inputEntitiesWithMeta);
         await this.validateRegisters();
         await this.fixRegisters();
     }
 
-    private async initRegisters(inputEntities: (EntityWithMeta<Entity> | null | Entity)[]) {
+    private async initRegisters(inputEntities: EntityWithMeta<Entity>[]) {
         for (let inputEntity of inputEntities) {
-
-            if (!inputEntity)
-                inputEntity = {
-                    entity: null,
-                    meta: null,
-                }
-            else if (!inputEntity.entity) {
-                inputEntity = {
-                    entity: inputEntity,
-                    meta: null,
-                }
-            }
-
             // const inputEntityId = await this.adapterDefinition.generateID(inputEntity.entity)
             const inputEntityId = Math.random().toString();
             const adapterRegister: Register<Entity> = {
@@ -277,7 +274,7 @@ export abstract class MyAdapterTransformerDefinition<input extends Entity, outpu
  * row-by-row
  * 1 input 1 output
  */
-export class MyConsumerAdapter<ad extends MyAdapterConsumerDefinition<Entity, Entity>> extends MyAdapter<ad>{
+export class MyLoaderAdapter<ad extends MyAdapterLoaderDefinition<Entity, Entity>> extends MyAdapter<ad>{
 
     constructor(dependencies: any) {
         super(dependencies)
@@ -322,7 +319,7 @@ export class MyConsumerAdapter<ad extends MyAdapterConsumerDefinition<Entity, En
     }
 }
 
-export abstract class MyAdapterConsumerDefinition<input extends Entity, output extends Entity> implements AdapterDefinition {
+export abstract class MyAdapterLoaderDefinition<input extends Entity, output extends Entity> implements AdapterDefinition {
     // readonly version: string
     abstract readonly id: string;
     abstract readonly inputType: string

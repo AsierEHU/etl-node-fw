@@ -1,4 +1,4 @@
-import { MyAdapterExtractorDefinition, MyAdapterTransformerDefinition, ToFixEntity, ValidationStatusTag } from "../interactors/adapters/definitions/my_first_definition";
+import { MyAdapterExtractorDefinition, MyAdapterLoaderDefinition, MyAdapterTransformerDefinition, ToFixEntity, ValidationStatusTag } from "../interactors/adapters/definitions/my_first_definition";
 
 
 type inputClass = {
@@ -43,6 +43,13 @@ export const testExtractor: MyAdapterExtractorDefinition<inputClass> = {
                     y: -34,
                 },
                 meta: "rawMocked to skip"
+            },
+            {
+                entity: {
+                    field: "Raw Object text 3",
+                    y: 30,
+                },
+                meta: "rawMocked to fail"
             }
         ];
         return rawMockedInput;
@@ -61,7 +68,7 @@ export const testExtractor: MyAdapterExtractorDefinition<inputClass> = {
         else if (entity.y < 0) {
             return {
                 statusTag: ValidationStatusTag.skipped,
-                meta: {}
+                meta: null
             };
         }
         else if (entity.y == 0) {
@@ -77,7 +84,7 @@ export const testExtractor: MyAdapterExtractorDefinition<inputClass> = {
         else {
             return {
                 statusTag: ValidationStatusTag.valid,
-                meta: {}
+                meta: null
             };
         }
     },
@@ -106,6 +113,9 @@ export const testTransformer: MyAdapterTransformerDefinition<inputClass, outputC
     inputType: "inputClass",
     outputType: "outputClass",
     async entityProcess(entity: inputClass) {
+        if (entity.y == 30) {
+            throw new Error("Y 30 error!!")
+        }
         return {
             text: entity.field,
             others: {

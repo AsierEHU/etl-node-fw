@@ -1,4 +1,4 @@
-import { MyConsumerAdapter, MyExtractorAdapter, MyFlexAdapter, MyTransformerAdapter } from "./definitions/my_first_definition";
+import { MyLoaderAdapter, MyExtractorAdapter, MyFlexAdapter, MyTransformerAdapter } from "./definitions/my_first_definition";
 import { Adapter, AdapterDefinition } from "./types";
 
 export class AdapterBuilder {
@@ -14,7 +14,7 @@ export class AdapterBuilder {
         adapterDependencies.adapterDefinition = adapterDefinition;
 
         if (adapterDefinition.definitionType == "MyAdapterLoaderDefinition") {
-            return new MyConsumerAdapter(adapterDependencies);
+            return new MyLoaderAdapter(adapterDependencies);
         }
         else if (adapterDefinition.definitionType == "MyAdapterExtractorDefinition") {
             return new MyExtractorAdapter(adapterDependencies);
