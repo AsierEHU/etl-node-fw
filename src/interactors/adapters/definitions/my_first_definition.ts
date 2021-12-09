@@ -1,13 +1,13 @@
-import { Register, RegisterDataAccess, RegisterStatusTag } from "../../registers/types";
+import { Entity, Register, RegisterDataAccess, RegisterStatusTag } from "../../registers/types";
 import { Adapter, AdapterStatus, AdapterDefinition, InputEntity, AdapterStatusTag, AdapterRunOptions, AdapterStatusSummary } from "../types"
 
 
 abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
 
     protected readonly adapterDefinition: ad;
-    protected readonly adapterRegisters: Register<any>[];
+    protected readonly adapterRegisters: Register<Entity>[];
     // protected readonly adapterPersistance: AdapterPersistance;
-    protected readonly registerDataAccess: RegisterDataAccess<any>;
+    protected readonly registerDataAccess: RegisterDataAccess<Entity>;
     protected readonly adapterStatus: AdapterStatus
 
 
@@ -70,7 +70,7 @@ abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
         await this.registerDataAccess.saveAll(this.adapterRegisters, { apdaterId: this.adapterStatus.id })
     }
 
-    protected getMockedRegisters(inputEntities?: InputEntity<any>[]): Register<any>[] | null {
+    protected getMockedRegisters(inputEntities?: InputEntity<Entity>[]): Register<Entity>[] | null {
 
         if (!inputEntities)
             return null;
@@ -80,7 +80,7 @@ abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
                 id: Math.random().toString(),
                 entityType: "Mocked",
                 source_id: null,
-                statusTag: null,
+                statusTag: RegisterStatusTag.success,
                 statusMeta: null,
                 entity: inputEntity.entity,
                 meta: inputEntity.meta
@@ -120,7 +120,7 @@ export class MyExtractorAdapter<ad extends MyAdapterExtractorDefinition<any>> ex
                 id: inputEntityId,
                 entityType: this.adapterDefinition.outputType,
                 source_id: null,
-                statusTag: null,
+                statusTag: RegisterStatusTag.notProcessed,
                 statusMeta: null,
                 entity: inputEntity.entity,
                 meta: inputEntity.meta
@@ -159,7 +159,11 @@ export class MyExtractorAdapter<ad extends MyAdapterExtractorDefinition<any>> ex
         const toFixRegisters = this.adapterRegisters.filter(register => register.statusTag == RegisterStatusTag.invalid);
         for (const toFixRegister of toFixRegisters) {
             try {
-                const fixedEntity = await this.adapterDefinition.entityFix(toFixRegister.entity);
+                const toFixEntity: ToFixEntity<Entity> = {
+                    entity: toFixRegister.entity,
+                    validationMeta: toFixRegister.statusMeta
+                }
+                const fixedEntity = await this.adapterDefinition.entityFix(toFixEntity);
                 if (fixedEntity) {
                     toFixRegister.entity = fixedEntity.entity;
                     toFixRegister.statusTag = RegisterStatusTag.success;
@@ -176,7 +180,7 @@ export class MyExtractorAdapter<ad extends MyAdapterExtractorDefinition<any>> ex
 
 }
 
-export abstract class MyAdapterExtractorDefinition<input extends object> implements AdapterDefinition {
+export abstract class MyAdapterExtractorDefinition<input extends Entity> implements AdapterDefinition {
     abstract definitionType: string;
     abstract id: string;
     abstract outputType: string
@@ -184,7 +188,7 @@ export abstract class MyAdapterExtractorDefinition<input extends object> impleme
     // getTrackFields: (entity:input) => Promise<string[]>
     abstract entitiesGet: (options: any) => Promise<InputEntity<input>[]>
     abstract entityValidate: (outputEntity: input) => Promise<ValidationResult> //data quality, error handling (error prevention), managin Bad Data-> triage or CleanUp
-    abstract entityFix: (entity: ToFixEntity<input>) => Promise<FixedEntity<input> | null> //error handling (error response), managin Bad Data-> CleanUp
+    abstract entityFix: (toFixEntity: ToFixEntity<input>) => Promise<FixedEntity<input> | null> //error handling (error response), managin Bad Data-> CleanUp
 }
 
 
@@ -243,7 +247,7 @@ export class MyTransformerAdapter<ad extends MyAdapterTransformerDefinition<any,
 
 }
 
-export abstract class MyAdapterTransformerDefinition<input extends object, output extends object> implements AdapterDefinition {
+export abstract class MyAdapterTransformerDefinition<input extends Entity, output extends Entity> implements AdapterDefinition {
     // readonly version: string
     abstract id: string;
     abstract inputType: string
@@ -305,7 +309,7 @@ export class MyConsumerAdapter<ad extends MyAdapterConsumerDefinition<any, any>>
     }
 }
 
-export abstract class MyAdapterConsumerDefinition<input extends object, output extends object> implements AdapterDefinition {
+export abstract class MyAdapterConsumerDefinition<input extends Entity, output extends Entity> implements AdapterDefinition {
     // readonly version: string
     abstract id: string;
     abstract inputType: string
@@ -366,7 +370,7 @@ export class MyFlexAdapter<ad extends MyAdapterFlexDefinition<any>> extends MyAd
 
 }
 
-export abstract class MyAdapterFlexDefinition<output extends object> implements AdapterDefinition {
+export abstract class MyAdapterFlexDefinition<output extends Entity> implements AdapterDefinition {
     // readonly version: string
     abstract id: string;
     abstract outputType: string
@@ -406,12 +410,12 @@ export type ValidationResult = {
     meta: any
 }
 
-export type ToFixEntity<input extends object> = {
+export type ToFixEntity<input extends Entity> = {
     entity: input,
-    validationResult: ValidationResult
+    validationMeta: any
 }
 
-export type FixedEntity<input extends object> = {
+export type FixedEntity<input extends Entity> = {
     entity: input,
     meta: any
 }

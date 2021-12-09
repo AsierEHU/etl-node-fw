@@ -1,8 +1,8 @@
-export type Register<entity extends object> = {
+export type Register<entity extends Entity> = {
     id: string //datalineage, unique
     entityType: string
     source_id: string | null //datalineage, [relative or absoulte]
-    statusTag: RegisterStatusTag | null  //managing bad data
+    statusTag: RegisterStatusTag  //managing bad data
     statusMeta: any
     entity: entity, //register itself
     meta: any, //save here for example every info need for final step (Alerts, csv name...)
@@ -10,13 +10,14 @@ export type Register<entity extends object> = {
 }
 
 export enum RegisterStatusTag {
+    notProcessed = "notProcessed",
     success = "success", //SW - Business
     failed = "failed",  //SW - Business
     invalid = "invalid", //Business
     skipped = "skipped", //Business
 }
 
-export interface RegisterDataAccess<entity extends object> {//For a specific context
+export interface RegisterDataAccess<entity extends Entity> {//For a specific context
     save: (register: Register<entity>, context: RegisterDataContext) => Promise<void>
     saveAll: (registers: Register<entity>[], context: RegisterDataContext) => Promise<void>
     get: (id: string) => Promise<Register<entity> | null>
@@ -35,4 +36,7 @@ export type RegisterDataFilter = {
     stepId?: string,
     apdaterId?: string,
     registerStatus?: RegisterStatusTag
+}
+
+export interface Entity{
 }

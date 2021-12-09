@@ -1,3 +1,5 @@
+import { Entity } from "../registers/types"
+
 export interface AdapterDefinition {
     readonly id: string
     readonly outputType: string
@@ -15,7 +17,7 @@ export type AdapterRunOptions = {
     getOptions?: any //filters, skips...
 }
 
-export type InputEntity<input extends object> = {
+export type InputEntity<input extends Entity> = {
     entity: input,
     meta: any,
 }

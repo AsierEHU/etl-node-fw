@@ -1,4 +1,4 @@
-import {MyAdapterConsumerDefinition, MyAdapterExtractorDefinition, MyAdapterTransformerDefinition, ToFixEntity, ValidationResult, ValidationStatusTag } from "../interactors/adapters/definitions/my_first_definition";
+import { MyAdapterConsumerDefinition, MyAdapterExtractorDefinition, MyAdapterTransformerDefinition, ToFixEntity, ValidationResult, ValidationStatusTag } from "../interactors/adapters/definitions/my_first_definition";
 
 
 type inputClass = {
@@ -60,7 +60,7 @@ export const adapter1Definition: MyAdapterExtractorDefinition<inputClass> = {
         }
     },
     async entityFix(toFixEntity: ToFixEntity<inputClass>) {
-        if (toFixEntity.validationResult.meta.type == "0 error") {
+        if (toFixEntity.validationMeta.type == "0 error") {
             const entity = toFixEntity.entity;
             entity.y = 1;
             return {
