@@ -1,3 +1,4 @@
+import EventEmitter from "events";
 import { Entity, Register, RegisterDataAccess, RegisterStatusTag } from "../../registers/types";
 import { Adapter, AdapterStatus, AdapterDefinition, InputEntity, AdapterStatusTag, AdapterRunOptions, AdapterStatusSummary } from "../types"
 
@@ -6,24 +7,26 @@ abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
 
     protected readonly adapterDefinition: ad;
     protected readonly adapterRegisters: Register<Entity>[];
-    // protected readonly adapterPersistance: AdapterPersistance;
+    protected readonly adapterPresenter: EventEmitter
     protected readonly registerDataAccess: RegisterDataAccess<Entity>;
     protected readonly adapterStatus: AdapterStatus
 
 
-    constructor(dependencies: AdapterDependencies<ad>) {
+    constructor(dependencies: MyAdapterDependencies<ad>) {
         this.adapterRegisters = [];
         this.adapterDefinition = dependencies.adapterDefinition;
-        // this.adapterPersistance = dependencies.adapterPersistance;
+        this.adapterPresenter = dependencies.adapterPresenter;
         this.registerDataAccess = dependencies.registerDataAccess;
-
         this.adapterStatus = {
             id: Math.random().toString(),
-            meta: null,
+            definitionId: this.adapterDefinition.id,
+            definitionType: this.adapterDefinition.definitionType,
             outputType: this.adapterDefinition.outputType,
-            statusTag: AdapterStatusTag.notProcessed,
+            statusTag: AdapterStatusTag.pending,
             summary: null,
+            meta: null,
         }
+        this.adapterPresenter.emit("adapterStatus", this.adapterStatus)
     }
 
     async start(runOptions?: AdapterRunOptions): Promise<AdapterStatusTag> {
@@ -32,7 +35,7 @@ abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
         this.adapterStatus.summary = this.calculateSummary();
         this.adapterStatus.statusTag = this.calculateStatus(this.adapterStatus.summary)
         this.adapterStatus.meta = { runOptions }
-        // await this.saveData();
+        this.adapterPresenter.emit("adapterStatus", this.adapterStatus)
         return this.adapterStatus.statusTag;
     }
 
@@ -120,7 +123,7 @@ export class MyExtractorAdapter<ad extends MyAdapterExtractorDefinition<Entity>>
                 id: inputEntityId,
                 entityType: this.adapterDefinition.outputType,
                 source_id: null,
-                statusTag: RegisterStatusTag.notProcessed,
+                statusTag: RegisterStatusTag.pending,
                 statusMeta: null,
                 entity: inputEntity.entity,
                 meta: inputEntity.meta
@@ -148,9 +151,9 @@ export class MyExtractorAdapter<ad extends MyAdapterExtractorDefinition<Entity>>
 
                 adapterRegister.statusMeta = validationResult.meta;
 
-            } catch (e: any) {
+            } catch (error: any) {
                 adapterRegister.statusTag = RegisterStatusTag.failed;
-                adapterRegister.statusMeta = e.message;
+                adapterRegister.statusMeta = error.message;
             }
         }
     }
@@ -172,7 +175,7 @@ export class MyExtractorAdapter<ad extends MyAdapterExtractorDefinition<Entity>>
                     toFixRegister.statusTag = RegisterStatusTag.invalid;
                 }
 
-            } catch (e) {
+            } catch (error) {
                 toFixRegister.statusTag = RegisterStatusTag.invalid;
             }
         }
@@ -181,9 +184,9 @@ export class MyExtractorAdapter<ad extends MyAdapterExtractorDefinition<Entity>>
 }
 
 export abstract class MyAdapterExtractorDefinition<input extends Entity> implements AdapterDefinition {
-    abstract definitionType: string;
-    abstract id: string;
-    abstract outputType: string
+    abstract readonly definitionType: string;
+    abstract readonly id: string;
+    abstract readonly outputType: string
     // generateID:(entity:input) => Promise<string | null>
     // getTrackFields: (entity:input) => Promise<string[]>
     abstract entitiesGet: (options: any) => Promise<InputEntity<input>[]>
@@ -196,9 +199,6 @@ export abstract class MyAdapterExtractorDefinition<input extends Entity> impleme
  * Local async step, persistance
  * row-by-row
  * 1 input 1 output
- * TODO: Each row to be loaded requires something from one or more other rows in that same set of data (for example, determining order or grouping, or a running total)
- * TODO: The ETL process is an incremental load, but the volume of data is significant enough that doing a row-by-row comparison in the transformation step does not perform well
- * TOOD: Map reduce
  */
 export class MyTransformerAdapter<ad extends MyAdapterTransformerDefinition<Entity, Entity>> extends MyAdapter<ad>{
 
@@ -229,14 +229,14 @@ export class MyTransformerAdapter<ad extends MyAdapterTransformerDefinition<Enti
                     meta: undefined,
                 }
                 this.adapterRegisters.push(adapterRegister)
-            } catch (e: any) {
+            } catch (error: any) {
                 const adapterRegister: Register<Entity> = {
                     // id: inputRegistry.id,
                     id: Math.random().toString(),
                     entityType: this.adapterDefinition.outputType,
                     source_id: inputRegistry.id,
                     statusTag: RegisterStatusTag.failed,
-                    statusMeta: e.message,
+                    statusMeta: error.message,
                     entity: null,
                     meta: undefined
                 }
@@ -249,10 +249,10 @@ export class MyTransformerAdapter<ad extends MyAdapterTransformerDefinition<Enti
 
 export abstract class MyAdapterTransformerDefinition<input extends Entity, output extends Entity> implements AdapterDefinition {
     // readonly version: string
-    abstract id: string;
-    abstract inputType: string
-    abstract outputType: string
-    abstract definitionType: string;
+    abstract readonly id: string;
+    abstract readonly inputType: string
+    abstract readonly outputType: string
+    abstract readonly definitionType: string;
     // generateID:(entity:output) => Promise<string | null>
     // getTrackFields: (entity:output) => Promise<string[]>
     abstract entityProcess: (entity: input) => Promise<output> //first time (success), on retry (failed entities)
@@ -264,7 +264,7 @@ export abstract class MyAdapterTransformerDefinition<input extends Entity, outpu
  * row-by-row
  * 1 input 1 output
  */
-export class MyConsumerAdapter<ad extends MyAdapterConsumerDefinition<Entity, Entity>> extends MyAdapter<ad>{
+export class MyConsumerAdapter<ad extends MyAdapterLoaderDefinition<Entity, Entity>> extends MyAdapter<ad>{
 
     constructor(dependencies: any) {
         super(dependencies)
@@ -293,7 +293,7 @@ export class MyConsumerAdapter<ad extends MyAdapterConsumerDefinition<Entity, En
                     meta: undefined
                 }
                 this.adapterRegisters.push(adapterRegister)
-            } catch (e) {
+            } catch (error) {
                 const adapterRegister: Register<Entity> = {
                     id: Math.random().toString(),
                     entityType: this.adapterDefinition.outputType,
@@ -309,12 +309,12 @@ export class MyConsumerAdapter<ad extends MyAdapterConsumerDefinition<Entity, En
     }
 }
 
-export abstract class MyAdapterConsumerDefinition<input extends Entity, output extends Entity> implements AdapterDefinition {
+export abstract class MyAdapterLoaderDefinition<input extends Entity, output extends Entity> implements AdapterDefinition {
     // readonly version: string
-    abstract id: string;
-    abstract inputType: string
-    abstract outputType: string
-    abstract definitionType: string;
+    abstract readonly id: string;
+    abstract readonly inputType: string
+    abstract readonly outputType: string
+    abstract readonly definitionType: string;
     // generateID:(entity:output) => Promise<string | null>
     // getTrackFields: (entity:output) => Promise<string[]>
     abstract entityLoad: (entity: input | null) => Promise<output> //first time (success), on retry (failed entities)
@@ -353,13 +353,13 @@ export class MyFlexAdapter<ad extends MyAdapterFlexDefinition<Entity>> extends M
                     meta: undefined,
                 }
                 this.adapterRegisters.push(adapterRegister)
-            } catch (e: any) {
+            } catch (error: any) {
                 const adapterRegister: Register<Entity> = {
                     id: Math.random().toString(),
                     entityType: this.adapterDefinition.outputType,
                     source_id: inputRegistry.id,
                     statusTag: RegisterStatusTag.failed,
-                    statusMeta: e.message,
+                    statusMeta: error.message,
                     entity: null,
                     meta: undefined
                 }
@@ -372,9 +372,9 @@ export class MyFlexAdapter<ad extends MyAdapterFlexDefinition<Entity>> extends M
 
 export abstract class MyAdapterFlexDefinition<output extends Entity> implements AdapterDefinition {
     // readonly version: string
-    abstract id: string;
-    abstract outputType: string
-    abstract definitionType: string;
+    abstract readonly id: string;
+    abstract readonly outputType: string
+    abstract readonly definitionType: string;
     // generateID:(entity:output) => Promise<string | null>
     // getTrackFields: (entity:output) => Promise<string[]>
     abstract registersGet: (options: Entity) => Promise<Register<Entity>[]>
@@ -389,14 +389,10 @@ export abstract class MyAdapterFlexDefinition<output extends Entity> implements 
  * Utils
  */
 
-export type AdapterDependencies<ad extends AdapterDefinition> = {
+export type MyAdapterDependencies<ad extends AdapterDefinition> = {
     adapterDefinition: ad
-    // adapterPersistance: AdapterPersistance
+    adapterPresenter: EventEmitter
     registerDataAccess: RegisterDataAccess<Entity>
-}
-
-export interface AdapterPersistance {
-    save: (AdapterStatus: AdapterStatus) => Promise<void>
 }
 
 export enum ValidationStatusTag {

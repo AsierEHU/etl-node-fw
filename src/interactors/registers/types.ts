@@ -10,7 +10,7 @@ export type Register<entity extends Entity> = {
 }
 
 export enum RegisterStatusTag {
-    notProcessed = "notProcessed",
+    pending = "pending",
     success = "success", //SW - Business
     failed = "failed",  //SW - Business
     invalid = "invalid", //Business

@@ -1,92 +1,97 @@
-// import { AdapterBuilder } from "../../adapters/builder";
-// import {AdapterDefinition, AdapterStatusTag} from "../../adapters/types";
-// import {Step, StepStatus, StepDefinition, StepStatusTag } from "../types"
+import EventEmitter from "events";
+import { AdapterBuilder } from "../../adapters/builder";
+import { AdapterDefinition, AdapterRunOptions, AdapterStatusTag } from "../../adapters/types";
+import { Step, StepStatus, StepDefinition, StepStatusTag, StepRunOptions } from "../types"
 
 
-// /**
-//  * Local async step, persistance
-//  */
-// export class MyStep<sd extends MyStepDefintion> implements Step<sd>{
+/**
+ * Local async step, persistance
+ */
+export class MyStep<sd extends MyStepDefinition> implements Step<sd>{
 
-//     private readonly stepDefinition: sd;
-//     private readonly adapterBuilder: AdapterBuilder;
-//     private readonly stepStatus: StepStatus;
-//         // entitiyFetcher: RegisterFetcher,
-//         // entitiesKeeper: EntityKeeper<e>,
+    private readonly stepDefinition: sd;
+    private readonly adapterBuilder: AdapterBuilder;
+    private readonly stepStatus: StepStatus;
+    private readonly stepPresenter: EventEmitter;
+    private readonly adapterDependencies: any;
 
-//     constructor(dependencies){
-//         this.stepDefinition = dependencies.stepDefinition;
-//         this.adapterBuilder = dependencies.adapterBuilder;
-//         this.stepStatus = {
-//             id:Math.random().toString(),
-//             definitionId: this.stepDefinition.id,
-//             statusTag: StepStatusTag.pending,
-//             statusMeta: undefined,
-//             timeStarted: undefined,
-//             timeFinished: undefined,
-//             exceptionTrace: undefined,
-//             meta: undefined
-//         }
-//     }
+    constructor(dependencies: MyStepDependencies<sd>) {
+        this.stepDefinition = dependencies.stepDefinition;
+        this.adapterBuilder = dependencies.adapterBuilder;
+        this.stepPresenter = dependencies.stepPresenter;
+        this.adapterDependencies = dependencies.adapterDependencies;
+        this.stepStatus = {
+            id: Math.random().toString(),
+            definitionId: this.stepDefinition.id,
+            definitionType: this.stepDefinition.definitionType,
+            statusTag: StepStatusTag.pending,
+            tryNumber: 0,
+            statusMeta: null,
+            timeStarted: null,
+            timeFinished: null,
+            meta: null
+        }
+        this.stepPresenter.emit("stepStatus", this.stepStatus)
+    }
 
-//     async start(runOptions?){
+    async start(runOptions?: StepRunOptions) {
+        this.stepStatus.timeStarted = new Date();
+        this.stepStatus.statusTag = StepStatusTag.active
+        this.stepStatus.meta = { runOptions };
+        this.stepPresenter.emit("stepStatus", this.stepStatus)
+        await this.tryRunAdapter(runOptions?.adapterRunOptions);
+        this.stepStatus.timeFinished = new Date();
+        this.stepPresenter.emit("stepStatus", this.stepStatus)
+        return this.stepStatus.statusTag;
+    }
 
-//         this.stepStatus.timeStarted = new Date();
-//         this.stepStatus.meta = {runOptions};
+    private async tryRunAdapter(adapterRunOptions?: AdapterRunOptions, tryNumber?: number) {
+        this.stepStatus.tryNumber = tryNumber || 1;
+        let status = null;
 
-//         await this.tryRunAdapter(runOptions.adapterRunOptions);
+        try {
+            //Inject here step context into entitiesStorage to safe inside the step context?
+            const adapter = this.adapterBuilder.buildAdapter(this.stepDefinition.adapterDefinition.id, this.adapterDependencies)
+            status = await adapter.start(adapterRunOptions)
+            this.stepStatus.statusTag = StepStatusTag.success;
+        } catch (error: any) {
+            status = AdapterStatusTag.failed
+            this.stepStatus.statusMeta = error.message
+        }
 
-//         this.stepStatus.timeFinished = new Date();
+        if (this.stepStatus.tryNumber <= this.stepDefinition.retartTries && status == AdapterStatusTag.failed) {
+            this.stepStatus.statusTag = StepStatusTag.failed;
+            await this.tryRunAdapter(adapterRunOptions, this.stepStatus.tryNumber + 1);
+        }
 
-//         //save
-//         return this.stepStatus.statusTag;
-//     }
+    }
 
-//     private async tryRunAdapter(adapterRunOptions:any, tryNumber?:number){
-//         tryNumber = tryNumber | 1;
-//         let status = null;
-//         this.stepStatus.statusTag = StepStatusTag.active
+    async getStatus() {
+        return this.stepStatus;
+    }
 
-//         try {
-//             //Inject here step context into entitiesStorage to safe inside the step context?
-//             const adapter = this.adapterBuilder.buildAdapter(this.stepDefinition.adapterDefinition.id)
-//             status = await adapter.start(adapterRunOptions)
-//             this.stepStatus.statusTag = StepStatusTag.success;
-//         } catch (error) {
-//             status = AdapterStatusTag.failed
-//             this.stepStatus.statusMeta = error.message
-//         }
+}
 
-//         if(tryNumber<=this.stepDefinition.retartTries && status == AdapterStatusTag.failed){
-//             this.stepStatus.statusTag = StepStatusTag.failed;
-//             await this.tryRunAdapter(adapterRunOptions, tryNumber++);
-//         }
-
-//     }
-
-//     async getStatus() {
-//         return this.stepStatus;
-//     }
-    
-// }
-
-// export abstract class MyStepDefintion implements StepDefinition {
-//     // readonly stepClass = "MyStep"
-//     readonly id:string
-//     readonly name:string
-//     readonly description:string
-//     readonly retartTries:number
-//     readonly skipProcessedRecords: boolean
-//     readonly adapterDefinition: AdapterDefinition
-//     readonly splitRecords: number
-// }
+export abstract class MyStepDefinition implements StepDefinition {
+    abstract readonly definitionType: string;
+    abstract readonly id: string
+    abstract readonly retartTries: number
+    abstract readonly adapterDefinition: AdapterDefinition
+}
 
 
-// /**
-//  * Utils
-//  */
+/**
+ * Utils
+ */
 
-// export interface StepDataAccess {
-//     save:(stepStatus:StepStatus)=>Promise<void>
-//     get:(id:string)=>Promise<StepStatus>
-// }
+export interface StepDataAccess {
+    save: (stepStatus: StepStatus) => Promise<void>
+    get: (id: string) => Promise<StepStatus>
+}
+
+export type MyStepDependencies<sp extends MyStepDefinition> = {
+    stepDefinition: sp
+    adapterBuilder: AdapterBuilder
+    stepPresenter: EventEmitter
+    adapterDependencies: any
+}

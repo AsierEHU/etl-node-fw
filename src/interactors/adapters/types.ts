@@ -4,7 +4,9 @@ export interface AdapterDefinition {
     readonly id: string
     readonly outputType: string
     readonly definitionType: string
+    //     abstract readonly splitRecords: number
     // version:string
+    //     abstract readonly skipProcessedRecords: boolean
 }
 
 export interface Adapter<AdapterDefinition> {
@@ -25,6 +27,8 @@ export type InputEntity<input extends Entity> = {
 
 export type AdapterStatus = {
     id: string
+    definitionId: string
+    definitionType: string
     outputType: string
     // stepStatusId: string
     // flowStatusId: string
@@ -42,7 +46,7 @@ export type AdapterStatusSummary = { //Audit
 }
 
 export enum AdapterStatusTag {
-    notProcessed = "notProcessed", //not processed yet
+    pending = "pending", //not processed yet
     success = "success", //all records success
     successPartial = "successPartial", //records exitos y records in (failed, invalid)
     skipped = "skipped", //all records skipped

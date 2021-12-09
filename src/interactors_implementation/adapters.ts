@@ -1,4 +1,4 @@
-import { MyAdapterConsumerDefinition, MyAdapterExtractorDefinition, MyAdapterTransformerDefinition, ToFixEntity, ValidationResult, ValidationStatusTag } from "../interactors/adapters/definitions/my_first_definition";
+import { MyAdapterLoaderDefinition, MyAdapterExtractorDefinition, MyAdapterTransformerDefinition, ToFixEntity, ValidationResult, ValidationStatusTag } from "../interactors/adapters/definitions/my_first_definition";
 
 
 type inputClass = {
@@ -68,11 +68,11 @@ export const testExtractor: MyAdapterExtractorDefinition<inputClass> = {
         }
     },
     async entityFix(toFixEntity: ToFixEntity<inputClass>) {
-        if (toFixEntity.validationMeta.type == "0 error") {
-            const entity = toFixEntity.entity;
-            if(!entity){
-                return null;
-            }
+        const entity = toFixEntity.entity;
+        if (!entity) {
+            return null;
+        }
+        else if (toFixEntity.validationMeta.type == "0 error") {
             entity.y = 1;
             return {
                 entity,
@@ -80,8 +80,7 @@ export const testExtractor: MyAdapterExtractorDefinition<inputClass> = {
                     note: "Fixed changing to 1"
                 }
             };
-        }
-        else {
+        }else{
             return null;
         }
     },
@@ -102,9 +101,9 @@ export const testTransformer: MyAdapterTransformerDefinition<inputClass, outputC
     },
 }
 
-export const testConsumer: MyAdapterConsumerDefinition<outputClass, resultClass> = {
-    id: "testConsumer",
-    definitionType: "MyAdapterConsumerDefinition",
+export const testLoader: MyAdapterLoaderDefinition<outputClass, resultClass> = {
+    id: "testLoader",
+    definitionType: "MyAdapterLoaderDefinition",
     inputType: "outputClass",
     outputType: "resultClass",
     async entityLoad(entity: outputClass | null) {

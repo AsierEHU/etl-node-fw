@@ -1,24 +1,19 @@
-import { Entity, RegisterDataAccess } from "../registers/types";
-import { AdapterDependencies, MyConsumerAdapter, MyExtractorAdapter, MyFlexAdapter, MyTransformerAdapter } from "./definitions/my_first_definition";
+import { MyConsumerAdapter, MyExtractorAdapter, MyFlexAdapter, MyTransformerAdapter } from "./definitions/my_first_definition";
 import { Adapter, AdapterDefinition } from "./types";
 
 export class AdapterBuilder {
     private readonly adapterDefinitionsMap: { [key: string]: AdapterDefinition }
-    private readonly registerDataAccess: RegisterDataAccess<Entity>
 
-    constructor(adapterDefinitions: Array<AdapterDefinition>, registerDataAccess: RegisterDataAccess<Entity>) {
+    constructor(adapterDefinitions: Array<AdapterDefinition>) {
         this.adapterDefinitionsMap = adapterDefinitions.reduce((map, adapterDefinition) => ({ ...map, [adapterDefinition.id]: adapterDefinition }), {})
-        this.registerDataAccess = registerDataAccess
     }
 
-    public buildAdapter(definitionId: string): Adapter<AdapterDefinition> {
+    public buildAdapter(definitionId: string, dependencies: any): Adapter<AdapterDefinition> {
         const adapterDefinition = this.adapterDefinitionsMap[definitionId];
-        const adapterDependencies: AdapterDependencies<AdapterDefinition> = {
-            adapterDefinition,
-            registerDataAccess: this.registerDataAccess
-        }
+        const adapterDependencies = dependencies;
+        adapterDependencies.adapterDefinition = adapterDefinition;
 
-        if (adapterDefinition.definitionType == "MyAdapterConsumerDefinition") {
+        if (adapterDefinition.definitionType == "MyAdapterLoaderDefinition") {
             return new MyConsumerAdapter(adapterDependencies);
         }
         else if (adapterDefinition.definitionType == "MyAdapterExtractorDefinition") {
