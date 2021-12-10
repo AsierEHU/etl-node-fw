@@ -14,9 +14,9 @@ export interface Adapter<AdapterDefinition> {
     getStatus(): Promise<AdapterStatus>
 }
 
-export type AdapterRunOptions = {
+export type AdapterRunOptions = { //filters, skips...
     mockEntities?: (EntityWithMeta<Entity> | null | Entity)[],
-    getOptions?: any //filters, skips...
+    onlyFailedEntities?: boolean
 }
 
 export type EntityWithMeta<input extends Entity> = {

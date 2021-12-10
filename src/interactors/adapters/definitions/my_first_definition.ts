@@ -3,6 +3,12 @@ import { Entity, Register, RegisterDataAccess, RegisterStatusTag } from "../../r
 import { Adapter, AdapterStatus, AdapterDefinition, EntityWithMeta, AdapterRunOptions, AdapterStatusSummary } from "../types"
 
 
+/**
+ * Local async step, persistance
+ * row-by-row
+ * Throw excepcion on unexpected error (all records fail)
+ * Check failed on handle error (1 record fails)
+ */
 abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
 
     protected readonly adapterDefinition: ad;
@@ -58,10 +64,10 @@ abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
         await this.registerDataAccess.saveAll(this.adapterRegisters, { apdaterId: this.adapterStatus.id })
     }
 
-    protected getMockedRegisters(inputEntities?: any[]): Register<Entity>[] | null {
+    protected getMockedRegisters(inputEntities?: any[]): Register<Entity>[] {
 
         if (!inputEntities)
-            return null;
+            return [];
 
         const inputEntitiesWithMeta = this.getInputFormat(inputEntities);
 
@@ -118,11 +124,33 @@ export class MyExtractorAdapter<ad extends MyAdapterExtractorDefinition<Entity>>
     }
 
     async run(runOptions?: AdapterRunOptions) {
-        const inputEntities = runOptions?.mockEntities || (await this.adapterDefinition.entitiesGet(runOptions?.getOptions));
-        const inputEntitiesWithMeta = this.getInputFormat(inputEntities)
+        const inputEntitiesWithMeta = await this.getEntities(runOptions);
         await this.initRegisters(inputEntitiesWithMeta);
         await this.validateRegisters();
         await this.fixRegisters();
+    }
+
+    private async getEntities(runOptions?: AdapterRunOptions): Promise<EntityWithMeta<Entity>[]> {
+        let inputEntities: any = [];
+
+        if (runOptions?.mockEntities) {
+            inputEntities = runOptions?.mockEntities
+        }
+        else if (runOptions?.onlyFailedEntities) {
+            const inputRegisters = (await this.registerDataAccess.getAll({
+                registerType: this.adapterDefinition.outputType,
+                //pass context (step | flow)
+                registerStatus: RegisterStatusTag.failed
+            }))
+            inputEntities = inputRegisters.map(register => register.entity)
+        }
+        else {
+            inputEntities = (await this.adapterDefinition.entitiesGet());
+        }
+
+        const inputEntitiesWithMeta = this.getInputFormat(inputEntities)
+
+        return inputEntitiesWithMeta;
     }
 
     private async initRegisters(inputEntities: EntityWithMeta<Entity>[]) {
@@ -133,7 +161,7 @@ export class MyExtractorAdapter<ad extends MyAdapterExtractorDefinition<Entity>>
                 id: inputEntityId,
                 entityType: this.adapterDefinition.outputType,
                 source_id: null,
-                statusTag: RegisterStatusTag.notProcessed,
+                statusTag: RegisterStatusTag.pending,
                 statusMeta: null,
                 entity: inputEntity.entity,
                 meta: inputEntity.meta
@@ -199,7 +227,7 @@ export abstract class MyAdapterExtractorDefinition<input extends Entity> impleme
     abstract readonly outputType: string
     // generateID:(entity:input) => Promise<string | null>
     // getTrackFields: (entity:input) => Promise<string[]>
-    abstract entitiesGet: (options: any) => Promise<(EntityWithMeta<input> | null | input)[]>
+    abstract entitiesGet: () => Promise<(EntityWithMeta<input> | null | input)[]>
     abstract entityValidate: (outputEntity: input | null) => Promise<ValidationResult> //data quality, error handling (error prevention), managin Bad Data-> triage or CleanUp
     abstract entityFix: (toFixEntity: ToFixEntity<input>) => Promise<FixedEntity<input> | null> //error handling (error response), managin Bad Data-> CleanUp
 }
@@ -217,13 +245,36 @@ export class MyTransformerAdapter<ad extends MyAdapterTransformerDefinition<Enti
     }
 
     async run(runOptions?: AdapterRunOptions) {
-        const inputRegisters =
-            this.getMockedRegisters(runOptions?.mockEntities) ||
-            (await this.registerDataAccess.getAll({ registerType: this.adapterDefinition.inputType, registerStatus: RegisterStatusTag.success }))
-        await this.processEntities(inputRegisters);
+        const inputRegisters = await this.getRegisters(runOptions)
+        await this.processRegisters(inputRegisters);
     }
 
-    private async processEntities(inputRegisters: Register<any>[]) {
+    private async getRegisters(runOptions?: AdapterRunOptions): Promise<Register<Entity>[]> {
+        let inputRegisters = [];
+
+        if (runOptions?.mockEntities) {
+            inputRegisters = this.getMockedRegisters(runOptions?.mockEntities)
+        }
+        else if (runOptions?.onlyFailedEntities) {
+            const outputRegisters = await this.registerDataAccess.getAll({
+                registerType: this.adapterDefinition.outputType,
+                //pass context (step | flow)
+                registerStatus: RegisterStatusTag.failed
+            })
+            const inputRegistersIds = outputRegisters.map(outputRegister => outputRegister.source_id)
+            inputRegisters = await this.registerDataAccess.getAll(undefined, inputRegistersIds)
+        }
+        else {
+            inputRegisters = await this.registerDataAccess.getAll({
+                registerType: this.adapterDefinition.inputType,
+                registerStatus: RegisterStatusTag.success
+            })
+        }
+
+        return inputRegisters;
+    }
+
+    private async processRegisters(inputRegisters: Register<any>[]) {
         for (const inputRegistry of inputRegisters) {
             try {
                 const inputEntity = inputRegistry.entity;
@@ -281,11 +332,35 @@ export class MyLoaderAdapter<ad extends MyAdapterLoaderDefinition<Entity, Entity
     }
 
     async run(runOptions?: AdapterRunOptions) {
-        const inputRegisters =
-            this.getMockedRegisters(runOptions?.mockEntities) ||
-            (await this.registerDataAccess.getAll({ registerType: this.adapterDefinition.inputType }))
+        const inputRegisters = await this.getRegisters(runOptions)
         await this.loadEntities(inputRegisters);
     }
+
+    private async getRegisters(runOptions?: AdapterRunOptions): Promise<Register<Entity>[]> {
+        let inputRegisters = [];
+
+        if (runOptions?.mockEntities) {
+            inputRegisters = this.getMockedRegisters(runOptions?.mockEntities)
+        }
+        else if (runOptions?.onlyFailedEntities) {
+            const outputRegisters = await this.registerDataAccess.getAll({
+                registerType: this.adapterDefinition.outputType,
+                //pass context (step | flow)
+                registerStatus: RegisterStatusTag.failed
+            })
+            const inputRegistersIds = outputRegisters.map(outputRegister => outputRegister.source_id)
+            inputRegisters = await this.registerDataAccess.getAll(undefined, inputRegistersIds)
+        }
+        else {
+            inputRegisters = await this.registerDataAccess.getAll({
+                registerType: this.adapterDefinition.inputType,
+                registerStatus: RegisterStatusTag.success
+            })
+        }
+
+        return inputRegisters;
+    }
+
 
     private async loadEntities(inputRegisters: Register<Entity>[]) {
         for (const inputRegistry of inputRegisters) {
@@ -303,13 +378,13 @@ export class MyLoaderAdapter<ad extends MyAdapterLoaderDefinition<Entity, Entity
                     meta: undefined
                 }
                 this.adapterRegisters.push(adapterRegister)
-            } catch (error) {
+            } catch (error: any) {
                 const adapterRegister: Register<Entity> = {
                     id: Math.random().toString(),
                     entityType: this.adapterDefinition.outputType,
                     source_id: inputRegistry.id,
                     statusTag: RegisterStatusTag.failed,
-                    statusMeta: undefined,
+                    statusMeta: error.message,
                     entity: null,
                     meta: undefined
                 }
@@ -343,11 +418,33 @@ export class MyFlexAdapter<ad extends MyAdapterFlexDefinition<Entity>> extends M
     }
 
     async run(runOptions?: AdapterRunOptions) {
-        const inputRegisters = this.getMockedRegisters(runOptions?.mockEntities) || (await this.adapterDefinition.registersGet(runOptions?.getOptions));
-        await this.processEntities(inputRegisters);
+        const inputRegisters = await this.getRegisters(runOptions);
+        await this.processRegisters(inputRegisters);
     }
 
-    private async processEntities(inputRegisters: Register<Entity>[]) {
+    private async getRegisters(runOptions?: AdapterRunOptions): Promise<Register<Entity>[]> {
+        let inputRegisters = [];
+
+        if (runOptions?.mockEntities) {
+            inputRegisters = this.getMockedRegisters(runOptions?.mockEntities)
+        }
+        else if (runOptions?.onlyFailedEntities) {
+            const outputRegisters = (await this.registerDataAccess.getAll({
+                registerType: this.adapterDefinition.outputType,
+                //pass context (step | flow)
+                registerStatus: RegisterStatusTag.failed
+            }))
+            const inputRegistersIds = outputRegisters.map(outputRegister => outputRegister.source_id)
+            inputRegisters = await this.registerDataAccess.getAll(undefined, inputRegistersIds)
+        }
+        else {
+            inputRegisters = await this.adapterDefinition.registersGet()
+        }
+
+        return inputRegisters;
+    }
+
+    private async processRegisters(inputRegisters: Register<Entity>[]) {
         for (const inputRegistry of inputRegisters) {
             try {
                 const inputEntity = inputRegistry.entity;
@@ -387,7 +484,7 @@ export abstract class MyAdapterFlexDefinition<output extends Entity> implements 
     abstract readonly definitionType: string;
     // generateID:(entity:output) => Promise<string | null>
     // getTrackFields: (entity:output) => Promise<string[]>
-    abstract registersGet: (options: Entity) => Promise<Register<Entity>[]>
+    abstract registersGet: () => Promise<Register<Entity>[]>
     abstract entityProcess: (entity: Entity | null) => Promise<output> //first time (success), on retry (failed entities)
 }
 

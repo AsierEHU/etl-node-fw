@@ -23,7 +23,7 @@ export const testExtractor: MyAdapterExtractorDefinition<inputClass> = {
     id: "testExtractor",
     definitionType: "MyAdapterExtractorDefinition",
     outputType: "inputClass",
-    async entitiesGet(options: any) {
+    async entitiesGet() {
         const rawMockedInput = [
             {
                 entity: {

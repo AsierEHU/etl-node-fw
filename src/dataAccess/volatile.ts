@@ -1,53 +1,13 @@
 import { Register, RegisterDataAccess, RegisterDataContext, RegisterDataFilter } from "../interactors/registers/types";
 
-
-// export class VolatileFlowDataAccess implements FlowDataAccess{
-
-//     private repo = {};    
-
-//     async save(flowData: FlowData){
-//         this.repo[flowData.id] = flowData;
-//     }
-
-//     async get(id:string){
-//         return this.repo[id];
-//     }
-// }
-
-
-// export class VolatileStepDataAccess implements StepDataAccess{
-
-//     private repo = {};    
-
-//     async save(stepStatus:StepStatus){
-//         this.repo[stepStatus.id] = stepStatus;
-//     }
-
-//     async get(id:string){
-//         return this.repo[id];
-//     }
-// }
-
-
-// export class VolatileAdapterDataAccess implements AdapterDataAccess{
-
-//     private repo = {};    
-
-//     async save(stepStatus:StepStatus){
-//         this.repo[stepStatus.id] = stepStatus;
-//     }
-
-//     async get(id:string){
-//         return this.repo[id];
-//     }
-// }
-
 export class VolatileRegisterDataAccess implements RegisterDataAccess<any>{
 
-    private repo: { [Properties in keyof string as string]: {
-        register: Register<any>,
-        context: RegisterDataContext
-    } };
+    private repo: {
+        [x: string]: {
+            register: Register<any>,
+            context: RegisterDataContext
+        }
+    };
 
     constructor(dependencies?: any) {
         this.repo = dependencies?.repo || {}

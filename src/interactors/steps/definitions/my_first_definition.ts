@@ -54,18 +54,27 @@ export class MyStep<sd extends MyStepDefinition> implements Step<sd>{
             rows_invalid: 0,
             rows_skipped: 0
         };
+        const adapter = this.adapterBuilder.buildAdapter(this.stepDefinition.adapterDefinition.id, this.adapterDependencies)
 
         try {
             //TODO: Inject here step context into entitiesStorage to safe inside the step context?
-            //TODO: Add run only with failed records
             //TODO: same adapter or other adapter?
-            const adapter = this.adapterBuilder.buildAdapter(this.stepDefinition.adapterDefinition.id, this.adapterDependencies)
             statusSummary = await adapter.start(adapterRunOptions)
         } catch (error: any) {
             this.stepStatus.statusMeta = error.message
+            if (this.shouldRetry()) {
+                await this.tryRunAdapter(adapterRunOptions, this.stepStatus.tryNumber + 1);
+            }
         }
 
-        if (this.shouldRestart(statusSummary) && this.stepStatus.tryNumber <= this.stepDefinition.retartTries) {
+        if (this.shouldRestartFailedEntities(statusSummary)) {
+            if (adapterRunOptions) {
+                adapterRunOptions.onlyFailedEntities = true;
+            } else {
+                adapterRunOptions = {
+                    onlyFailedEntities: true
+                }
+            }
             await this.tryRunAdapter(adapterRunOptions, this.stepStatus.tryNumber + 1);
         }
         else {
@@ -75,13 +84,16 @@ export class MyStep<sd extends MyStepDefinition> implements Step<sd>{
                 this.stepStatus.statusTag = StepStatusTag.success;
             }
         }
-
     }
 
-    private shouldRestart(statusSummary: AdapterStatusSummary): boolean {
-        if (statusSummary.rows_failed > 0)
+    private shouldRestartFailedEntities(statusSummary: AdapterStatusSummary): boolean {
+        if (statusSummary.rows_failed > 0 && this.shouldRetry())
             return true
         return false
+    }
+
+    private shouldRetry(): boolean {
+        return this.stepStatus.tryNumber <= this.stepDefinition.retartTries
     }
 
     private isFailedStatus(statusSummary: AdapterStatusSummary): boolean {

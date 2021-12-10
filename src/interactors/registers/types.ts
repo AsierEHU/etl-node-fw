@@ -10,7 +10,7 @@ export type Register<entity extends Entity> = {
 }
 
 export enum RegisterStatusTag {
-    notProcessed = "notProcessed",
+    pending = "pending",
     success = "success", //SW - Business
     failed = "failed",  //SW - Business
     invalid = "invalid", //Business
@@ -21,7 +21,7 @@ export interface RegisterDataAccess<entity extends Entity> {//For a specific con
     save: (register: Register<entity>, context: RegisterDataContext) => Promise<void>
     saveAll: (registers: Register<entity>[], context: RegisterDataContext) => Promise<void>
     get: (id: string) => Promise<Register<entity> | null>
-    getAll: (filter?: RegisterDataFilter) => Promise<Register<entity>[]>
+    getAll: (filter?: RegisterDataFilter, registersIds?: (string | null)[]) => Promise<Register<entity>[]>
 }
 
 export type RegisterDataContext = {
@@ -38,5 +38,5 @@ export type RegisterDataFilter = {
     registerStatus?: RegisterStatusTag
 }
 
-export interface Entity{
+export interface Entity {
 }
