@@ -1,4 +1,4 @@
-import { Entity } from "../registers/types"
+import { Entity, RegisterDataContext } from "../registers/types"
 
 export interface AdapterDefinition {
     readonly id: string
@@ -24,16 +24,14 @@ export type EntityWithMeta<input extends Entity> = {
     meta: any,
 }
 
-
 export type AdapterStatus = {
     id: string
     definitionId: string
     definitionType: string
     outputType: string
-    // stepStatusId: string
-    // flowStatusId: string
     statusSummary: AdapterStatusSummary | null,
     meta: any //save here for example every info need for final step (Alerts, csv name...)
+    syncContext: RegisterDataContext
 }
 
 export type AdapterStatusSummary = { //Audit
@@ -42,4 +40,9 @@ export type AdapterStatusSummary = { //Audit
     rows_failed: number
     rows_invalid: number
     rows_skipped: number
+}
+
+export interface AdapterDependencies<ad extends AdapterDefinition> {
+    adapterDefinition: ad
+    syncContext?: RegisterDataContext
 }

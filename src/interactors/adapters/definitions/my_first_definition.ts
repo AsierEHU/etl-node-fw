@@ -1,6 +1,6 @@
 import EventEmitter from "events";
-import { Entity, Register, RegisterDataAccess, RegisterStatusTag } from "../../registers/types";
-import { Adapter, AdapterStatus, AdapterDefinition, EntityWithMeta, AdapterRunOptions, AdapterStatusSummary } from "../types"
+import { Entity, Register, RegisterDataAccess, RegisterDataContext, RegisterStatusTag } from "../../registers/types";
+import { Adapter, AdapterStatus, AdapterDefinition, EntityWithMeta, AdapterRunOptions, AdapterStatusSummary, AdapterDependencies } from "../types"
 
 
 /**
@@ -16,6 +16,7 @@ abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
     protected readonly adapterPresenter: EventEmitter
     protected readonly registerDataAccess: RegisterDataAccess<Entity>;
     protected readonly adapterStatus: AdapterStatus
+    protected readonly syncUpperContext?: RegisterDataContext
 
 
     constructor(dependencies: MyAdapterDependencies<ad>) {
@@ -23,27 +24,30 @@ abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
         this.adapterDefinition = dependencies.adapterDefinition;
         this.adapterPresenter = dependencies.adapterPresenter;
         this.registerDataAccess = dependencies.registerDataAccess;
+        this.syncUpperContext = dependencies.syncContext;
+        const id = Math.random().toString();
+
         this.adapterStatus = {
-            id: Math.random().toString(),
+            id,
             definitionId: this.adapterDefinition.id,
             definitionType: this.adapterDefinition.definitionType,
             outputType: this.adapterDefinition.outputType,
             statusSummary: null,
             meta: null,
+            syncContext: { ...this.syncUpperContext, apdaterId: id }
         }
         this.adapterPresenter.emit("adapterStatus", this.adapterStatus)
     }
 
     async start(runOptions?: AdapterRunOptions): Promise<AdapterStatusSummary> {
         await this.run(runOptions);
-        await this.saveRegisters();
         this.adapterStatus.statusSummary = this.calculateSummary();
         this.adapterStatus.meta = { runOptions }
         this.adapterPresenter.emit("adapterStatus", this.adapterStatus)
         return this.adapterStatus.statusSummary;
     }
 
-    abstract run(runOptions?: AdapterRunOptions): Promise<void>
+    protected abstract run(runOptions?: AdapterRunOptions): Promise<void>
 
     private calculateSummary(): AdapterStatusSummary {
         const statusSummary = {
@@ -60,8 +64,12 @@ abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
     //     await this.adapterPersistance.save(this.adapterStatus)
     // }
 
-    private async saveRegisters() {
-        await this.registerDataAccess.saveAll(this.adapterRegisters, { apdaterId: this.adapterStatus.id })
+    protected async saveRegisters() {
+        await this.registerDataAccess.saveAll(this.adapterRegisters, this.adapterStatus.syncContext)
+    }
+
+    protected async saveRegister(register: Register<Entity>) {
+        await this.registerDataAccess.save(register, this.adapterStatus.syncContext)
     }
 
     protected getMockedRegisters(inputEntities?: any[]): Register<Entity>[] {
@@ -128,6 +136,7 @@ export class MyExtractorAdapter<ad extends MyAdapterExtractorDefinition<Entity>>
         await this.initRegisters(inputEntitiesWithMeta);
         await this.validateRegisters();
         await this.fixRegisters();
+        await this.saveRegisters();
     }
 
     private async getEntities(runOptions?: AdapterRunOptions): Promise<EntityWithMeta<Entity>[]> {
@@ -139,8 +148,8 @@ export class MyExtractorAdapter<ad extends MyAdapterExtractorDefinition<Entity>>
         else if (runOptions?.onlyFailedEntities) {
             const inputRegisters = (await this.registerDataAccess.getAll({
                 registerType: this.adapterDefinition.outputType,
-                //pass context (step | flow)
-                registerStatus: RegisterStatusTag.failed
+                registerStatus: RegisterStatusTag.failed,
+                flowId: this.adapterStatus.syncContext.flowId
             }))
             inputEntities = inputRegisters.map(register => register.entity)
         }
@@ -247,6 +256,7 @@ export class MyTransformerAdapter<ad extends MyAdapterTransformerDefinition<Enti
     async run(runOptions?: AdapterRunOptions) {
         const inputRegisters = await this.getRegisters(runOptions)
         await this.processRegisters(inputRegisters);
+        await this.saveRegisters();
     }
 
     private async getRegisters(runOptions?: AdapterRunOptions): Promise<Register<Entity>[]> {
@@ -258,16 +268,19 @@ export class MyTransformerAdapter<ad extends MyAdapterTransformerDefinition<Enti
         else if (runOptions?.onlyFailedEntities) {
             const outputRegisters = await this.registerDataAccess.getAll({
                 registerType: this.adapterDefinition.outputType,
-                //pass context (step | flow)
-                registerStatus: RegisterStatusTag.failed
+                registerStatus: RegisterStatusTag.failed,
+                flowId: this.adapterStatus.syncContext.flowId
             })
             const inputRegistersIds = outputRegisters.map(outputRegister => outputRegister.source_id) as string[]
-            inputRegisters = await this.registerDataAccess.getAll(undefined, inputRegistersIds)
+            inputRegisters = await this.registerDataAccess.getAll({
+                flowId: this.adapterStatus.syncContext.flowId
+            }, inputRegistersIds)
         }
         else {
             inputRegisters = await this.registerDataAccess.getAll({
                 registerType: this.adapterDefinition.inputType,
-                registerStatus: RegisterStatusTag.success
+                registerStatus: RegisterStatusTag.success,
+                flowId: this.adapterStatus.syncContext.flowId
             })
         }
 
@@ -333,7 +346,7 @@ export class MyLoaderAdapter<ad extends MyAdapterLoaderDefinition<Entity, Entity
 
     async run(runOptions?: AdapterRunOptions) {
         const inputRegisters = await this.getRegisters(runOptions)
-        await this.loadEntities(inputRegisters);
+        await this.loadAndSaveRegisters(inputRegisters);
     }
 
     private async getRegisters(runOptions?: AdapterRunOptions): Promise<Register<Entity>[]> {
@@ -345,16 +358,19 @@ export class MyLoaderAdapter<ad extends MyAdapterLoaderDefinition<Entity, Entity
         else if (runOptions?.onlyFailedEntities) {
             const outputRegisters = await this.registerDataAccess.getAll({
                 registerType: this.adapterDefinition.outputType,
-                //pass context (step | flow)
-                registerStatus: RegisterStatusTag.failed
+                registerStatus: RegisterStatusTag.failed,
+                flowId: this.adapterStatus.syncContext.flowId
             })
             const inputRegistersIds = outputRegisters.map(outputRegister => outputRegister.source_id) as string[]
-            inputRegisters = await this.registerDataAccess.getAll(undefined, inputRegistersIds)
+            inputRegisters = await this.registerDataAccess.getAll({
+                flowId: this.adapterStatus.syncContext.flowId
+            }, inputRegistersIds)
         }
         else {
             inputRegisters = await this.registerDataAccess.getAll({
                 registerType: this.adapterDefinition.inputType,
-                registerStatus: RegisterStatusTag.success
+                registerStatus: RegisterStatusTag.success,
+                flowId: this.adapterStatus.syncContext.flowId
             })
         }
 
@@ -362,7 +378,7 @@ export class MyLoaderAdapter<ad extends MyAdapterLoaderDefinition<Entity, Entity
     }
 
 
-    private async loadEntities(inputRegisters: Register<Entity>[]) {
+    private async loadAndSaveRegisters(inputRegisters: Register<Entity>[]) {
         for (const inputRegistry of inputRegisters) {
             try {
                 const inputEntity = inputRegistry.entity;
@@ -378,6 +394,7 @@ export class MyLoaderAdapter<ad extends MyAdapterLoaderDefinition<Entity, Entity
                     meta: undefined
                 }
                 this.adapterRegisters.push(adapterRegister)
+                await this.saveRegister(adapterRegister);
             } catch (error: any) {
                 const adapterRegister: Register<Entity> = {
                     id: Math.random().toString(),
@@ -389,6 +406,7 @@ export class MyLoaderAdapter<ad extends MyAdapterLoaderDefinition<Entity, Entity
                     meta: undefined
                 }
                 this.adapterRegisters.push(adapterRegister)
+                await this.saveRegister(adapterRegister);
             }
         }
     }
@@ -496,8 +514,7 @@ export abstract class MyAdapterFlexDefinition<output extends Entity> implements 
  * Utils
  */
 
-export type MyAdapterDependencies<ad extends AdapterDefinition> = {
-    adapterDefinition: ad
+export interface MyAdapterDependencies<ad extends AdapterDefinition> extends AdapterDependencies<ad> {
     adapterPresenter: EventEmitter
     registerDataAccess: RegisterDataAccess<Entity>
 }

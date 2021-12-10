@@ -1,7 +1,8 @@
 import EventEmitter from "events";
 import { AdapterBuilder } from "../../adapters/builder";
-import { AdapterDefinition, AdapterRunOptions, AdapterStatusSummary } from "../../adapters/types";
-import { Step, StepStatus, StepDefinition, StepStatusTag, StepRunOptions } from "../types"
+import { AdapterDefinition, AdapterDependencies, AdapterRunOptions, AdapterStatusSummary } from "../../adapters/types";
+import { RegisterDataContext } from "../../registers/types";
+import { Step, StepStatus, StepDefinition, StepStatusTag, StepRunOptions, StepDependencies } from "../types"
 
 
 /**
@@ -13,15 +14,17 @@ export class MyStep<sd extends MyStepDefinition> implements Step<sd>{
     private readonly adapterBuilder: AdapterBuilder;
     private readonly stepStatus: StepStatus;
     private readonly stepPresenter: EventEmitter;
-    private readonly adapterDependencies: any;
+    private readonly adapterDependencies: AdapterDependencies<AdapterDefinition>;
+    protected readonly syncUpperContext: RegisterDataContext
 
     constructor(dependencies: MyStepDependencies<sd>) {
         this.stepDefinition = dependencies.stepDefinition;
         this.adapterBuilder = dependencies.adapterBuilder;
         this.stepPresenter = dependencies.stepPresenter;
-        this.adapterDependencies = dependencies.adapterDependencies;
+        this.syncUpperContext = dependencies.syncContext;
+        const id = Math.random().toString();
         this.stepStatus = {
-            id: Math.random().toString(),
+            id,
             definitionId: this.stepDefinition.id,
             definitionType: this.stepDefinition.definitionType,
             statusTag: StepStatusTag.pending,
@@ -29,8 +32,11 @@ export class MyStep<sd extends MyStepDefinition> implements Step<sd>{
             statusMeta: null,
             timeStarted: null,
             timeFinished: null,
-            meta: null
+            meta: null,
+            syncContext: { ...this.syncUpperContext, stepId: id }
         }
+        this.adapterDependencies = dependencies.adapterDependencies;
+        this.adapterDependencies.syncContext = this.stepStatus.syncContext;
         this.stepPresenter.emit("stepStatus", this.stepStatus)
     }
 
@@ -57,7 +63,6 @@ export class MyStep<sd extends MyStepDefinition> implements Step<sd>{
         const adapter = this.adapterBuilder.buildAdapter(this.stepDefinition.adapterDefinition.id, this.adapterDependencies)
 
         try {
-            //TODO: Inject here step context into entitiesStorage to safe inside the step context?
             //TODO: same adapter or other adapter?
             statusSummary = await adapter.start(adapterRunOptions)
         } catch (error: any) {
@@ -127,8 +132,7 @@ export interface StepDataAccess {
     get: (id: string) => Promise<StepStatus>
 }
 
-export type MyStepDependencies<sp extends MyStepDefinition> = {
-    stepDefinition: sp
+export interface MyStepDependencies<sp extends MyStepDefinition> extends StepDependencies<sp> {
     adapterBuilder: AdapterBuilder
     stepPresenter: EventEmitter
     adapterDependencies: any
