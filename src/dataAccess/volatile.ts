@@ -30,7 +30,16 @@ export class VolatileRegisterDataAccess implements RegisterDataAccess<any>{
         }
     };
 
-    async getAll(filter?: RegisterDataFilter) {
+    async getAll(filter?: RegisterDataFilter, registersIds?: string[]) {
+
+        if (registersIds) {
+            const registers = [];
+            for (const id of registersIds) {
+                registers.push(await this.get(id))
+            }
+            return registers;
+        }
+
         let repoRegisters = Object.values(this.repo);
 
         if (filter?.apdaterId)

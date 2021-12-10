@@ -261,7 +261,7 @@ export class MyTransformerAdapter<ad extends MyAdapterTransformerDefinition<Enti
                 //pass context (step | flow)
                 registerStatus: RegisterStatusTag.failed
             })
-            const inputRegistersIds = outputRegisters.map(outputRegister => outputRegister.source_id)
+            const inputRegistersIds = outputRegisters.map(outputRegister => outputRegister.source_id) as string[]
             inputRegisters = await this.registerDataAccess.getAll(undefined, inputRegistersIds)
         }
         else {
@@ -348,7 +348,7 @@ export class MyLoaderAdapter<ad extends MyAdapterLoaderDefinition<Entity, Entity
                 //pass context (step | flow)
                 registerStatus: RegisterStatusTag.failed
             })
-            const inputRegistersIds = outputRegisters.map(outputRegister => outputRegister.source_id)
+            const inputRegistersIds = outputRegisters.map(outputRegister => outputRegister.source_id) as string[]
             inputRegisters = await this.registerDataAccess.getAll(undefined, inputRegistersIds)
         }
         else {
@@ -434,7 +434,7 @@ export class MyFlexAdapter<ad extends MyAdapterFlexDefinition<Entity>> extends M
                 //pass context (step | flow)
                 registerStatus: RegisterStatusTag.failed
             }))
-            const inputRegistersIds = outputRegisters.map(outputRegister => outputRegister.source_id)
+            const inputRegistersIds = outputRegisters.map(outputRegister => outputRegister.source_id) as string[]
             inputRegisters = await this.registerDataAccess.getAll(undefined, inputRegistersIds)
         }
         else {

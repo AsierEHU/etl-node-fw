@@ -21,7 +21,7 @@ export interface RegisterDataAccess<entity extends Entity> {//For a specific con
     save: (register: Register<entity>, context: RegisterDataContext) => Promise<void>
     saveAll: (registers: Register<entity>[], context: RegisterDataContext) => Promise<void>
     get: (id: string) => Promise<Register<entity> | null>
-    getAll: (filter?: RegisterDataFilter, registersIds?: (string | null)[]) => Promise<Register<entity>[]>
+    getAll: (filter?: RegisterDataFilter, registersIds?: string[]) => Promise<Register<entity>[]>
 }
 
 export type RegisterDataContext = {
