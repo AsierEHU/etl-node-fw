@@ -146,7 +146,7 @@ export class MyExtractorAdapter<ad extends MyAdapterExtractorDefinition<Entity>>
             const inputRegisters = (await this.registerDataAccess.getAll({
                 registerType: this.adapterDefinition.outputType,
                 registerStatus: RegisterStatusTag.failed,
-                flowId: this.adapterStatus.syncContext.flowId
+                stepId: this.adapterStatus.syncContext.stepId
             }))
             inputEntities = inputRegisters.map(register => register.entity)
         }
@@ -267,12 +267,10 @@ export class MyTransformerAdapter<ad extends MyAdapterTransformerDefinition<Enti
             const outputRegisters = await this.registerDataAccess.getAll({
                 registerType: this.adapterDefinition.outputType,
                 registerStatus: RegisterStatusTag.failed,
-                flowId: this.adapterStatus.syncContext.flowId
+                stepId: this.adapterStatus.syncContext.stepId
             })
             const inputRegistersIds = outputRegisters.map(outputRegister => outputRegister.source_id) as string[]
-            inputRegisters = await this.registerDataAccess.getAll({
-                flowId: this.adapterStatus.syncContext.flowId
-            }, inputRegistersIds)
+            inputRegisters = await this.registerDataAccess.getAll(undefined, inputRegistersIds)
         }
         else {
             inputRegisters = await this.registerDataAccess.getAll({
@@ -359,12 +357,10 @@ export class MyLoaderAdapter<ad extends MyAdapterLoaderDefinition<Entity, Entity
             const outputRegisters = await this.registerDataAccess.getAll({
                 registerType: this.adapterDefinition.outputType,
                 registerStatus: RegisterStatusTag.failed,
-                flowId: this.adapterStatus.syncContext.flowId
+                stepId: this.adapterStatus.syncContext.stepId
             })
             const inputRegistersIds = outputRegisters.map(outputRegister => outputRegister.source_id) as string[]
-            inputRegisters = await this.registerDataAccess.getAll({
-                flowId: this.adapterStatus.syncContext.flowId
-            }, inputRegistersIds)
+            inputRegisters = await this.registerDataAccess.getAll(undefined, inputRegistersIds)
         }
         else {
             inputRegisters = await this.registerDataAccess.getAll({
@@ -451,8 +447,8 @@ export class MyFlexAdapter<ad extends MyAdapterFlexDefinition<Entity>> extends M
         else if (runOptions?.onlyFailedEntities) {
             const outputRegisters = (await this.registerDataAccess.getAll({
                 registerType: this.adapterDefinition.outputType,
-                //pass context (step | flow)
-                registerStatus: RegisterStatusTag.failed
+                registerStatus: RegisterStatusTag.failed,
+                stepId: this.adapterStatus.syncContext.stepId
             }))
             const inputRegistersIds = outputRegisters.map(outputRegister => outputRegister.source_id) as string[]
             inputRegisters = await this.registerDataAccess.getAll(undefined, inputRegistersIds)
