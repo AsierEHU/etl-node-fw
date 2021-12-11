@@ -1,8 +1,8 @@
 import EventEmitter from "events";
 import { AdapterBuilder } from "../../adapters/builder";
-import { AdapterDefinition, AdapterDependencies, AdapterRunOptions, AdapterStatusSummary } from "../../adapters/types";
+import { AdapterDefinition, AdapterDependencies, AdapterRunOptions } from "../../adapters/types";
 import { RegisterDataContext } from "../../registers/types";
-import { Step, StepStatus, StepDefinition, StepStatusTag, StepRunOptions, StepDependencies } from "../types"
+import { Step, StepStatus, StepDefinition, StepStatusTag, StepRunOptions, StepDependencies, StepStatusSummary } from "../types"
 
 
 /**
@@ -33,7 +33,14 @@ export class MyStep<sd extends MyStepDefinition> implements Step<sd>{
             timeStarted: null,
             timeFinished: null,
             meta: null,
-            syncContext: { ...this.syncUpperContext, stepId: id }
+            syncContext: { ...this.syncUpperContext, stepId: id },
+            statusSummary: {
+                output_rows: 0,
+                rows_success: 0,
+                rows_failed: 0,
+                rows_invalid: 0,
+                rows_skipped: 0
+            }
         }
         this.adapterDependencies = dependencies.adapterDependencies;
         this.adapterDependencies.syncContext = this.stepStatus.syncContext;
@@ -53,18 +60,17 @@ export class MyStep<sd extends MyStepDefinition> implements Step<sd>{
 
     private async tryRunAdapter(adapterRunOptions?: AdapterRunOptions, tryNumber?: number) {
         this.stepStatus.tryNumber = tryNumber || 1;
-        let statusSummary: AdapterStatusSummary = {
-            output_rows: 0,
-            rows_success: 0,
-            rows_failed: 0,
-            rows_invalid: 0,
-            rows_skipped: 0
-        };
         const adapter = this.adapterBuilder.buildAdapter(this.stepDefinition.adapterDefinitionId, this.adapterDependencies)
 
         try {
-            //TODO: same adapter or other adapter?
-            statusSummary = await adapter.start(adapterRunOptions)
+            const adapterStatusSummary = await adapter.start(adapterRunOptions)
+            if (adapterRunOptions?.onlyFailedEntities) {
+                this.stepStatus.statusSummary.rows_success += adapterStatusSummary.rows_success
+                this.stepStatus.statusSummary.rows_failed = adapterStatusSummary.rows_failed
+            } else {
+                this.stepStatus.statusSummary = adapterStatusSummary
+            }
+
         } catch (error: any) {
             this.stepStatus.statusMeta = error.message
             if (this.shouldRetry()) {
@@ -72,18 +78,12 @@ export class MyStep<sd extends MyStepDefinition> implements Step<sd>{
             }
         }
 
-        if (this.shouldRestartFailedEntities(statusSummary)) {
-            if (adapterRunOptions) {
-                adapterRunOptions.onlyFailedEntities = true;
-            } else {
-                adapterRunOptions = {
-                    onlyFailedEntities: true
-                }
-            }
-            await this.tryRunAdapter(adapterRunOptions, this.stepStatus.tryNumber + 1);
+        if (this.shouldRestartFailedEntities()) {
+            const restartAdapterRunOptions = { ...adapterRunOptions, onlyFailedEntities: true }
+            await this.tryRunAdapter(restartAdapterRunOptions, this.stepStatus.tryNumber + 1);
         }
         else {
-            if (this.stepDefinition.isFailedStatus(statusSummary)) {
+            if (this.stepDefinition.isFailedStatus(this.stepStatus.statusSummary)) {
                 this.stepStatus.statusTag = StepStatusTag.failed;
             } else {
                 this.stepStatus.statusTag = StepStatusTag.success;
@@ -91,10 +91,8 @@ export class MyStep<sd extends MyStepDefinition> implements Step<sd>{
         }
     }
 
-    private shouldRestartFailedEntities(statusSummary: AdapterStatusSummary): boolean {
-        if (statusSummary.rows_failed > 0 && this.shouldRetry())
-            return true
-        return false
+    private shouldRestartFailedEntities(): boolean {
+        return this.stepStatus.statusSummary.rows_failed > 0 && this.shouldRetry()
     }
 
     private shouldRetry(): boolean {
@@ -112,7 +110,7 @@ export abstract class MyStepDefinition implements StepDefinition {
     abstract readonly definitionType: string;
     abstract readonly id: string
     abstract readonly retartTries: number
-    abstract isFailedStatus(statusSummary: AdapterStatusSummary): boolean
+    abstract isFailedStatus(statusSummary: StepStatusSummary): boolean
 }
 
 

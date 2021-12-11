@@ -37,10 +37,6 @@ presenter.on("stepStatus", (stepStatus) => {
 
 async function adapterExample() {
 
-    presenter.on("adapterStatus", (adapterStatus) => {
-        console.log(adapterStatus)
-    })
-
     const adapter1 = adapterBuilder.buildAdapter("testExtractor", adapterDependencies)
     await adapter1.start();
 

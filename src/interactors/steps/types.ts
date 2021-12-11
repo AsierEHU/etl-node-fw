@@ -1,4 +1,4 @@
-import { AdapterDefinition, AdapterRunOptions } from "../adapters/types";
+import { AdapterRunOptions } from "../adapters/types";
 import { RegisterDataContext } from "../registers/types";
 
 export interface Step<sd extends StepDefinition> {
@@ -38,9 +38,18 @@ export type StepStatus = {
     // exceptionTrace: object, //debugging
     meta: any
     syncContext: RegisterDataContext
+    statusSummary: StepStatusSummary
 }
 
 export interface StepDependencies<sp extends StepDefinition> {
     stepDefinition: sp
     syncContext: RegisterDataContext
+}
+
+export type StepStatusSummary = { //Audit
+    output_rows: number
+    rows_success: number
+    rows_failed: number
+    rows_invalid: number
+    rows_skipped: number
 }
