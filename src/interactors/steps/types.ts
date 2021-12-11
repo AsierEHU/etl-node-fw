@@ -14,7 +14,7 @@ export interface StepDefinition {
     readonly id: string
     readonly definitionType: string
     // version:string
-    readonly adapterDefinition: AdapterDefinition
+    readonly adapterDefinitionId: string
     // stepClass:string
     //name or description
 }

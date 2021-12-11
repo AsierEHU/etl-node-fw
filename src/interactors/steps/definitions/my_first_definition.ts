@@ -60,7 +60,7 @@ export class MyStep<sd extends MyStepDefinition> implements Step<sd>{
             rows_invalid: 0,
             rows_skipped: 0
         };
-        const adapter = this.adapterBuilder.buildAdapter(this.stepDefinition.adapterDefinition.id, this.adapterDependencies)
+        const adapter = this.adapterBuilder.buildAdapter(this.stepDefinition.adapterDefinitionId, this.adapterDependencies)
 
         try {
             //TODO: same adapter or other adapter?
@@ -83,7 +83,7 @@ export class MyStep<sd extends MyStepDefinition> implements Step<sd>{
             await this.tryRunAdapter(adapterRunOptions, this.stepStatus.tryNumber + 1);
         }
         else {
-            if (this.isFailedStatus(statusSummary)) {
+            if (this.stepDefinition.isFailedStatus(statusSummary)) {
                 this.stepStatus.statusTag = StepStatusTag.failed;
             } else {
                 this.stepStatus.statusTag = StepStatusTag.success;
@@ -101,14 +101,6 @@ export class MyStep<sd extends MyStepDefinition> implements Step<sd>{
         return this.stepStatus.tryNumber <= this.stepDefinition.retartTries
     }
 
-    private isFailedStatus(statusSummary: AdapterStatusSummary): boolean {
-        //TODO: flexible configuration about what is failed
-        //default
-        if (statusSummary.rows_failed > 0)
-            return true
-        return false
-    }
-
     async getStatus() {
         return this.stepStatus;
     }
@@ -116,10 +108,11 @@ export class MyStep<sd extends MyStepDefinition> implements Step<sd>{
 }
 
 export abstract class MyStepDefinition implements StepDefinition {
+    abstract readonly adapterDefinitionId: string;
     abstract readonly definitionType: string;
     abstract readonly id: string
     abstract readonly retartTries: number
-    abstract readonly adapterDefinition: AdapterDefinition
+    abstract isFailedStatus(statusSummary: AdapterStatusSummary): boolean
 }
 
 
