@@ -6,6 +6,7 @@ export type Register<entity extends Entity> = {
     statusMeta: any
     entity: entity | null, //register itself
     meta: any, //save here for example every info need for final step (Alerts, csv name...)
+    context: RegisterDataContext
     // hash:string,
 }
 
@@ -18,8 +19,8 @@ export enum RegisterStatusTag {
 }
 
 export interface RegisterDataAccess<entity extends Entity> {//For a specific context
-    save: (register: Register<entity>, context: RegisterDataContext) => Promise<void>
-    saveAll: (registers: Register<entity>[], context: RegisterDataContext) => Promise<void>
+    save: (register: Register<entity>) => Promise<void>
+    saveAll: (registers: Register<entity>[]) => Promise<void>
     get: (id: string) => Promise<Register<entity> | null>
     getAll: (filter?: RegisterDataFilter, registersIds?: string[]) => Promise<Register<entity>[]>
 }
@@ -31,10 +32,10 @@ export type RegisterDataContext = {
 }
 
 export type RegisterDataFilter = {
-    registerType?: string,
     flowId?: string,
     stepId?: string,
     apdaterId?: string,
+    registerType?: string,
     registerStatus?: RegisterStatusTag
 }
 

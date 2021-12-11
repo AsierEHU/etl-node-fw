@@ -60,16 +60,12 @@ abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
         return statusSummary;
     }
 
-    // private async saveData() {
-    //     await this.adapterPersistance.save(this.adapterStatus)
-    // }
-
     protected async saveRegisters() {
-        await this.registerDataAccess.saveAll(this.adapterRegisters, this.adapterStatus.syncContext)
+        await this.registerDataAccess.saveAll(this.adapterRegisters)
     }
 
     protected async saveRegister(register: Register<Entity>) {
-        await this.registerDataAccess.save(register, this.adapterStatus.syncContext)
+        await this.registerDataAccess.save(register)
     }
 
     protected getMockedRegisters(inputEntities?: any[]): Register<Entity>[] {
@@ -87,7 +83,8 @@ abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
                 statusTag: RegisterStatusTag.success,
                 statusMeta: null,
                 entity: inputEntity.entity,
-                meta: inputEntity.meta
+                meta: inputEntity.meta,
+                context: this.adapterStatus.syncContext
             }
         })
     }
@@ -173,7 +170,8 @@ export class MyExtractorAdapter<ad extends MyAdapterExtractorDefinition<Entity>>
                 statusTag: RegisterStatusTag.pending,
                 statusMeta: null,
                 entity: inputEntity.entity,
-                meta: inputEntity.meta
+                meta: inputEntity.meta,
+                context: this.adapterStatus.syncContext
             }
             this.adapterRegisters.push(adapterRegister)
         }
@@ -301,6 +299,7 @@ export class MyTransformerAdapter<ad extends MyAdapterTransformerDefinition<Enti
                     statusMeta: undefined,
                     entity: outputEntity,
                     meta: undefined,
+                    context: this.adapterStatus.syncContext
                 }
                 this.adapterRegisters.push(adapterRegister)
             } catch (error: any) {
@@ -312,7 +311,8 @@ export class MyTransformerAdapter<ad extends MyAdapterTransformerDefinition<Enti
                     statusTag: RegisterStatusTag.failed,
                     statusMeta: error.message,
                     entity: null,
-                    meta: undefined
+                    meta: undefined,
+                    context: this.adapterStatus.syncContext
                 }
                 this.adapterRegisters.push(adapterRegister)
             }
@@ -391,7 +391,8 @@ export class MyLoaderAdapter<ad extends MyAdapterLoaderDefinition<Entity, Entity
                     statusTag: RegisterStatusTag.success,
                     statusMeta: undefined,
                     entity: outputEntity,
-                    meta: undefined
+                    meta: undefined,
+                    context: this.adapterStatus.syncContext
                 }
                 this.adapterRegisters.push(adapterRegister)
                 await this.saveRegister(adapterRegister);
@@ -403,7 +404,8 @@ export class MyLoaderAdapter<ad extends MyAdapterLoaderDefinition<Entity, Entity
                     statusTag: RegisterStatusTag.failed,
                     statusMeta: error.message,
                     entity: null,
-                    meta: undefined
+                    meta: undefined,
+                    context: this.adapterStatus.syncContext
                 }
                 this.adapterRegisters.push(adapterRegister)
                 await this.saveRegister(adapterRegister);
@@ -476,6 +478,7 @@ export class MyFlexAdapter<ad extends MyAdapterFlexDefinition<Entity>> extends M
                     statusMeta: undefined,
                     entity: outputEntity,
                     meta: undefined,
+                    context: this.adapterStatus.syncContext
                 }
                 this.adapterRegisters.push(adapterRegister)
             } catch (error: any) {
@@ -486,7 +489,8 @@ export class MyFlexAdapter<ad extends MyAdapterFlexDefinition<Entity>> extends M
                     statusTag: RegisterStatusTag.failed,
                     statusMeta: error.message,
                     entity: null,
-                    meta: undefined
+                    meta: undefined,
+                    context: this.adapterStatus.syncContext
                 }
                 this.adapterRegisters.push(adapterRegister)
             }

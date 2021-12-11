@@ -3,30 +3,24 @@ import { Register, RegisterDataAccess, RegisterDataContext, RegisterDataFilter }
 export class VolatileRegisterDataAccess implements RegisterDataAccess<any>{
 
     private repo: {
-        [x: string]: {
-            register: Register<any>,
-            context: RegisterDataContext
-        }
+        [x: string]: Register<any>
     };
 
     constructor(dependencies?: any) {
         this.repo = dependencies?.repo || {}
     }
 
-    async save(register: Register<any>, context: RegisterDataContext) {
-        this.repo[register.id] = {
-            register,
-            context,
-        }
+    async save(register: Register<any>) {
+        this.repo[register.id] = register
     };
 
     async get(id: string) {
-        return this.repo[id]?.register
+        return this.repo[id]
     }
 
-    async saveAll(registers: Register<any>[], context: RegisterDataContext) {
+    async saveAll(registers: Register<any>[]) {
         for (const register of registers) {
-            await this.save(register, context)
+            await this.save(register)
         }
     };
 
@@ -48,17 +42,12 @@ export class VolatileRegisterDataAccess implements RegisterDataAccess<any>{
             repoRegisters = repoRegisters.filter(repoRegister => repoRegister.context.stepId == filter.stepId)
         if (filter?.flowId)
             repoRegisters = repoRegisters.filter(repoRegister => repoRegister.context.flowId == filter.flowId)
-
-        let registers = repoRegisters.map(repoRegister => {
-            return repoRegister.register;
-        });
-
         if (filter?.registerType)
-            registers = registers.filter(registers => registers.entityType == filter.registerType)
+            repoRegisters = repoRegisters.filter(repoRegister => repoRegister.entityType == filter.registerType)
         if (filter?.registerStatus)
-            registers = registers.filter(registers => registers.statusTag == filter.registerStatus)
+            repoRegisters = repoRegisters.filter(repoRegister => repoRegister.statusTag == filter.registerStatus)
 
-        return registers;
+        return repoRegisters;
     };
 
 }
