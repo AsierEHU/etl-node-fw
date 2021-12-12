@@ -153,7 +153,7 @@ export class MyExtractorAdapter<ad extends MyAdapterExtractorDefinition<Entity>>
             const inputRegisters = (await this.registerDataAccess.getAll({
                 registerType: this.adapterDefinition.outputType,
                 registerStatus: RegisterStatusTag.failed,
-                stepId: this.adapterStatus.syncContext.stepId
+                ...this.syncUpperContext
             }))
             inputEntities = inputRegisters.map(register => register.entity)
         }
@@ -277,7 +277,7 @@ export class MyTransformerAdapter<ad extends MyAdapterTransformerDefinition<Enti
             const outputRegisters = await this.registerDataAccess.getAll({
                 registerType: this.adapterDefinition.outputType,
                 registerStatus: RegisterStatusTag.failed,
-                stepId: this.adapterStatus.syncContext.stepId
+                ...this.syncUpperContext
             })
             const inputRegistersIds = outputRegisters.map(outputRegister => outputRegister.source_id) as string[]
             inputRegisters = await this.registerDataAccess.getAll(undefined, inputRegistersIds)
@@ -369,7 +369,7 @@ export class MyLoaderAdapter<ad extends MyAdapterLoaderDefinition<Entity, Entity
             const outputRegisters = await this.registerDataAccess.getAll({
                 registerType: this.adapterDefinition.outputType,
                 registerStatus: RegisterStatusTag.failed,
-                stepId: this.adapterStatus.syncContext.stepId
+                ...this.syncUpperContext
             })
             const inputRegistersIds = outputRegisters.map(outputRegister => outputRegister.source_id) as string[]
             inputRegisters = await this.registerDataAccess.getAll(undefined, inputRegistersIds)
@@ -462,7 +462,7 @@ export class MyFlexAdapter<ad extends MyAdapterFlexDefinition<Entity>> extends M
             const outputRegisters = (await this.registerDataAccess.getAll({
                 registerType: this.adapterDefinition.outputType,
                 registerStatus: RegisterStatusTag.failed,
-                stepId: this.adapterStatus.syncContext.stepId
+                ...this.syncUpperContext
             }))
             const inputRegistersIds = outputRegisters.map(outputRegister => outputRegister.source_id) as string[]
             inputRegisters = await this.registerDataAccess.getAll(undefined, inputRegistersIds)
