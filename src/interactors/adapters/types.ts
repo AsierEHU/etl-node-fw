@@ -32,7 +32,7 @@ export type AdapterStatus = {
     definitionType: string
     outputType: string
     statusSummary: AdapterStatusSummary | null,
-    meta: any //save here for example every info need for final step (Alerts, csv name...)
+    runOptions: AdapterRunOptions | null
     syncContext: RegisterDataContext
 }
 

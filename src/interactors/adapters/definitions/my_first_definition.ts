@@ -33,7 +33,7 @@ abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
             definitionType: this.adapterDefinition.definitionType,
             outputType: this.adapterDefinition.outputType,
             statusSummary: null,
-            meta: null,
+            runOptions: null,
             syncContext: { ...this.syncUpperContext, apdaterId: id }
         }
         this.adapterPresenter.emit("adapterStatus", this.adapterStatus)
@@ -42,7 +42,7 @@ abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
     async start(runOptions?: AdapterRunOptions): Promise<AdapterStatusSummary> {
         await this.run(runOptions);
         this.adapterStatus.statusSummary = this.calculateSummary();
-        this.adapterStatus.meta = { runOptions }
+        this.adapterStatus.runOptions = runOptions || null;
         this.adapterPresenter.emit("adapterStatus", this.adapterStatus)
         return this.adapterStatus.statusSummary;
     }

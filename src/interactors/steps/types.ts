@@ -36,9 +36,9 @@ export type StepStatus = {
     timeStarted: Date | null  //debugging
     timeFinished: Date | null   //debugging
     // exceptionTrace: object, //debugging
-    meta: any
+    runOptions: StepRunOptions | null
     syncContext: RegisterDataContext
-    statusSummary: StepStatusSummary
+    statusSummary: StepStatusSummary | null
 }
 
 export interface StepDependencies<sp extends StepDefinition> {

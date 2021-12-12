@@ -32,15 +32,9 @@ export class MyStep<sd extends MyStepDefinition> implements Step<sd>{
             statusMeta: null,
             timeStarted: null,
             timeFinished: null,
-            meta: null,
+            runOptions: null,
             syncContext: { ...this.syncUpperContext, stepId: id },
-            statusSummary: {
-                output_rows: 0,
-                rows_success: 0,
-                rows_failed: 0,
-                rows_invalid: 0,
-                rows_skipped: 0
-            }
+            statusSummary: null
         }
         this.adapterDependencies = dependencies.adapterDependencies;
         this.adapterDependencies.syncContext = this.stepStatus.syncContext;
@@ -50,7 +44,7 @@ export class MyStep<sd extends MyStepDefinition> implements Step<sd>{
     async start(runOptions?: StepRunOptions) {
         this.stepStatus.timeStarted = new Date();
         this.stepStatus.statusTag = StepStatusTag.active
-        this.stepStatus.meta = { runOptions };
+        this.stepStatus.runOptions = runOptions || null;
         this.stepPresenter.emit("stepStatus", this.stepStatus)
         await this.tryRunAdapter(runOptions?.adapterRunOptions);
         this.stepStatus.timeFinished = new Date();
@@ -61,6 +55,16 @@ export class MyStep<sd extends MyStepDefinition> implements Step<sd>{
     private async tryRunAdapter(adapterRunOptions?: AdapterRunOptions, tryNumber?: number) {
         this.stepStatus.tryNumber = tryNumber || 1;
         const adapter = this.adapterBuilder.buildAdapter(this.stepDefinition.adapterDefinitionId, this.adapterDependencies)
+
+        if (!this.stepStatus.statusSummary) {
+            this.stepStatus.statusSummary = {
+                output_rows: 0,
+                rows_success: 0,
+                rows_failed: 0,
+                rows_invalid: 0,
+                rows_skipped: 0
+            }
+        }
 
         try {
             const adapterStatusSummary = await adapter.start(adapterRunOptions)
@@ -73,12 +77,12 @@ export class MyStep<sd extends MyStepDefinition> implements Step<sd>{
 
         } catch (error: any) {
             this.stepStatus.statusMeta = error.message
-            if (this.shouldRetry()) {
+            if (this.canRetry()) {
                 await this.tryRunAdapter(adapterRunOptions, this.stepStatus.tryNumber + 1);
             }
         }
 
-        if (this.shouldRestartFailedEntities()) {
+        if (this.stepStatus.statusSummary.rows_failed > 0 && this.canRetry()) {
             const restartAdapterRunOptions = { ...adapterRunOptions, onlyFailedEntities: true }
             await this.tryRunAdapter(restartAdapterRunOptions, this.stepStatus.tryNumber + 1);
         }
@@ -91,11 +95,7 @@ export class MyStep<sd extends MyStepDefinition> implements Step<sd>{
         }
     }
 
-    private shouldRestartFailedEntities(): boolean {
-        return this.stepStatus.statusSummary.rows_failed > 0 && this.shouldRetry()
-    }
-
-    private shouldRetry(): boolean {
+    private canRetry(): boolean {
         return this.stepStatus.tryNumber <= this.stepDefinition.retartTries
     }
 
