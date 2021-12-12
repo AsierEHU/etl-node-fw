@@ -79,7 +79,8 @@ abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
             return {
                 id: Math.random().toString(),
                 entityType: "Mocked",
-                source_id: null,
+                sourceAbsoluteId: null,
+                sourceRelativeId: null,
                 statusTag: RegisterStatusTag.success,
                 statusMeta: null,
                 entity: inputEntity.entity,
@@ -173,7 +174,8 @@ export class MyExtractorAdapter<ad extends MyAdapterExtractorDefinition<Entity>>
             const adapterRegister: Register<Entity> = {
                 id: inputEntityId,
                 entityType: this.adapterDefinition.outputType,
-                source_id: null,
+                sourceAbsoluteId: inputEntityId,
+                sourceRelativeId: inputEntityId,
                 statusTag: RegisterStatusTag.pending,
                 statusMeta: null,
                 entity: inputEntity.entity,
@@ -279,7 +281,7 @@ export class MyTransformerAdapter<ad extends MyAdapterTransformerDefinition<Enti
                 registerStatus: RegisterStatusTag.failed,
                 ...this.syncUpperContext
             })
-            const inputRegistersIds = outputRegisters.map(outputRegister => outputRegister.source_id) as string[]
+            const inputRegistersIds = outputRegisters.map(outputRegister => outputRegister.sourceRelativeId) as string[]
             inputRegisters = await this.registerDataAccess.getAll(undefined, inputRegistersIds)
         }
         else {
@@ -302,7 +304,8 @@ export class MyTransformerAdapter<ad extends MyAdapterTransformerDefinition<Enti
                     // id: await this.adapterDefinition.generateID(outputEntity),
                     id: Math.random().toString(),
                     entityType: this.adapterDefinition.outputType,
-                    source_id: inputRegistry.id,
+                    sourceAbsoluteId: inputRegistry.sourceRelativeId,
+                    sourceRelativeId: inputRegistry.id,
                     statusTag: RegisterStatusTag.success,
                     statusMeta: undefined,
                     entity: outputEntity,
@@ -315,7 +318,8 @@ export class MyTransformerAdapter<ad extends MyAdapterTransformerDefinition<Enti
                     // id: inputRegistry.id,
                     id: Math.random().toString(),
                     entityType: this.adapterDefinition.outputType,
-                    source_id: inputRegistry.id,
+                    sourceAbsoluteId: inputRegistry.sourceRelativeId,
+                    sourceRelativeId: inputRegistry.id,
                     statusTag: RegisterStatusTag.failed,
                     statusMeta: error.message,
                     entity: null,
@@ -371,7 +375,7 @@ export class MyLoaderAdapter<ad extends MyAdapterLoaderDefinition<Entity, Entity
                 registerStatus: RegisterStatusTag.failed,
                 ...this.syncUpperContext
             })
-            const inputRegistersIds = outputRegisters.map(outputRegister => outputRegister.source_id) as string[]
+            const inputRegistersIds = outputRegisters.map(outputRegister => outputRegister.sourceRelativeId) as string[]
             inputRegisters = await this.registerDataAccess.getAll(undefined, inputRegistersIds)
         }
         else {
@@ -395,7 +399,8 @@ export class MyLoaderAdapter<ad extends MyAdapterLoaderDefinition<Entity, Entity
                     // id: await this.adapterDefinition.generateID(outputEntity),
                     id: Math.random().toString(),
                     entityType: this.adapterDefinition.outputType,
-                    source_id: inputRegistry.id,
+                    sourceAbsoluteId: inputRegistry.sourceRelativeId,
+                    sourceRelativeId: inputRegistry.id,
                     statusTag: RegisterStatusTag.success,
                     statusMeta: undefined,
                     entity: outputEntity,
@@ -408,7 +413,8 @@ export class MyLoaderAdapter<ad extends MyAdapterLoaderDefinition<Entity, Entity
                 const adapterRegister: Register<Entity> = {
                     id: Math.random().toString(),
                     entityType: this.adapterDefinition.outputType,
-                    source_id: inputRegistry.id,
+                    sourceAbsoluteId: inputRegistry.sourceRelativeId,
+                    sourceRelativeId: inputRegistry.id,
                     statusTag: RegisterStatusTag.failed,
                     statusMeta: error.message,
                     entity: null,
@@ -464,7 +470,7 @@ export class MyFlexAdapter<ad extends MyAdapterFlexDefinition<Entity>> extends M
                 registerStatus: RegisterStatusTag.failed,
                 ...this.syncUpperContext
             }))
-            const inputRegistersIds = outputRegisters.map(outputRegister => outputRegister.source_id) as string[]
+            const inputRegistersIds = outputRegisters.map(outputRegister => outputRegister.sourceRelativeId) as string[]
             inputRegisters = await this.registerDataAccess.getAll(undefined, inputRegistersIds)
         }
         else {
@@ -483,7 +489,8 @@ export class MyFlexAdapter<ad extends MyAdapterFlexDefinition<Entity>> extends M
                     // id: await this.adapterDefinition.generateID(outputEntity),
                     id: Math.random().toString(),
                     entityType: this.adapterDefinition.outputType,
-                    source_id: inputRegistry.id,
+                    sourceAbsoluteId: inputRegistry.sourceRelativeId,
+                    sourceRelativeId: inputRegistry.id,
                     statusTag: RegisterStatusTag.success,
                     statusMeta: undefined,
                     entity: outputEntity,
@@ -495,7 +502,8 @@ export class MyFlexAdapter<ad extends MyAdapterFlexDefinition<Entity>> extends M
                 const adapterRegister: Register<Entity> = {
                     id: Math.random().toString(),
                     entityType: this.adapterDefinition.outputType,
-                    source_id: inputRegistry.id,
+                    sourceAbsoluteId: inputRegistry.sourceRelativeId,
+                    sourceRelativeId: inputRegistry.id,
                     statusTag: RegisterStatusTag.failed,
                     statusMeta: error.message,
                     entity: null,

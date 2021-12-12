@@ -1,7 +1,8 @@
 export type Register<entity extends Entity> = {
     id: string //datalineage, unique
     entityType: string
-    source_id: string | null //datalineage, [relative or absoulte]
+    sourceRelativeId: string | null //datalineage
+    sourceAbsoluteId: string | null //datalineage
     statusTag: RegisterStatusTag  //managing bad data
     statusMeta: any
     entity: entity | null, //register itself
