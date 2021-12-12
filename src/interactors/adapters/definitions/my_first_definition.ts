@@ -189,21 +189,30 @@ export class MyExtractorAdapter<ad extends MyAdapterExtractorDefinition<Entity>>
     private async validateRegisters() {
         for (const adapterRegister of this.adapterRegisters) {
             try {
-                const validationResult = await this.adapterDefinition.entityValidate(adapterRegister.entity);
+                const result: any = await this.adapterDefinition.entityValidate(adapterRegister.entity);
+                let validationStatusTag;
+                let validationMeta;
+                if (result.statusTag && result.meta) {
+                    validationStatusTag = result.statusTag;
+                    validationMeta = result.meta;
+                } else {
+                    validationStatusTag = result;
+                    validationMeta = null;
+                }
 
-                if (validationResult.statusTag == ValidationStatusTag.invalid) {
+                if (validationStatusTag == ValidationStatusTag.invalid) {
                     adapterRegister.statusTag = RegisterStatusTag.invalid;
                 }
 
-                else if (validationResult.statusTag == ValidationStatusTag.skipped) {
+                else if (validationStatusTag == ValidationStatusTag.skipped) {
                     adapterRegister.statusTag = RegisterStatusTag.skipped;
                 }
 
-                else if (validationResult.statusTag == ValidationStatusTag.valid) {
+                else if (validationStatusTag == ValidationStatusTag.valid) {
                     adapterRegister.statusTag = RegisterStatusTag.success;
                 }
 
-                adapterRegister.statusMeta = validationResult.meta;
+                adapterRegister.statusMeta = validationMeta;
 
             } catch (error: any) {
                 adapterRegister.statusTag = RegisterStatusTag.failed;
@@ -244,7 +253,7 @@ export abstract class MyAdapterExtractorDefinition<input extends Entity> impleme
     // generateID:(entity:input) => Promise<string | null>
     // getTrackFields: (entity:input) => Promise<string[]>
     abstract entitiesGet: () => Promise<(EntityWithMeta<input> | null | input)[]>
-    abstract entityValidate: (outputEntity: input | null) => Promise<ValidationResult> //data quality, error handling (error prevention), managin Bad Data-> triage or CleanUp
+    abstract entityValidate: (inputEntity: input | null) => Promise<ValidationResult | ValidationStatusTag> //data quality, error handling (error prevention), managin Bad Data-> triage or CleanUp
     abstract entityFix: (toFixEntity: ToFixEntity<input>) => Promise<FixedEntity<input> | null> //error handling (error response), managin Bad Data-> CleanUp
 }
 

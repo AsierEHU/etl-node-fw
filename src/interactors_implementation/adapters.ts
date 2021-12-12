@@ -66,10 +66,7 @@ export const testExtractor: MyAdapterExtractorDefinition<inputClass> = {
             };
         }
         else if (entity.y < 0) {
-            return {
-                statusTag: ValidationStatusTag.skipped,
-                meta: null
-            };
+            return ValidationStatusTag.skipped;
         }
         else if (entity.y == 0) {
             return {
@@ -82,10 +79,7 @@ export const testExtractor: MyAdapterExtractorDefinition<inputClass> = {
             };
         }
         else {
-            return {
-                statusTag: ValidationStatusTag.valid,
-                meta: null
-            };
+            return ValidationStatusTag.valid;
         }
     },
     async entityFix(toFixEntity: ToFixEntity<inputClass>) {
