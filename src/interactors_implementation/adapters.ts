@@ -1,4 +1,5 @@
-import { MyAdapterExtractorDefinition, MyAdapterLoaderDefinition, MyAdapterTransformerDefinition, ToFixEntity, ValidationStatusTag } from "../interactors/adapters/definitions/my_first_definition";
+import { MyAdapterExtractorDefinition, MyAdapterLoaderDefinition, MyAdapterTransformerDefinition } from "../interactors/adapters/definitions/myFirstDefinition/my_first_definition";
+import { ToFixEntity, ValidationStatusTag } from "../interactors/adapters/definitions/myFirstDefinition/types";
 
 
 type inputClass = {

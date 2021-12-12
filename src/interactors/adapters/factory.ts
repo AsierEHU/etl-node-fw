@@ -1,4 +1,4 @@
-import { MyLoaderAdapter, MyExtractorAdapter, MyFlexAdapter, MyTransformerAdapter } from "./definitions/my_first_definition";
+import { MyLoaderAdapter, MyExtractorAdapter, MyFlexAdapter, MyTransformerAdapter } from "./definitions/myFirstDefinition/my_first_definition";
 import { Adapter, AdapterDefinition } from "./types";
 
 export class AdapterFactory {

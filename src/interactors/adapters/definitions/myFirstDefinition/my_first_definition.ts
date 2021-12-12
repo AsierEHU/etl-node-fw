@@ -1,7 +1,11 @@
 import EventEmitter from "events";
-import { Entity, Register, RegisterDataContext, RegisterStatusTag } from "../../registers/types";
-import { Adapter, AdapterStatus, AdapterDefinition, EntityWithMeta, AdapterRunOptions, AdapterStatusSummary, AdapterDependencies } from "../types"
+import { Entity, Register, RegisterDataContext, RegisterStatusTag } from "../../../registers/types";
+import { Adapter, AdapterStatus, AdapterDefinition, EntityWithMeta, AdapterRunOptions, AdapterStatusSummary } from "../../types"
 import { v4 as uuidv4 } from 'uuid';
+import { FixedEntity, MyAdapterDependencies, RegisterDataAccess, ToFixEntity, ValidationResult, ValidationStatusTag } from "./types";
+import { getInputFormat, getMockedRegisters } from "./utils";
+
+
 
 /**
  * Local async step, persistance
@@ -68,50 +72,6 @@ abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
         await this.registerDataAccess.save(register)
     }
 
-    protected getMockedRegisters(inputEntities?: any[]): Register<Entity>[] {
-
-        if (!inputEntities)
-            return [];
-
-        const inputEntitiesWithMeta = this.getInputFormat(inputEntities);
-
-        return inputEntitiesWithMeta.map(inputEntity => {
-            return {
-                id: uuidv4(),
-                entityType: "Mocked",
-                sourceAbsoluteId: null,
-                sourceRelativeId: null,
-                statusTag: RegisterStatusTag.success,
-                statusMeta: null,
-                entity: inputEntity.entity,
-                meta: inputEntity.meta,
-                context: this.adapterStatus.syncContext
-            }
-        })
-    }
-
-    protected getInputFormat(inputEntities: any[]): EntityWithMeta<Entity>[] {
-
-        return inputEntities.map(inputEntity => {
-            if (inputEntity?.entity && inputEntity?.meta) {
-                return inputEntity;
-
-            }
-            else if (inputEntity) {
-                return {
-                    entity: inputEntity,
-                    meta: null,
-                }
-            }
-            else {
-                return {
-                    entity: null,
-                    meta: null,
-                }
-            }
-        })
-    }
-
     async getStatus() {
         return this.adapterStatus;
     }
@@ -162,7 +122,7 @@ export class MyExtractorAdapter<ad extends MyAdapterExtractorDefinition<Entity>>
             inputEntities = (await this.adapterDefinition.entitiesGet());
         }
 
-        const inputEntitiesWithMeta = this.getInputFormat(inputEntities)
+        const inputEntitiesWithMeta = getInputFormat(inputEntities)
 
         return inputEntitiesWithMeta;
     }
@@ -282,7 +242,7 @@ export class MyTransformerAdapter<ad extends MyAdapterTransformerDefinition<Enti
             inputRegisters = runOptions.registers
         }
         else if (runOptions?.mockEntities) {
-            inputRegisters = this.getMockedRegisters(runOptions?.mockEntities)
+            inputRegisters = getMockedRegisters(runOptions?.mockEntities || [], this.adapterStatus.syncContext)
         }
         else if (runOptions?.onlyFailedEntities) {
             const outputRegisters = await this.registerDataAccess.getAll({
@@ -376,7 +336,7 @@ export class MyLoaderAdapter<ad extends MyAdapterLoaderDefinition<Entity, Entity
             inputRegisters = runOptions.registers
         }
         else if (runOptions?.mockEntities) {
-            inputRegisters = this.getMockedRegisters(runOptions?.mockEntities)
+            inputRegisters = getMockedRegisters(runOptions?.mockEntities || [], this.adapterStatus.syncContext)
         }
         else if (runOptions?.onlyFailedEntities) {
             const outputRegisters = await this.registerDataAccess.getAll({
@@ -471,7 +431,7 @@ export class MyFlexAdapter<ad extends MyAdapterFlexDefinition<Entity>> extends M
             inputRegisters = runOptions.registers
         }
         else if (runOptions?.mockEntities) {
-            inputRegisters = this.getMockedRegisters(runOptions?.mockEntities)
+            inputRegisters = getMockedRegisters(runOptions?.mockEntities || [], this.adapterStatus.syncContext)
         }
         else if (runOptions?.onlyFailedEntities) {
             const outputRegisters = (await this.registerDataAccess.getAll({
@@ -535,53 +495,4 @@ export abstract class MyAdapterFlexDefinition<output extends Entity> implements 
     // getTrackFields: (entity:output) => Promise<string[]>
     abstract registersGet: () => Promise<Register<Entity>[]>
     abstract entityProcess: (entity: Entity | null) => Promise<output> //first time (success), on retry (failed entities)
-}
-
-
-
-
-
-/**
- * Utils
- */
-
-export interface MyAdapterDependencies<ad extends AdapterDefinition> extends AdapterDependencies<ad> {
-    adapterPresenter: EventEmitter
-    registerDataAccess: RegisterDataAccess<Entity>
-}
-
-export enum ValidationStatusTag {
-    valid = "valid",
-    invalid = "invalid",
-    skipped = "skipped",
-}
-
-export type ValidationResult = {
-    statusTag: ValidationStatusTag
-    meta: any
-}
-
-export type ToFixEntity<input extends Entity> = {
-    entity: input | null,
-    validationMeta: any
-}
-
-export type FixedEntity<input extends Entity> = {
-    entity: input,
-    meta: any
-}
-
-export interface RegisterDataAccess<entity extends Entity> {//For a specific context
-    save: (register: Register<entity>) => Promise<void>
-    saveAll: (registers: Register<entity>[]) => Promise<void>
-    get: (id: string) => Promise<Register<entity> | null>
-    getAll: (filter?: RegisterDataFilter, registersIds?: string[]) => Promise<Register<entity>[]>
-}
-
-export type RegisterDataFilter = {
-    flowId?: string,
-    stepId?: string,
-    apdaterId?: string,
-    registerType?: string,
-    registerStatus?: RegisterStatusTag
 }
