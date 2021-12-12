@@ -18,25 +18,10 @@ export enum RegisterStatusTag {
     skipped = "skipped", //Business
 }
 
-export interface RegisterDataAccess<entity extends Entity> {//For a specific context
-    save: (register: Register<entity>) => Promise<void>
-    saveAll: (registers: Register<entity>[]) => Promise<void>
-    get: (id: string) => Promise<Register<entity> | null>
-    getAll: (filter?: RegisterDataFilter, registersIds?: string[]) => Promise<Register<entity>[]>
-}
-
 export type RegisterDataContext = {
     flowId?: string,
     stepId?: string,
     apdaterId?: string,
-}
-
-export type RegisterDataFilter = {
-    flowId?: string,
-    stepId?: string,
-    apdaterId?: string,
-    registerType?: string,
-    registerStatus?: RegisterStatusTag
 }
 
 export interface Entity {

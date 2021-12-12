@@ -1,4 +1,4 @@
-import { Entity, RegisterDataContext } from "../registers/types"
+import { Entity, Register, RegisterDataContext } from "../registers/types"
 
 export interface AdapterDefinition {
     readonly id: string
@@ -12,10 +12,12 @@ export interface AdapterDefinition {
 export interface Adapter<AdapterDefinition> {
     start(runOptions?: AdapterRunOptions): Promise<AdapterStatusSummary> //start, if registers -> filter input by ids, if skip -> compare hash to skip
     getStatus(): Promise<AdapterStatus>
+    getRegisters(): Promise<Register<Entity>[]>
 }
 
 export type AdapterRunOptions = { //filters, skips...
     mockEntities?: (EntityWithMeta<Entity> | null | Entity)[],
+    registers?: Register<Entity>[]
     onlyFailedEntities?: boolean
 }
 

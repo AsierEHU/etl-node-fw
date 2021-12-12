@@ -1,5 +1,5 @@
 import EventEmitter from "events";
-import { Entity, Register, RegisterDataAccess, RegisterDataContext, RegisterStatusTag } from "../../registers/types";
+import { Entity, Register, RegisterDataContext, RegisterStatusTag } from "../../registers/types";
 import { Adapter, AdapterStatus, AdapterDefinition, EntityWithMeta, AdapterRunOptions, AdapterStatusSummary, AdapterDependencies } from "../types"
 
 
@@ -115,6 +115,10 @@ abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
         return this.adapterStatus;
     }
 
+    async getRegisters() {
+        return this.adapterRegisters
+    }
+
 }
 
 /**
@@ -129,17 +133,20 @@ export class MyExtractorAdapter<ad extends MyAdapterExtractorDefinition<Entity>>
     }
 
     async run(runOptions?: AdapterRunOptions) {
-        const inputEntitiesWithMeta = await this.getEntities(runOptions);
+        const inputEntitiesWithMeta = await this.inputEntities(runOptions);
         await this.initRegisters(inputEntitiesWithMeta);
         await this.validateRegisters();
         await this.fixRegisters();
         await this.saveRegisters();
     }
 
-    private async getEntities(runOptions?: AdapterRunOptions): Promise<EntityWithMeta<Entity>[]> {
+    private async inputEntities(runOptions?: AdapterRunOptions): Promise<EntityWithMeta<Entity>[]> {
         let inputEntities: any = [];
 
-        if (runOptions?.mockEntities) {
+        if (runOptions?.registers) {
+            inputEntities = runOptions.registers.map(register => register.entity)
+        }
+        else if (runOptions?.mockEntities) {
             inputEntities = runOptions?.mockEntities
         }
         else if (runOptions?.onlyFailedEntities) {
@@ -215,7 +222,7 @@ export class MyExtractorAdapter<ad extends MyAdapterExtractorDefinition<Entity>>
                 if (fixedEntity) {
                     toFixRegister.entity = fixedEntity.entity;
                     toFixRegister.statusTag = RegisterStatusTag.success;
-                    toFixRegister.statusMeta = fixedEntity.meta;
+                    toFixRegister.statusMeta = { ...toFixRegister.statusMeta, fixMeta: fixedEntity.meta }
                 } else {
                     toFixRegister.statusTag = RegisterStatusTag.invalid;
                 }
@@ -252,15 +259,18 @@ export class MyTransformerAdapter<ad extends MyAdapterTransformerDefinition<Enti
     }
 
     async run(runOptions?: AdapterRunOptions) {
-        const inputRegisters = await this.getRegisters(runOptions)
+        const inputRegisters = await this.inputRegisters(runOptions)
         await this.processRegisters(inputRegisters);
         await this.saveRegisters();
     }
 
-    private async getRegisters(runOptions?: AdapterRunOptions): Promise<Register<Entity>[]> {
+    private async inputRegisters(runOptions?: AdapterRunOptions): Promise<Register<Entity>[]> {
         let inputRegisters = [];
 
-        if (runOptions?.mockEntities) {
+        if (runOptions?.registers) {
+            inputRegisters = runOptions.registers
+        }
+        else if (runOptions?.mockEntities) {
             inputRegisters = this.getMockedRegisters(runOptions?.mockEntities)
         }
         else if (runOptions?.onlyFailedEntities) {
@@ -343,14 +353,16 @@ export class MyLoaderAdapter<ad extends MyAdapterLoaderDefinition<Entity, Entity
     }
 
     async run(runOptions?: AdapterRunOptions) {
-        const inputRegisters = await this.getRegisters(runOptions)
+        const inputRegisters = await this.inputRegisters(runOptions)
         await this.loadAndSaveRegisters(inputRegisters);
     }
 
-    private async getRegisters(runOptions?: AdapterRunOptions): Promise<Register<Entity>[]> {
+    private async inputRegisters(runOptions?: AdapterRunOptions): Promise<Register<Entity>[]> {
         let inputRegisters = [];
-
-        if (runOptions?.mockEntities) {
+        if (runOptions?.registers) {
+            inputRegisters = runOptions.registers
+        }
+        else if (runOptions?.mockEntities) {
             inputRegisters = this.getMockedRegisters(runOptions?.mockEntities)
         }
         else if (runOptions?.onlyFailedEntities) {
@@ -434,14 +446,16 @@ export class MyFlexAdapter<ad extends MyAdapterFlexDefinition<Entity>> extends M
     }
 
     async run(runOptions?: AdapterRunOptions) {
-        const inputRegisters = await this.getRegisters(runOptions);
+        const inputRegisters = await this.inputRegisters(runOptions);
         await this.processRegisters(inputRegisters);
     }
 
-    private async getRegisters(runOptions?: AdapterRunOptions): Promise<Register<Entity>[]> {
+    private async inputRegisters(runOptions?: AdapterRunOptions): Promise<Register<Entity>[]> {
         let inputRegisters = [];
-
-        if (runOptions?.mockEntities) {
+        if (runOptions?.registers) {
+            inputRegisters = runOptions.registers
+        }
+        else if (runOptions?.mockEntities) {
             inputRegisters = this.getMockedRegisters(runOptions?.mockEntities)
         }
         else if (runOptions?.onlyFailedEntities) {
@@ -538,4 +552,19 @@ export type ToFixEntity<input extends Entity> = {
 export type FixedEntity<input extends Entity> = {
     entity: input,
     meta: any
+}
+
+export interface RegisterDataAccess<entity extends Entity> {//For a specific context
+    save: (register: Register<entity>) => Promise<void>
+    saveAll: (registers: Register<entity>[]) => Promise<void>
+    get: (id: string) => Promise<Register<entity> | null>
+    getAll: (filter?: RegisterDataFilter, registersIds?: string[]) => Promise<Register<entity>[]>
+}
+
+export type RegisterDataFilter = {
+    flowId?: string,
+    stepId?: string,
+    apdaterId?: string,
+    registerType?: string,
+    registerStatus?: RegisterStatusTag
 }
