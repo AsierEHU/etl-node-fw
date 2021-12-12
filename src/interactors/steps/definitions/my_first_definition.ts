@@ -1,5 +1,5 @@
 import EventEmitter from "events";
-import { AdapterBuilder } from "../../adapters/builder";
+import { AdapterFactory } from "../../adapters/factory";
 import { AdapterDefinition, AdapterDependencies, AdapterRunOptions } from "../../adapters/types";
 import { RegisterDataContext } from "../../registers/types";
 import { Step, StepStatus, StepDefinition, StepStatusTag, StepRunOptions, StepDependencies, StepStatusSummary } from "../types"
@@ -11,7 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 export class MyStep<sd extends MyStepDefinition> implements Step<sd>{
 
     private readonly stepDefinition: sd;
-    private readonly adapterBuilder: AdapterBuilder;
+    private readonly adapterBuilder: AdapterFactory;
     private readonly stepStatus: StepStatus;
     private readonly stepPresenter: EventEmitter;
     private readonly adapterDependencies: AdapterDependencies<AdapterDefinition>;
@@ -54,7 +54,7 @@ export class MyStep<sd extends MyStepDefinition> implements Step<sd>{
 
     private async tryRunAdapter(adapterRunOptions?: AdapterRunOptions, tryNumber?: number) {
         this.stepStatus.tryNumber = tryNumber || 1;
-        const adapter = this.adapterBuilder.buildAdapter(this.stepDefinition.adapterDefinitionId, this.adapterDependencies)
+        const adapter = this.adapterBuilder.createAdapter(this.stepDefinition.adapterDefinitionId, this.adapterDependencies)
 
         if (!this.stepStatus.statusSummary) {
             this.stepStatus.statusSummary = {
@@ -124,7 +124,7 @@ export interface StepDataAccess {
 }
 
 export interface MyStepDependencies<sp extends MyStepDefinition> extends StepDependencies<sp> {
-    adapterBuilder: AdapterBuilder
+    adapterBuilder: AdapterFactory
     stepPresenter: EventEmitter
     adapterDependencies: any
 }

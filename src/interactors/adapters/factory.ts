@@ -1,14 +1,14 @@
 import { MyLoaderAdapter, MyExtractorAdapter, MyFlexAdapter, MyTransformerAdapter } from "./definitions/my_first_definition";
 import { Adapter, AdapterDefinition } from "./types";
 
-export class AdapterBuilder {
+export class AdapterFactory {
     private readonly adapterDefinitionsMap: { [key: string]: AdapterDefinition }
 
     constructor(adapterDefinitions: Array<AdapterDefinition>) {
         this.adapterDefinitionsMap = adapterDefinitions.reduce((map, adapterDefinition) => ({ ...map, [adapterDefinition.id]: adapterDefinition }), {})
     }
 
-    public buildAdapter(definitionId: string, dependencies: any): Adapter<AdapterDefinition> {
+    public createAdapter(definitionId: string, dependencies: any): Adapter<AdapterDefinition> {
         const adapterDefinition = this.adapterDefinitionsMap[definitionId];
         const adapterDependencies = dependencies;
         adapterDependencies.adapterDefinition = adapterDefinition;

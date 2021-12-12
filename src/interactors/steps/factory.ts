@@ -1,14 +1,14 @@
 import { MyStep, MyStepDefinition, MyStepDependencies } from "./definitions/my_first_definition";
 import { Step, StepDefinition } from "./types"
 
-export class StepBuilder {
+export class StepFactory {
     private readonly stepDefinitionsMap: { [key: string]: StepDefinition }
 
     constructor(stepDefinitions: Array<StepDefinition>) {
         this.stepDefinitionsMap = stepDefinitions.reduce((map, stepDefinition) => ({ ...map, [stepDefinition.id]: stepDefinition }), {})
     }
 
-    public buildStep(definitionId: string, dependencies: any): Step<StepDefinition> {
+    public createStep(definitionId: string, dependencies: any): Step<StepDefinition> {
         const stepDefinition = this.stepDefinitionsMap[definitionId];
         const stepDependencies = dependencies;
         stepDependencies.stepDefinition = stepDefinition;

@@ -1,7 +1,7 @@
 import { EventEmitter } from "stream";
 import { VolatileRegisterDataAccess } from "./dataAccess/volatile";
-import { AdapterBuilder } from "./interactors/adapters/builder";
-import { StepBuilder } from "./interactors/steps/builder";
+import { AdapterFactory } from "./interactors/adapters/factory";
+import { StepFactory } from "./interactors/steps/factory";
 import { testExtractor, testTransformer, testLoader } from "./interactors_implementation/adapters";
 import { testStepExtractor, testStepLoader, testStepTransformer } from "./interactors_implementation/steps";
 
@@ -11,7 +11,7 @@ const presenter = new EventEmitter()
 //Adapter dependencies
 const adapterDefinitions = [testExtractor, testTransformer, testLoader];
 const registerDataAccess = new VolatileRegisterDataAccess();
-const adapterBuilder = new AdapterBuilder(adapterDefinitions)
+const adapterBuilder = new AdapterFactory(adapterDefinitions)
 const adapterDependencies = {
     adapterPresenter: presenter,
     registerDataAccess,
@@ -19,7 +19,7 @@ const adapterDependencies = {
 
 //Step dependencies
 const stepDefinitions = [testStepExtractor, testStepLoader, testStepTransformer]
-const stepBuilder = new StepBuilder(stepDefinitions)
+const stepBuilder = new StepFactory(stepDefinitions)
 const stepDependencies = {
     stepPresenter: presenter,
     adapterDependencies,
@@ -37,13 +37,13 @@ presenter.on("stepStatus", (stepStatus) => {
 
 async function adapterExample() {
 
-    const adapter1 = adapterBuilder.buildAdapter("testExtractor", adapterDependencies)
+    const adapter1 = adapterBuilder.createAdapter("testExtractor", adapterDependencies)
     await adapter1.start();
 
-    const adapter2 = adapterBuilder.buildAdapter("testTransformer", adapterDependencies)
+    const adapter2 = adapterBuilder.createAdapter("testTransformer", adapterDependencies)
     await adapter2.start();
 
-    const adapter3 = adapterBuilder.buildAdapter("testLoader", adapterDependencies)
+    const adapter3 = adapterBuilder.createAdapter("testLoader", adapterDependencies)
     await adapter3.start();
 
     const registers = await registerDataAccess.getAll();
@@ -53,13 +53,13 @@ async function adapterExample() {
 
 async function stepExample() {
 
-    const step1 = stepBuilder.buildStep("test1", stepDependencies);
+    const step1 = stepBuilder.createStep("test1", stepDependencies);
     await step1.start()
 
-    const step2 = stepBuilder.buildStep("test2", stepDependencies);
+    const step2 = stepBuilder.createStep("test2", stepDependencies);
     await step2.start()
 
-    const step3 = stepBuilder.buildStep("test3", stepDependencies);
+    const step3 = stepBuilder.createStep("test3", stepDependencies);
     await step3.start()
 
     const registers = await registerDataAccess.getAll();
