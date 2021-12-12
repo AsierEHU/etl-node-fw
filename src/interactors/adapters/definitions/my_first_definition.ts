@@ -1,7 +1,7 @@
 import EventEmitter from "events";
 import { Entity, Register, RegisterDataContext, RegisterStatusTag } from "../../registers/types";
 import { Adapter, AdapterStatus, AdapterDefinition, EntityWithMeta, AdapterRunOptions, AdapterStatusSummary, AdapterDependencies } from "../types"
-
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Local async step, persistance
@@ -25,7 +25,7 @@ abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
         this.adapterPresenter = dependencies.adapterPresenter;
         this.registerDataAccess = dependencies.registerDataAccess;
         this.syncUpperContext = dependencies.syncContext;
-        const id = Math.random().toString();
+        const id = uuidv4();
 
         this.adapterStatus = {
             id,
@@ -77,7 +77,7 @@ abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
 
         return inputEntitiesWithMeta.map(inputEntity => {
             return {
-                id: Math.random().toString(),
+                id: uuidv4(),
                 entityType: "Mocked",
                 sourceAbsoluteId: null,
                 sourceRelativeId: null,
@@ -170,7 +170,7 @@ export class MyExtractorAdapter<ad extends MyAdapterExtractorDefinition<Entity>>
     private async initRegisters(inputEntities: EntityWithMeta<Entity>[]) {
         for (let inputEntity of inputEntities) {
             // const inputEntityId = await this.adapterDefinition.generateID(inputEntity.entity)
-            const inputEntityId = Math.random().toString();
+            const inputEntityId = uuidv4();
             const adapterRegister: Register<Entity> = {
                 id: inputEntityId,
                 entityType: this.adapterDefinition.outputType,
@@ -302,7 +302,7 @@ export class MyTransformerAdapter<ad extends MyAdapterTransformerDefinition<Enti
                 const outputEntity = await this.adapterDefinition.entityProcess(inputEntity);
                 const adapterRegister: Register<Entity> = {
                     // id: await this.adapterDefinition.generateID(outputEntity),
-                    id: Math.random().toString(),
+                    id: uuidv4(),
                     entityType: this.adapterDefinition.outputType,
                     sourceAbsoluteId: inputRegistry.sourceRelativeId,
                     sourceRelativeId: inputRegistry.id,
@@ -316,7 +316,7 @@ export class MyTransformerAdapter<ad extends MyAdapterTransformerDefinition<Enti
             } catch (error: any) {
                 const adapterRegister: Register<Entity> = {
                     // id: inputRegistry.id,
-                    id: Math.random().toString(),
+                    id: uuidv4(),
                     entityType: this.adapterDefinition.outputType,
                     sourceAbsoluteId: inputRegistry.sourceRelativeId,
                     sourceRelativeId: inputRegistry.id,
@@ -397,7 +397,7 @@ export class MyLoaderAdapter<ad extends MyAdapterLoaderDefinition<Entity, Entity
                 const outputEntity = await this.adapterDefinition.entityLoad(inputEntity);
                 const adapterRegister: Register<Entity> = {
                     // id: await this.adapterDefinition.generateID(outputEntity),
-                    id: Math.random().toString(),
+                    id: uuidv4(),
                     entityType: this.adapterDefinition.outputType,
                     sourceAbsoluteId: inputRegistry.sourceRelativeId,
                     sourceRelativeId: inputRegistry.id,
@@ -411,7 +411,7 @@ export class MyLoaderAdapter<ad extends MyAdapterLoaderDefinition<Entity, Entity
                 await this.saveRegister(adapterRegister);
             } catch (error: any) {
                 const adapterRegister: Register<Entity> = {
-                    id: Math.random().toString(),
+                    id: uuidv4(),
                     entityType: this.adapterDefinition.outputType,
                     sourceAbsoluteId: inputRegistry.sourceRelativeId,
                     sourceRelativeId: inputRegistry.id,
@@ -487,7 +487,7 @@ export class MyFlexAdapter<ad extends MyAdapterFlexDefinition<Entity>> extends M
                 const outputEntity = await this.adapterDefinition.entityProcess(inputEntity);
                 const adapterRegister: Register<Entity> = {
                     // id: await this.adapterDefinition.generateID(outputEntity),
-                    id: Math.random().toString(),
+                    id: uuidv4(),
                     entityType: this.adapterDefinition.outputType,
                     sourceAbsoluteId: inputRegistry.sourceRelativeId,
                     sourceRelativeId: inputRegistry.id,
@@ -500,7 +500,7 @@ export class MyFlexAdapter<ad extends MyAdapterFlexDefinition<Entity>> extends M
                 this.adapterRegisters.push(adapterRegister)
             } catch (error: any) {
                 const adapterRegister: Register<Entity> = {
-                    id: Math.random().toString(),
+                    id: uuidv4(),
                     entityType: this.adapterDefinition.outputType,
                     sourceAbsoluteId: inputRegistry.sourceRelativeId,
                     sourceRelativeId: inputRegistry.id,

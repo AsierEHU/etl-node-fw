@@ -3,7 +3,7 @@ import { AdapterBuilder } from "../../adapters/builder";
 import { AdapterDefinition, AdapterDependencies, AdapterRunOptions } from "../../adapters/types";
 import { RegisterDataContext } from "../../registers/types";
 import { Step, StepStatus, StepDefinition, StepStatusTag, StepRunOptions, StepDependencies, StepStatusSummary } from "../types"
-
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Local async step, persistance
@@ -22,7 +22,7 @@ export class MyStep<sd extends MyStepDefinition> implements Step<sd>{
         this.adapterBuilder = dependencies.adapterBuilder;
         this.stepPresenter = dependencies.stepPresenter;
         this.syncUpperContext = dependencies.syncContext;
-        const id = Math.random().toString();
+        const id = uuidv4();
         this.stepStatus = {
             id,
             definitionId: this.stepDefinition.id,
