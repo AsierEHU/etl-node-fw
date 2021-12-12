@@ -42,6 +42,10 @@ export class MyStep<sd extends MyStepDefinition> implements Step<sd>{
     }
 
     async start(runOptions?: StepRunOptions) {
+
+        if (this.stepStatus.statusTag != StepStatusTag.pending)
+            return this.stepStatus.statusTag
+
         this.stepStatus.timeStarted = new Date();
         this.stepStatus.statusTag = StepStatusTag.active
         this.stepStatus.runOptions = runOptions || null;

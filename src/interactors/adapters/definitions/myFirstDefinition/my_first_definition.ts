@@ -44,6 +44,9 @@ abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
     }
 
     async start(runOptions?: AdapterRunOptions): Promise<AdapterStatusSummary> {
+        if (this.adapterStatus.statusSummary)
+            return this.adapterStatus.statusSummary
+
         await this.run(runOptions);
         this.adapterStatus.statusSummary = this.calculateSummary();
         this.adapterStatus.runOptions = runOptions || null;
