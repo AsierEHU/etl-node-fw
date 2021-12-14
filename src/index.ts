@@ -2,14 +2,14 @@ import { EventEmitter } from "stream";
 import { VolatileRegisterDataAccess } from "./dataAccess/volatile";
 import { AdapterFactory } from "./interactors/adapters/factory";
 import { StepFactory } from "./interactors/steps/factory";
-import { testExtractor, testTransformer, testLoader } from "./interactors_implementation/adapters";
-import { testStepExtractor, testStepLoader, testStepTransformer } from "./interactors_implementation/steps";
+import { testExtractor, testTransformer, testLoader, testFlex } from "./interactors_implementation/adapters";
+import { testStepExtractor, testStepFlex, testStepLoader, testStepTransformer } from "./interactors_implementation/steps";
 
 //Global dependencies
 const presenter = new EventEmitter()
 
 //Adapter dependencies
-const adapterDefinitions = [testExtractor, testTransformer, testLoader];
+const adapterDefinitions = [testExtractor, testTransformer, testLoader, testFlex];
 const registerDataAccess = new VolatileRegisterDataAccess();
 const adapterBuilder = new AdapterFactory(adapterDefinitions)
 const adapterDependencies = {
@@ -18,7 +18,7 @@ const adapterDependencies = {
 }
 
 //Step dependencies
-const stepDefinitions = [testStepExtractor, testStepLoader, testStepTransformer]
+const stepDefinitions = [testStepExtractor, testStepLoader, testStepTransformer, testStepFlex]
 const stepBuilder = new StepFactory(stepDefinitions)
 const stepDependencies = {
     stepPresenter: presenter,
@@ -61,6 +61,9 @@ async function stepExample() {
 
     const step3 = stepBuilder.createStep("test3", stepDependencies);
     await step3.runOnce()
+
+    const step4 = stepBuilder.createStep("test4", stepDependencies);
+    await step4.runOnce()
 
     const registers = await registerDataAccess.getAll();
 

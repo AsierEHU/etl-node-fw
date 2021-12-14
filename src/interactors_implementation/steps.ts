@@ -31,3 +31,13 @@ export const testStepLoader: MyStepDefinition = {
         return statusSummary.rows_failed > 0
     }
 }
+
+export const testStepFlex: MyStepDefinition = {
+    id: "test4",
+    adapterDefinitionId: "testFlex",
+    retartTries: 1,
+    definitionType: "MyStepDefinition",
+    isFailedStatus: function (statusSummary: AdapterStatusSummary): boolean {
+        return statusSummary.rows_failed > 0
+    }
+}

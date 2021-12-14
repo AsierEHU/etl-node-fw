@@ -1,5 +1,6 @@
-import { MyAdapterExtractorDefinition, MyAdapterLoaderDefinition, MyAdapterTransformerDefinition } from "../interactors/adapters/definitions/myFirstDefinition/my_first_definition";
-import { ToFixEntity, ValidationStatusTag } from "../interactors/adapters/definitions/myFirstDefinition/types";
+import { MyAdapterExtractorDefinition, MyAdapterFlexDefinition, MyAdapterLoaderDefinition, MyAdapterTransformerDefinition } from "../interactors/adapters/definitions/myFirstDefinition/my_first_definition";
+import { RegisterDataAccess, RegisterDataFilter, ToFixEntity, ValidationStatusTag } from "../interactors/adapters/definitions/myFirstDefinition/types";
+import { Entity, RegisterDataContext } from "../interactors/registers/types";
 
 
 type inputClass = {
@@ -16,6 +17,10 @@ type outputClass = {
 
 type resultClass = {
     success: boolean,
+}
+
+type result2Class = {
+    successTotal: number
 }
 
 
@@ -130,4 +135,21 @@ export const testLoader: MyAdapterLoaderDefinition<outputClass, resultClass> = {
             success: true,
         } as resultClass;
     },
+}
+
+export const testFlex: MyAdapterFlexDefinition<result2Class> = {
+    id: "testFlex",
+    outputType: "result2Class",
+    definitionType: "MyAdapterFlexDefinition",
+    async entitiesGet(registerDataAccess: RegisterDataAccess<Entity>, syncContext: RegisterDataContext) {
+        const filter: RegisterDataFilter = {
+            flowId: syncContext.flowId,
+            registerType: "resultClass"
+        }
+        const registers = await registerDataAccess.getAll(filter)
+        const entities = registers.map(reg => reg.entity)
+        return [{
+            successTotal: entities.length
+        }]
+    }
 }

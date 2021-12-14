@@ -222,9 +222,9 @@ export abstract class MyAdapterExtractorDefinition<input extends Entity> impleme
     abstract readonly definitionType: string;
     abstract readonly id: string;
     abstract readonly outputType: string
-    abstract entitiesGet: () => Promise<(EntityWithMeta<input> | null | input)[]>
-    abstract entityValidate: (inputEntity: input | null) => Promise<ValidationResult | ValidationStatusTag> //data quality, error handling (error prevention), managin Bad Data-> triage or CleanUp
-    abstract entityFix: (toFixEntity: ToFixEntity<input>) => Promise<FixedEntity<input> | null> //error handling (error response), managin Bad Data-> CleanUp
+    abstract readonly entitiesGet: () => Promise<(EntityWithMeta<input> | null | input)[]>
+    abstract readonly entityValidate: (inputEntity: input | null) => Promise<ValidationResult | ValidationStatusTag> //data quality, error handling (error prevention), managin Bad Data-> triage or CleanUp
+    abstract readonly entityFix: (toFixEntity: ToFixEntity<input>) => Promise<FixedEntity<input> | null> //error handling (error response), managin Bad Data-> CleanUp
 }
 
 
@@ -297,7 +297,7 @@ export abstract class MyAdapterTransformerDefinition<input extends Entity, outpu
     abstract readonly inputType: string
     abstract readonly outputType: string
     abstract readonly definitionType: string;
-    abstract entityProcess: (entity: input) => Promise<output>
+    abstract readonly entityProcess: (entity: input) => Promise<output>
 }
 
 
@@ -371,7 +371,7 @@ export abstract class MyAdapterLoaderDefinition<input extends Entity, output ext
     abstract readonly inputType: string
     abstract readonly outputType: string
     abstract readonly definitionType: string;
-    abstract entityLoad: (entity: input | null) => Promise<output>
+    abstract readonly entityLoad: (entity: input | null) => Promise<output>
 }
 
 
@@ -387,57 +387,42 @@ export class MyFlexAdapter<ad extends MyAdapterFlexDefinition<Entity>> extends M
     }
 
     async outputRegisters(inputRegisters: Register<Entity>[], runOptions?: AdapterRunOptions) {
-        const outputRegisters = await this.processRegisters(inputRegisters);
+        const outputRegisters = inputRegisters;
+        await this.registerDataAccess.saveAll(outputRegisters)
         return outputRegisters
     }
 
     protected async getRegisters(): Promise<Register<Entity>[]> {
-        const inputRegisters = await this.adapterDefinition.registersGet()
-        return inputRegisters
+        const inputEntities = await this.adapterDefinition.entitiesGet(this.registerDataAccess, this.adapterStatus.syncContext);
+        const inputEntitiesWithMeta = getWithMetaFormat(inputEntities)
+        const registers = await this.initRegisters(inputEntitiesWithMeta);
+        return registers;
     }
 
-    private async processRegisters(inputRegisters: Register<Entity>[]) {
-        const outputRegisters = []
-        for (const inputRegistry of inputRegisters) {
-            try {
-                const inputEntity = inputRegistry.entity;
-                const outputEntity = await this.adapterDefinition.entityProcess(inputEntity);
-                const register: Register<Entity> = {
-                    id: uuidv4(),
-                    entityType: this.adapterDefinition.outputType,
-                    sourceAbsoluteId: inputRegistry.sourceRelativeId,
-                    sourceRelativeId: inputRegistry.id,
-                    statusTag: RegisterStatusTag.success,
-                    statusMeta: undefined,
-                    entity: outputEntity,
-                    meta: undefined,
-                    context: this.adapterStatus.syncContext
-                }
-                outputRegisters.push(register)
-            } catch (error: any) {
-                const register: Register<Entity> = {
-                    id: uuidv4(),
-                    entityType: this.adapterDefinition.outputType,
-                    sourceAbsoluteId: inputRegistry.sourceRelativeId,
-                    sourceRelativeId: inputRegistry.id,
-                    statusTag: RegisterStatusTag.failed,
-                    statusMeta: error.message,
-                    entity: null,
-                    meta: undefined,
-                    context: this.adapterStatus.syncContext
-                }
-                outputRegisters.push(register)
+    protected async initRegisters(inputEntities: EntityWithMeta<Entity>[]) {
+        const registers = []
+        for (let inputEntity of inputEntities) {
+            const inputEntityId = uuidv4();
+            const register: Register<Entity> = {
+                id: inputEntityId,
+                entityType: this.adapterDefinition.outputType,
+                sourceAbsoluteId: inputEntityId,
+                sourceRelativeId: inputEntityId,
+                statusTag: RegisterStatusTag.success,
+                statusMeta: null,
+                entity: inputEntity.entity,
+                meta: inputEntity.meta,
+                context: this.adapterStatus.syncContext
             }
+            registers.push(register)
         }
-        return outputRegisters
+        return registers
     }
-
 }
 
 export abstract class MyAdapterFlexDefinition<output extends Entity> implements AdapterDefinition {
     abstract readonly id: string;
     abstract readonly outputType: string
     abstract readonly definitionType: string;
-    abstract registersGet: () => Promise<Register<Entity>[]>
-    abstract entityProcess: (entity: Entity | null) => Promise<output>
+    abstract readonly entitiesGet: (registerDataAccess: RegisterDataAccess<Entity>, syncContext: RegisterDataContext) => Promise<output[]>
 }
