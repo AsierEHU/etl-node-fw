@@ -3,7 +3,7 @@ import { Entity, Register, RegisterDataContext, RegisterStatusTag } from "../../
 import { Adapter, AdapterStatus, AdapterDefinition, EntityWithMeta, AdapterRunOptions, AdapterStatusSummary } from "../../types"
 import { v4 as uuidv4 } from 'uuid';
 import { FixedEntity, MyAdapterDependencies, RegisterDataAccess, ToFixEntity, ValidationResult, ValidationStatusTag } from "./types";
-import { getWithMetaFormat } from "./utils";
+import { calculateSummary, getWithMetaFormat } from "./utils";
 
 
 
@@ -20,17 +20,14 @@ abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
     protected readonly registerDataAccess: RegisterDataAccess<Entity>;
     protected readonly adapterStatus: AdapterStatus
     protected readonly syncUpperContext?: RegisterDataContext
-    protected outputRegisters: Register<Entity>[]
 
 
     constructor(dependencies: MyAdapterDependencies<ad>) {
-
         this.adapterDefinition = dependencies.adapterDefinition;
         this.adapterPresenter = dependencies.adapterPresenter;
         this.registerDataAccess = dependencies.registerDataAccess;
         this.syncUpperContext = dependencies.syncContext;
 
-        this.outputRegisters = [];
         const id = uuidv4();
         this.adapterStatus = {
             id,
@@ -58,9 +55,9 @@ abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
         this.adapterStatus.runOptions = runOptions || null;
 
         const inputRegisters = await this.inputRegisters(runOptions);
-        await this.run(inputRegisters, runOptions);
+        const outputRegisters = await this.outputRegisters(inputRegisters, runOptions);
 
-        this.adapterStatus.statusSummary = this.calculateSummary();
+        this.adapterStatus.statusSummary = calculateSummary(outputRegisters);
         this.adapterPresenter.emit("adapterStatus", this.adapterStatus)
         return this.adapterStatus.statusSummary;
     }
@@ -108,26 +105,7 @@ abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
 
     protected abstract getRegisters(): Promise<Register<Entity>[]>
 
-    protected abstract run(inputRegisters: Register<Entity>[], runOptions?: AdapterRunOptions): Promise<void>
-
-    private calculateSummary(): AdapterStatusSummary {
-        const statusSummary = {
-            output_rows: this.outputRegisters.length,
-            rows_success: this.outputRegisters.filter(register => register.statusTag == RegisterStatusTag.success).length,
-            rows_failed: this.outputRegisters.filter(register => register.statusTag == RegisterStatusTag.failed).length,
-            rows_invalid: this.outputRegisters.filter(register => register.statusTag == RegisterStatusTag.invalid).length,
-            rows_skipped: this.outputRegisters.filter(register => register.statusTag == RegisterStatusTag.skipped).length,
-        };
-        return statusSummary;
-    }
-
-    protected async saveRegisters() {
-        await this.registerDataAccess.saveAll(this.outputRegisters)
-    }
-
-    protected async saveRegister(register: Register<Entity>) {
-        await this.registerDataAccess.save(register)
-    }
+    protected abstract outputRegisters(inputRegisters: Register<Entity>[], runOptions?: AdapterRunOptions): Promise<Register<Entity>[]>
 
     async getStatus() {
         return this.adapterStatus;
@@ -145,12 +123,12 @@ export class MyExtractorAdapter<ad extends MyAdapterExtractorDefinition<Entity>>
         super(dependencies)
     }
 
-
-    async run(inputRegisters: Register<Entity>[], runOptions?: AdapterRunOptions) {
-        this.outputRegisters = inputRegisters
-        await this.validateRegisters();
-        await this.fixRegisters();
-        await this.saveRegisters();
+    async outputRegisters(inputRegisters: Register<Entity>[], runOptions?: AdapterRunOptions) {
+        await this.validateRegisters(inputRegisters);
+        await this.fixRegisters(inputRegisters);
+        const outputRegisters = inputRegisters;
+        await this.registerDataAccess.saveAll(outputRegisters)
+        return outputRegisters
     }
 
     protected async getRegisters(): Promise<Register<Entity>[]> {
@@ -164,7 +142,7 @@ export class MyExtractorAdapter<ad extends MyAdapterExtractorDefinition<Entity>>
         const registers = []
         for (let inputEntity of inputEntities) {
             const inputEntityId = uuidv4();
-            const adapterRegister: Register<Entity> = {
+            const register: Register<Entity> = {
                 id: inputEntityId,
                 entityType: this.adapterDefinition.outputType,
                 sourceAbsoluteId: inputEntityId,
@@ -175,15 +153,15 @@ export class MyExtractorAdapter<ad extends MyAdapterExtractorDefinition<Entity>>
                 meta: inputEntity.meta,
                 context: this.adapterStatus.syncContext
             }
-            registers.push(adapterRegister)
+            registers.push(register)
         }
         return registers
     }
 
-    private async validateRegisters() {
-        for (const adapterRegister of this.outputRegisters) {
+    private async validateRegisters(inputRegisters: Register<Entity>[]) {
+        for (const register of inputRegisters) {
             try {
-                const result: any = await this.adapterDefinition.entityValidate(adapterRegister.entity);
+                const result: any = await this.adapterDefinition.entityValidate(register.entity);
                 let validationStatusTag;
                 let validationMeta;
                 if (result.statusTag && result.meta) {
@@ -195,28 +173,28 @@ export class MyExtractorAdapter<ad extends MyAdapterExtractorDefinition<Entity>>
                 }
 
                 if (validationStatusTag == ValidationStatusTag.invalid) {
-                    adapterRegister.statusTag = RegisterStatusTag.invalid;
+                    register.statusTag = RegisterStatusTag.invalid;
                 }
 
                 else if (validationStatusTag == ValidationStatusTag.skipped) {
-                    adapterRegister.statusTag = RegisterStatusTag.skipped;
+                    register.statusTag = RegisterStatusTag.skipped;
                 }
 
                 else if (validationStatusTag == ValidationStatusTag.valid) {
-                    adapterRegister.statusTag = RegisterStatusTag.success;
+                    register.statusTag = RegisterStatusTag.success;
                 }
 
-                adapterRegister.statusMeta = validationMeta;
+                register.statusMeta = validationMeta;
 
             } catch (error: any) {
-                adapterRegister.statusTag = RegisterStatusTag.failed;
-                adapterRegister.statusMeta = error.message;
+                register.statusTag = RegisterStatusTag.failed;
+                register.statusMeta = error.message;
             }
         }
     }
 
-    private async fixRegisters() {
-        const toFixRegisters = this.outputRegisters.filter(register => register.statusTag == RegisterStatusTag.invalid);
+    private async fixRegisters(inputRegisters: Register<Entity>[]) {
+        const toFixRegisters = inputRegisters.filter(register => register.statusTag == RegisterStatusTag.invalid);
         for (const toFixRegister of toFixRegisters) {
             try {
                 const toFixEntity: ToFixEntity<Entity> = {
@@ -261,9 +239,10 @@ export class MyTransformerAdapter<ad extends MyAdapterTransformerDefinition<Enti
         super(dependencies)
     }
 
-    async run(inputRegisters: Register<Entity>[], runOptions?: AdapterRunOptions) {
-        await this.processRegisters(inputRegisters);
-        await this.saveRegisters();
+    async outputRegisters(inputRegisters: Register<Entity>[], runOptions?: AdapterRunOptions) {
+        const outputRegisters = await this.processRegisters(inputRegisters);
+        await this.registerDataAccess.saveAll(outputRegisters)
+        return outputRegisters
     }
 
     protected async getRegisters(): Promise<Register<Entity>[]> {
@@ -275,13 +254,13 @@ export class MyTransformerAdapter<ad extends MyAdapterTransformerDefinition<Enti
         return inputRegisters
     }
 
-    private async processRegisters(inputRegisters: Register<any>[]) {
+    private async processRegisters(inputRegisters: Register<Entity>[]): Promise<Register<Entity>[]> {
+        const outputRegisters = [];
         for (const inputRegistry of inputRegisters) {
             try {
-                const inputEntity = inputRegistry.entity;
+                const inputEntity = inputRegistry.entity as Entity;
                 const outputEntity = await this.adapterDefinition.entityProcess(inputEntity);
-                const adapterRegister: Register<Entity> = {
-                    // id: await this.adapterDefinition.generateID(outputEntity),
+                const register: Register<Entity> = {
                     id: uuidv4(),
                     entityType: this.adapterDefinition.outputType,
                     sourceAbsoluteId: inputRegistry.sourceRelativeId,
@@ -292,10 +271,9 @@ export class MyTransformerAdapter<ad extends MyAdapterTransformerDefinition<Enti
                     meta: undefined,
                     context: this.adapterStatus.syncContext
                 }
-                this.outputRegisters.push(adapterRegister)
+                outputRegisters.push(register)
             } catch (error: any) {
-                const adapterRegister: Register<Entity> = {
-                    // id: inputRegistry.id,
+                const register: Register<Entity> = {
                     id: uuidv4(),
                     entityType: this.adapterDefinition.outputType,
                     sourceAbsoluteId: inputRegistry.sourceRelativeId,
@@ -306,22 +284,20 @@ export class MyTransformerAdapter<ad extends MyAdapterTransformerDefinition<Enti
                     meta: undefined,
                     context: this.adapterStatus.syncContext
                 }
-                this.outputRegisters.push(adapterRegister)
+                outputRegisters.push(register)
             }
         }
+        return outputRegisters;
     }
 
 }
 
 export abstract class MyAdapterTransformerDefinition<input extends Entity, output extends Entity> implements AdapterDefinition {
-    // readonly version: string
     abstract readonly id: string;
     abstract readonly inputType: string
     abstract readonly outputType: string
     abstract readonly definitionType: string;
-    // generateID:(entity:output) => Promise<string | null>
-    // getTrackFields: (entity:output) => Promise<string[]>
-    abstract entityProcess: (entity: input) => Promise<output> //first time (success), on retry (failed entities)
+    abstract entityProcess: (entity: input) => Promise<output>
 }
 
 
@@ -336,8 +312,9 @@ export class MyLoaderAdapter<ad extends MyAdapterLoaderDefinition<Entity, Entity
         super(dependencies)
     }
 
-    async run(inputRegisters: Register<Entity>[], runOptions?: AdapterRunOptions) {
-        await this.loadAndSaveRegisters(inputRegisters);
+    async outputRegisters(inputRegisters: Register<Entity>[], runOptions?: AdapterRunOptions) {
+        const ouputRegisters = await this.loadAndSaveRegisters(inputRegisters);
+        return ouputRegisters
     }
 
     protected async getRegisters(): Promise<Register<Entity>[]> {
@@ -350,11 +327,12 @@ export class MyLoaderAdapter<ad extends MyAdapterLoaderDefinition<Entity, Entity
     }
 
     private async loadAndSaveRegisters(inputRegisters: Register<Entity>[]) {
+        const outputRegisters = [];
         for (const inputRegistry of inputRegisters) {
             try {
                 const inputEntity = inputRegistry.entity;
                 const outputEntity = await this.adapterDefinition.entityLoad(inputEntity);
-                const adapterRegister: Register<Entity> = {
+                const register: Register<Entity> = {
                     // id: await this.adapterDefinition.generateID(outputEntity),
                     id: uuidv4(),
                     entityType: this.adapterDefinition.outputType,
@@ -366,10 +344,10 @@ export class MyLoaderAdapter<ad extends MyAdapterLoaderDefinition<Entity, Entity
                     meta: undefined,
                     context: this.adapterStatus.syncContext
                 }
-                this.outputRegisters.push(adapterRegister)
-                await this.saveRegister(adapterRegister);
+                outputRegisters.push(register)
+                await this.registerDataAccess.save(register)
             } catch (error: any) {
-                const adapterRegister: Register<Entity> = {
+                const register: Register<Entity> = {
                     id: uuidv4(),
                     entityType: this.adapterDefinition.outputType,
                     sourceAbsoluteId: inputRegistry.sourceRelativeId,
@@ -380,22 +358,20 @@ export class MyLoaderAdapter<ad extends MyAdapterLoaderDefinition<Entity, Entity
                     meta: undefined,
                     context: this.adapterStatus.syncContext
                 }
-                this.outputRegisters.push(adapterRegister)
-                await this.saveRegister(adapterRegister);
+                outputRegisters.push(register)
+                await this.registerDataAccess.save(register)
             }
         }
+        return outputRegisters;
     }
 }
 
 export abstract class MyAdapterLoaderDefinition<input extends Entity, output extends Entity> implements AdapterDefinition {
-    // readonly version: string
     abstract readonly id: string;
     abstract readonly inputType: string
     abstract readonly outputType: string
     abstract readonly definitionType: string;
-    // generateID:(entity:output) => Promise<string | null>
-    // getTrackFields: (entity:output) => Promise<string[]>
-    abstract entityLoad: (entity: input | null) => Promise<output> //first time (success), on retry (failed entities)
+    abstract entityLoad: (entity: input | null) => Promise<output>
 }
 
 
@@ -410,8 +386,9 @@ export class MyFlexAdapter<ad extends MyAdapterFlexDefinition<Entity>> extends M
         super(dependencies)
     }
 
-    async run(inputRegisters: Register<Entity>[], runOptions?: AdapterRunOptions) {
-        await this.processRegisters(inputRegisters);
+    async outputRegisters(inputRegisters: Register<Entity>[], runOptions?: AdapterRunOptions) {
+        const outputRegisters = await this.processRegisters(inputRegisters);
+        return outputRegisters
     }
 
     protected async getRegisters(): Promise<Register<Entity>[]> {
@@ -420,11 +397,12 @@ export class MyFlexAdapter<ad extends MyAdapterFlexDefinition<Entity>> extends M
     }
 
     private async processRegisters(inputRegisters: Register<Entity>[]) {
+        const outputRegisters = []
         for (const inputRegistry of inputRegisters) {
             try {
                 const inputEntity = inputRegistry.entity;
                 const outputEntity = await this.adapterDefinition.entityProcess(inputEntity);
-                const adapterRegister: Register<Entity> = {
+                const register: Register<Entity> = {
                     id: uuidv4(),
                     entityType: this.adapterDefinition.outputType,
                     sourceAbsoluteId: inputRegistry.sourceRelativeId,
@@ -435,9 +413,9 @@ export class MyFlexAdapter<ad extends MyAdapterFlexDefinition<Entity>> extends M
                     meta: undefined,
                     context: this.adapterStatus.syncContext
                 }
-                this.outputRegisters.push(adapterRegister)
+                outputRegisters.push(register)
             } catch (error: any) {
-                const adapterRegister: Register<Entity> = {
+                const register: Register<Entity> = {
                     id: uuidv4(),
                     entityType: this.adapterDefinition.outputType,
                     sourceAbsoluteId: inputRegistry.sourceRelativeId,
@@ -448,9 +426,10 @@ export class MyFlexAdapter<ad extends MyAdapterFlexDefinition<Entity>> extends M
                     meta: undefined,
                     context: this.adapterStatus.syncContext
                 }
-                this.outputRegisters.push(adapterRegister)
+                outputRegisters.push(register)
             }
         }
+        return outputRegisters
     }
 
 }
