@@ -16,7 +16,6 @@ export interface Adapter<AdapterDefinition> {
 
 export type AdapterRunOptions = { //filters, skips...
     mockEntities?: (EntityWithMeta<Entity> | null | Entity)[],
-    registers?: Register<Entity>[]
     onlyFailedEntities?: boolean
 }
 
