@@ -19,7 +19,7 @@
 //   }
 
 // export interface Flow <fdo extends FlowDefinitionOptions, fd extends FlowDefinition<fdo>>{
-//     start(definitionOptions?:fdo,[{stepDefinitionId, mockData}]?): Promise<string> //start a flow from the beginning
+//     runOnce(definitionOptions?:fdo,[{stepDefinitionId, mockData}]?): Promise<string> //start a flow from the beginning
 //     continue(): Promise<void> //continue flow from the last success or partial success step.
 //     getData(): Promise<FlowData>
 //     getDefinitionOptions(): Promise<FlowDefinitionOptions>

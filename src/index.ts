@@ -38,13 +38,13 @@ presenter.on("stepStatus", (stepStatus) => {
 async function adapterExample() {
 
     const adapter1 = adapterBuilder.createAdapter("testExtractor", adapterDependencies)
-    await adapter1.start();
+    await adapter1.runOnce();
 
     const adapter2 = adapterBuilder.createAdapter("testTransformer", adapterDependencies)
-    await adapter2.start();
+    await adapter2.runOnce();
 
     const adapter3 = adapterBuilder.createAdapter("testLoader", adapterDependencies)
-    await adapter3.start();
+    await adapter3.runOnce();
 
     const registers = await registerDataAccess.getAll();
 
@@ -54,13 +54,13 @@ async function adapterExample() {
 async function stepExample() {
 
     const step1 = stepBuilder.createStep("test1", stepDependencies);
-    await step1.start()
+    await step1.runOnce()
 
     const step2 = stepBuilder.createStep("test2", stepDependencies);
-    await step2.start()
+    await step2.runOnce()
 
     const step3 = stepBuilder.createStep("test3", stepDependencies);
-    await step3.start()
+    await step3.runOnce()
 
     const registers = await registerDataAccess.getAll();
 

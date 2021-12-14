@@ -10,9 +10,8 @@ export interface AdapterDefinition {
 }
 
 export interface Adapter<AdapterDefinition> {
-    start(runOptions?: AdapterRunOptions): Promise<AdapterStatusSummary> //start, if registers -> filter input by ids, if skip -> compare hash to skip
+    runOnce(runOptions?: AdapterRunOptions): Promise<AdapterStatusSummary> //start, if registers -> filter input by ids, if skip -> compare hash to skip
     getStatus(): Promise<AdapterStatus>
-    getRegisters(): Promise<Register<Entity>[]>
 }
 
 export type AdapterRunOptions = { //filters, skips...

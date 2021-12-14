@@ -43,13 +43,22 @@ abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
         this.adapterPresenter.emit("adapterStatus", this.adapterStatus)
     }
 
-    async start(runOptions?: AdapterRunOptions): Promise<AdapterStatusSummary> {
+    async runOnce(runOptions?: AdapterRunOptions): Promise<AdapterStatusSummary> {
         if (this.adapterStatus.statusSummary)
-            return this.adapterStatus.statusSummary
+            throw new Error("Run once")
+
+        this.adapterStatus.statusSummary = {
+            output_rows: 0,
+            rows_success: 0,
+            rows_failed: 0,
+            rows_invalid: 0,
+            rows_skipped: 0,
+        };
+        this.adapterStatus.runOptions = runOptions || null;
 
         await this.run(runOptions);
+
         this.adapterStatus.statusSummary = this.calculateSummary();
-        this.adapterStatus.runOptions = runOptions || null;
         this.adapterPresenter.emit("adapterStatus", this.adapterStatus)
         return this.adapterStatus.statusSummary;
     }
@@ -78,11 +87,6 @@ abstract class MyAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
     async getStatus() {
         return this.adapterStatus;
     }
-
-    async getRegisters() {
-        return this.adapterRegisters
-    }
-
 }
 
 /**

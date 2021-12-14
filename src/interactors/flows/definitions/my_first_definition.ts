@@ -38,7 +38,7 @@
 //     continue(): Promise<void> {
 //         throw new Error("Method not implemented.")
 //     }
-//     start(flowOptions?: MyFlowDefinitionOptions): Promise<string> {
+//     runOnce(flowOptions?: MyFlowDefinitionOptions): Promise<string> {
 //         //save MyFlowDefinitionOptions as an internal entity with a custom step -> initialStep?:Step
 //         //When step fails -> keep retries number and the ids to retry
 

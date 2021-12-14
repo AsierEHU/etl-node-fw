@@ -1,9 +1,10 @@
 import EventEmitter from "events";
-import { AdapterFactory } from "../../adapters/factory";
-import { AdapterDefinition, AdapterDependencies, AdapterRunOptions } from "../../adapters/types";
-import { RegisterDataContext } from "../../registers/types";
-import { Step, StepStatus, StepDefinition, StepStatusTag, StepRunOptions, StepDependencies, StepStatusSummary } from "../types"
+import { AdapterFactory } from "../../../adapters/factory";
+import { AdapterDefinition, AdapterDependencies, AdapterRunOptions } from "../../../adapters/types";
+import { RegisterDataContext } from "../../../registers/types";
+import { Step, StepStatus, StepStatusTag, StepRunOptions } from "../../types"
 import { v4 as uuidv4 } from 'uuid';
+import { MyStepDefinition, MyStepDependencies } from "./types";
 
 /**
  * Local async step, persistance
@@ -41,13 +42,13 @@ export class MyStep<sd extends MyStepDefinition> implements Step<sd>{
         this.stepPresenter.emit("stepStatus", this.stepStatus)
     }
 
-    async start(runOptions?: StepRunOptions) {
+    async runOnce(runOptions?: StepRunOptions) {
 
         if (this.stepStatus.statusTag != StepStatusTag.pending)
-            return this.stepStatus.statusTag
+            throw new Error("Run once")
 
-        this.stepStatus.timeStarted = new Date();
         this.stepStatus.statusTag = StepStatusTag.active
+        this.stepStatus.timeStarted = new Date();
         this.stepStatus.runOptions = runOptions || null;
         this.stepPresenter.emit("stepStatus", this.stepStatus)
         await this.tryRunAdapter(runOptions?.adapterRunOptions);
@@ -71,7 +72,7 @@ export class MyStep<sd extends MyStepDefinition> implements Step<sd>{
         }
 
         try {
-            const adapterStatusSummary = await adapter.start(adapterRunOptions)
+            const adapterStatusSummary = await adapter.runOnce(adapterRunOptions)
             if (adapterRunOptions?.onlyFailedEntities) {
                 this.stepStatus.statusSummary.rows_success += adapterStatusSummary.rows_success
                 this.stepStatus.statusSummary.rows_failed = adapterStatusSummary.rows_failed
@@ -109,26 +110,3 @@ export class MyStep<sd extends MyStepDefinition> implements Step<sd>{
 
 }
 
-export abstract class MyStepDefinition implements StepDefinition {
-    abstract readonly adapterDefinitionId: string;
-    abstract readonly definitionType: string;
-    abstract readonly id: string
-    abstract readonly retartTries: number
-    abstract isFailedStatus(statusSummary: StepStatusSummary): boolean
-}
-
-
-/**
- * Utils
- */
-
-export interface StepDataAccess {
-    save: (stepStatus: StepStatus) => Promise<void>
-    get: (id: string) => Promise<StepStatus>
-}
-
-export interface MyStepDependencies<sp extends MyStepDefinition> extends StepDependencies<sp> {
-    adapterBuilder: AdapterFactory
-    stepPresenter: EventEmitter
-    adapterDependencies: any
-}

@@ -1,4 +1,4 @@
-import { MyStep, MyStepDefinition, MyStepDependencies } from "./definitions/my_first_definition";
+import { MyStep } from "./definitions/myFirstDefinition/my_first_definition";
 import { Step, StepDefinition } from "./types"
 
 export class StepFactory {

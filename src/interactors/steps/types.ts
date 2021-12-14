@@ -2,7 +2,7 @@ import { AdapterRunOptions } from "../adapters/types";
 import { RegisterDataContext } from "../registers/types";
 
 export interface Step<sd extends StepDefinition> {
-    start(stepRunOptions?: StepRunOptions): Promise<StepStatusTag> //start, if registers -> filter input by ids, if skip -> compare hash to skip
+    runOnce(stepRunOptions?: StepRunOptions): Promise<StepStatusTag> //start, if registers -> filter input by ids, if skip -> compare hash to skip
     getStatus(): Promise<StepStatus>
 }
 
