@@ -1,6 +1,6 @@
 
-import { AdapterStatusSummary } from "../interactors/adapters/types";
-import { MyStepDefinition } from "../interactors/steps/definitions/myFirstDefinition/types";
+import { AdapterStatusSummary } from "../../src/interactors/adapters/types";
+import { MyStepDefinition } from "../../src/interactors/steps/definitions/myFirstDefinition/types";
 
 export const testStepExtractor: MyStepDefinition = {
     id: "test1",

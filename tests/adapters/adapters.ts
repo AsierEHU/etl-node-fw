@@ -1,6 +1,6 @@
-import { MyAdapterExtractorDefinition, MyAdapterFlexDefinition, MyAdapterLoaderDefinition, MyAdapterTransformerDefinition } from "../interactors/adapters/definitions/myFirstDefinition/my_first_definition";
-import { RegisterDataAccess, RegisterDataFilter, ToFixEntity, ValidationStatusTag } from "../interactors/adapters/definitions/myFirstDefinition/types";
-import { Entity, RegisterDataContext } from "../interactors/registers/types";
+import { MyAdapterExtractorDefinition, MyAdapterFlexDefinition, MyAdapterLoaderDefinition, MyAdapterTransformerDefinition } from "../../src/interactors/adapters/definitions/myFirstDefinition/my_first_definition";
+import { RegisterDataAccess, RegisterDataFilter, ToFixEntity, ValidationStatusTag } from "../../src/interactors/adapters/definitions/myFirstDefinition/types";
+import { Entity, RegisterDataContext } from "../../src/interactors/registers/types";
 
 
 type inputClass = {

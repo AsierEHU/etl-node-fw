@@ -2,8 +2,8 @@ import { EventEmitter } from "stream";
 import { VolatileRegisterDataAccess } from "./dataAccess/volatile";
 import { AdapterFactory } from "./interactors/adapters/factory";
 import { StepFactory } from "./interactors/steps/factory";
-import { testExtractor, testTransformer, testLoader, testFlex } from "./interactors_implementation/adapters";
-import { testStepExtractor, testStepFlex, testStepLoader, testStepTransformer } from "./interactors_implementation/steps";
+import { testExtractor, testTransformer, testLoader, testFlex } from "../tests/adapters/adapters";
+import { testStepExtractor, testStepFlex, testStepLoader, testStepTransformer } from "../tests/interactors_implementation/steps";
 
 //Global dependencies
 const presenter = new EventEmitter()
