@@ -1,4 +1,4 @@
-import { RegisterDataAccess, RegisterDataFilter } from "../interactors/adapters/definitions/myFirstDefinition/types";
+import { RegisterDataAccess, RegisterDataFilter } from "../interactors/adapters/definitions/types";
 import { Register } from "../interactors/registers/types";
 
 export class VolatileRegisterDataAccess implements RegisterDataAccess<any>{
@@ -38,11 +38,11 @@ export class VolatileRegisterDataAccess implements RegisterDataAccess<any>{
         let repoRegisters = Object.values(this.repo);
 
         if (filter?.apdaterId)
-            repoRegisters = repoRegisters.filter(repoRegister => repoRegister.context.apdaterId == filter.apdaterId)
+            repoRegisters = repoRegisters.filter(repoRegister => repoRegister.syncContext.apdaterId == filter.apdaterId)
         if (filter?.stepId)
-            repoRegisters = repoRegisters.filter(repoRegister => repoRegister.context.stepId == filter.stepId)
+            repoRegisters = repoRegisters.filter(repoRegister => repoRegister.syncContext.stepId == filter.stepId)
         if (filter?.flowId)
-            repoRegisters = repoRegisters.filter(repoRegister => repoRegister.context.flowId == filter.flowId)
+            repoRegisters = repoRegisters.filter(repoRegister => repoRegister.syncContext.flowId == filter.flowId)
         if (filter?.registerType)
             repoRegisters = repoRegisters.filter(repoRegister => repoRegister.entityType == filter.registerType)
         if (filter?.registerStatus)

@@ -1,5 +1,5 @@
-import { Entity, Register, RegisterStatusTag } from "../../../registers/types";
-import { AdapterStatusSummary, EntityWithMeta } from "../../types";
+import { Entity, Register, RegisterStatusTag } from "../../registers/types";
+import { AdapterStatusSummary, EntityWithMeta } from "../types";
 
 export const getWithMetaFormat = (inputEntities: any[]): EntityWithMeta<Entity>[] => {
 

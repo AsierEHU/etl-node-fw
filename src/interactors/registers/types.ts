@@ -7,7 +7,7 @@ export type Register<entity extends Entity> = {
     statusMeta: any
     entity: entity | null, //register itself
     meta: any, //save here for example every info need for final step (Alerts, csv name...)
-    context: RegisterDataContext
+    syncContext: RegisterDataContext
     // hash:string,
 }
 

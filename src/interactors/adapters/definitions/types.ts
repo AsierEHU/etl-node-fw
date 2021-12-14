@@ -1,6 +1,6 @@
 import EventEmitter from "events"
-import { Entity, Register, RegisterStatusTag } from "../../../registers/types"
-import { AdapterDefinition, AdapterDependencies } from "../../types"
+import { Entity, Register, RegisterStatusTag } from "../../registers/types"
+import { AdapterDefinition, AdapterDependencies } from "../types"
 
 
 export interface MyAdapterDependencies<ad extends AdapterDefinition> extends AdapterDependencies<ad> {
@@ -29,7 +29,7 @@ export type FixedEntity<input extends Entity> = {
     meta: any
 }
 
-export interface RegisterDataAccess<entity extends Entity> {//For a specific context
+export interface RegisterDataAccess<entity extends Entity> {//For a specific syncContext
     save: (register: Register<entity>) => Promise<void>
     saveAll: (registers: Register<entity>[]) => Promise<void>
     get: (id: string) => Promise<Register<entity> | null>

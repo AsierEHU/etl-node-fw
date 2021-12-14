@@ -1,4 +1,7 @@
-import { MyLoaderAdapter, MyExtractorAdapter, MyFlexAdapter, MyTransformerAdapter } from "./definitions/myFirstDefinition/my_first_definition";
+import { LocalAdapterExtractor } from "./definitions/localAdapterExtractor";
+import { LocalAdapterFlex } from "./definitions/localAdapterFlex";
+import { LocalAdapterLoader } from "./definitions/localAdapterLoader";
+import { LocalAdapterTransformer } from "./definitions/localAdapterTransformer";
 import { Adapter, AdapterDefinition } from "./types";
 
 export class AdapterFactory {
@@ -13,17 +16,17 @@ export class AdapterFactory {
         const adapterDependencies = dependencies;
         adapterDependencies.adapterDefinition = adapterDefinition;
 
-        if (adapterDefinition.definitionType == "MyAdapterLoaderDefinition") {
-            return new MyLoaderAdapter(adapterDependencies);
+        if (adapterDefinition.definitionType == "LocalAdapterLoaderDefinition") {
+            return new LocalAdapterLoader(adapterDependencies);
         }
-        else if (adapterDefinition.definitionType == "MyAdapterExtractorDefinition") {
-            return new MyExtractorAdapter(adapterDependencies);
+        else if (adapterDefinition.definitionType == "LocalAdapterExtractorDefinition") {
+            return new LocalAdapterExtractor(adapterDependencies);
         }
-        else if (adapterDefinition.definitionType == "MyAdapterTransformerDefinition") {
-            return new MyTransformerAdapter(adapterDependencies);
+        else if (adapterDefinition.definitionType == "LocalAdapterTransformerDefinition") {
+            return new LocalAdapterTransformer(adapterDependencies);
         }
-        else if (adapterDefinition.definitionType == "MyAdapterFlexDefinition") {
-            return new MyFlexAdapter(adapterDependencies);
+        else if (adapterDefinition.definitionType == "LocalAdapterFlexDefinition") {
+            return new LocalAdapterFlex(adapterDependencies);
         }
         else {
             throw Error("Not adapter match with definition id: " + definitionId)

@@ -20,7 +20,7 @@ export type AdapterRunOptions = { //filters, skips...
 }
 
 export type EntityWithMeta<input extends Entity> = {
-    entity: input,
+    entity: input | null,
     meta: any,
 }
 
