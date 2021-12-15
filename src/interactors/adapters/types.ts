@@ -1,12 +1,10 @@
-import { Entity, RegisterDataContext, RegisterMeta, RegisterStatusTag } from "../registers/types"
+import { Entity, RegisterDataContext } from "../registers/types"
 
 export interface AdapterDefinition {
     readonly id: string
     readonly outputType: string
     readonly definitionType: string
     //     abstract readonly splitRecords: number
-    // version:string
-    //     abstract readonly skipProcessedRecords: boolean
 }
 
 export interface Adapter<AdapterDefinition> {
@@ -19,7 +17,7 @@ export type AdapterRunOptions = { //filters, skips...
     onlyFailedEntities?: boolean
 }
 
-export type InputEntity<e extends Entity> = (EntityWithMeta<e> | null | e)
+export type InputEntity<e extends Entity> = EntityWithMeta<e> | null | e
 
 export type EntityWithMeta<e extends Entity> = {
     entity: e | null,

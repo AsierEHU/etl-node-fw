@@ -1,42 +1,42 @@
 
 import { AdapterStatusSummary } from "../../src/interactors/adapters/types";
-import { MyStepDefinition } from "../../src/interactors/steps/definitions/myFirstDefinition/types";
+import { LocalStepDefinition } from "../../src/interactors/steps/definitions/myFirstDefinition/types";
 
-export const testStepExtractor: MyStepDefinition = {
+export const testStepExtractor: LocalStepDefinition = {
     id: "test1",
     adapterDefinitionId: "testExtractor",
     retartTries: 3,
-    definitionType: "MyStepDefinition",
+    definitionType: "LocalStepDefinition",
     isFailedStatus: function (statusSummary: AdapterStatusSummary): boolean {
         return statusSummary.rows_failed > 0
     }
 }
 
-export const testStepTransformer: MyStepDefinition = {
+export const testStepTransformer: LocalStepDefinition = {
     id: "test2",
     adapterDefinitionId: "testTransformer",
     retartTries: 1,
-    definitionType: "MyStepDefinition",
+    definitionType: "LocalStepDefinition",
     isFailedStatus: function (statusSummary: AdapterStatusSummary): boolean {
         return statusSummary.rows_failed > 0
     }
 }
 
-export const testStepLoader: MyStepDefinition = {
+export const testStepLoader: LocalStepDefinition = {
     id: "test3",
     adapterDefinitionId: "testLoader",
     retartTries: 2,
-    definitionType: "MyStepDefinition",
+    definitionType: "LocalStepDefinition",
     isFailedStatus: function (statusSummary: AdapterStatusSummary): boolean {
         return statusSummary.rows_failed > 0
     }
 }
 
-export const testStepFlex: MyStepDefinition = {
+export const testStepFlex: LocalStepDefinition = {
     id: "test4",
     adapterDefinitionId: "testFlex",
     retartTries: 1,
-    definitionType: "MyStepDefinition",
+    definitionType: "LocalStepDefinition",
     isFailedStatus: function (statusSummary: AdapterStatusSummary): boolean {
         return statusSummary.rows_failed > 0
     }

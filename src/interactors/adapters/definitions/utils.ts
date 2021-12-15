@@ -2,7 +2,7 @@ import { Entity, Register, RegisterStatusTag } from "../../registers/types";
 import { AdapterStatusSummary, EntityWithMeta, InputEntity } from "../types";
 import { ValidationResult, ValidationStatusTag } from "./types";
 
-export const getWithMetaFormat = (inputEntities: InputEntity<any>[]): EntityWithMeta<Entity>[] => {
+export const getWithMetaFormat = (inputEntities: InputEntity<Entity>[]): EntityWithMeta<Entity>[] => {
     return inputEntities.map(inputEntity => {
         if (isEntityWithMeta(inputEntity)) {
             return inputEntity

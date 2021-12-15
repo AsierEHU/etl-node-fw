@@ -6,7 +6,7 @@
 //     readonly id:string
 //     readonly name:string
 //     readonly description:string
-//     readonly stepsDefinition:[MyStepDefinition<object>]
+//     readonly stepsDefinition:[LocalStepDefinition<object>]
 //     finalStep?:(registerFetcher: RegisterFetcher)=>Promise<void> //always reached
 //     shouldProcessConinue:(entities, stepStatusTag:StepStatusTag) => Promise<boolean>
 // }

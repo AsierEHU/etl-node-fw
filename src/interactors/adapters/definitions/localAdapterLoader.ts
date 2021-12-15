@@ -72,7 +72,7 @@ export class LocalAdapterLoader<ad extends LocalAdapterLoaderDefinition<Entity, 
 
     private async validateRegister(register: Register<Entity>): Promise<Register<object>> {
         try {
-            const validation: any = await this.adapterDefinition.entityValidate(register.entity);
+            const validation = await this.adapterDefinition.entityValidate(register.entity);
             const validationWithMeta = getValidationResultWithMeta(validation);
 
             if (validationWithMeta.statusTag == ValidationStatusTag.invalid) {

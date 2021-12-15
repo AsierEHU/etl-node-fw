@@ -19,21 +19,21 @@ export type ValidationResult = {
     meta: any
 }
 
-export type ToFixEntity<input extends Entity> = {
-    entity: input | null,
+export type ToFixEntity<e extends Entity> = {
+    entity: e | null,
     validationMeta: any
 }
 
-export type FixedEntity<input extends Entity> = {
-    entity: input,
+export type FixedEntity<e extends Entity> = {
+    entity: e,
     meta: any
 }
 
-export interface RegisterDataAccess<entity extends Entity> {//For a specific syncContext
-    save: (register: Register<entity>) => Promise<void>
-    saveAll: (registers: Register<entity>[]) => Promise<void>
-    get: (id: string) => Promise<Register<entity> | null>
-    getAll: (filter?: RegisterDataFilter, registersIds?: string[]) => Promise<Register<entity>[]>
+export interface RegisterDataAccess<e extends Entity> {//For a specific syncContext
+    save: (register: Register<e>) => Promise<void>
+    saveAll: (registers: Register<e>[]) => Promise<void>
+    get: (id: string) => Promise<Register<e> | null>
+    getAll: (filter?: RegisterDataFilter, registersIds?: string[]) => Promise<Register<e>[]>
 }
 
 export type RegisterDataFilter = {

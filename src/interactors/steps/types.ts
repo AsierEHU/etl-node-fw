@@ -32,7 +32,7 @@ export type StepStatus = {
     definitionType: string
     tryNumber: number //retries
     statusTag: StepStatusTag //debugging
-    statusMeta: any
+    statusMeta: string | object | null
     timeStarted: Date | null  //debugging
     timeFinished: Date | null   //debugging
     // exceptionTrace: object, //debugging

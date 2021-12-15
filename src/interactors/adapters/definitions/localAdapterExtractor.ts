@@ -56,7 +56,7 @@ export class LocalAdapterExtractor<ad extends LocalAdapterExtractorDefinition<En
     private async validateRegisters(inputRegisters: Register<Entity>[]) {
         for (const register of inputRegisters) {
             try {
-                const validation: any = await this.adapterDefinition.entityValidate(register.entity);
+                const validation = await this.adapterDefinition.entityValidate(register.entity);
                 const validationWithMeta = getValidationResultWithMeta(validation);
 
                 if (validationWithMeta.statusTag == ValidationStatusTag.invalid) {
@@ -105,11 +105,11 @@ export class LocalAdapterExtractor<ad extends LocalAdapterExtractorDefinition<En
 
 }
 
-export abstract class LocalAdapterExtractorDefinition<input extends Entity> implements AdapterDefinition {
+export abstract class LocalAdapterExtractorDefinition<output extends Entity> implements AdapterDefinition {
     abstract readonly definitionType: string;
     abstract readonly id: string;
     abstract readonly outputType: string
-    abstract readonly entitiesGet: () => Promise<InputEntity<input>[]>
-    abstract readonly entityValidate: (inputEntity: input | null) => Promise<ValidationResult | ValidationStatusTag> //data quality, error handling (error prevention), managin Bad Data-> triage or CleanUp
-    abstract readonly entityFix: (toFixEntity: ToFixEntity<input>) => Promise<FixedEntity<input> | null> //error handling (error response), managin Bad Data-> CleanUp
+    abstract readonly entitiesGet: () => Promise<InputEntity<output>[]>
+    abstract readonly entityValidate: (inputEntity: output | null) => Promise<ValidationResult | ValidationStatusTag> //data quality, error handling (error prevention), managin Bad Data-> triage or CleanUp
+    abstract readonly entityFix: (toFixEntity: ToFixEntity<output>) => Promise<FixedEntity<output> | null> //error handling (error response), managin Bad Data-> CleanUp
 }

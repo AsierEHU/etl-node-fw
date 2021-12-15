@@ -1,4 +1,4 @@
-import { MyStep } from "./definitions/myFirstDefinition/my_first_definition";
+import { LocalStep } from "./definitions/localStep";
 import { Step, StepDefinition } from "./types"
 
 export class StepFactory {
@@ -22,8 +22,8 @@ export class StepFactory {
         const stepDependencies = dependencies;
         stepDependencies.stepDefinition = stepDefinition;
 
-        if (stepDefinition.definitionType == "MyStepDefinition") {
-            return new MyStep(stepDependencies);
+        if (stepDefinition.definitionType == "LocalStepDefinition") {
+            return new LocalStep(stepDependencies);
         }
         else {
             throw Error("Not step match with definition type: " + stepDefinition.definitionType)

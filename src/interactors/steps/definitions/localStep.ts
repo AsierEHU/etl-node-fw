@@ -1,16 +1,16 @@
 import EventEmitter from "events";
-import { AdapterFactory } from "../../../adapters/factory";
-import { AdapterDefinition, AdapterDependencies, AdapterRunOptions } from "../../../adapters/types";
-import { RegisterDataContext } from "../../../registers/types";
-import { Step, StepStatus, StepStatusTag, StepRunOptions } from "../../types"
+import { AdapterFactory } from "../../adapters/factory";
+import { AdapterDefinition, AdapterDependencies, AdapterRunOptions } from "../../adapters/types";
+import { RegisterDataContext } from "../../registers/types";
+import { Step, StepStatus, StepStatusTag, StepRunOptions, StepDefinition, StepStatusSummary } from "../types"
 import { v4 as uuidv4 } from 'uuid';
-import { MyStepDefinition, MyStepDependencies } from "./types";
+import { MyStepDependencies } from "./types";
 import { cloneDeep } from "lodash";
 
 /**
  * Local async step, persistance
  */
-export class MyStep<sd extends MyStepDefinition> implements Step<sd>{
+export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
 
     private readonly stepDefinition: sd;
     private readonly adapterBuilder: AdapterFactory;
@@ -111,3 +111,10 @@ export class MyStep<sd extends MyStepDefinition> implements Step<sd>{
 
 }
 
+export abstract class LocalStepDefinition implements StepDefinition {
+    abstract readonly adapterDefinitionId: string;
+    abstract readonly definitionType: string;
+    abstract readonly id: string
+    abstract readonly retartTries: number
+    abstract isFailedStatus(statusSummary: StepStatusSummary): boolean
+}
