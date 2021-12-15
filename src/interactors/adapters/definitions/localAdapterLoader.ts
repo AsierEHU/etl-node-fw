@@ -3,7 +3,8 @@ import { Entity, Register, RegisterStatusTag } from "../../registers/types";
 import { AdapterDefinition, EntityWithMeta } from "../types"
 import { v4 as uuidv4 } from 'uuid';
 import { LocalAdapter } from "./localAdapter";
-import { getWithMetaFormat } from "./utils";
+import { getValidationResultWithMeta, getWithMetaFormat } from "./utils";
+import { ValidationResult, ValidationStatusTag } from "./types";
 
 /**
  * Local async step, persistance
@@ -16,11 +17,6 @@ export class LocalAdapterLoader<ad extends LocalAdapterLoaderDefinition<Entity, 
         super(dependencies)
     }
 
-    async outputRegisters(inputRegisters: Register<Entity>[]) {
-        const ouputRegisters = await this.loadAndSaveRegisters(inputRegisters);
-        return ouputRegisters
-    }
-
     protected async getRegisters(): Promise<Register<Entity>[]> {
         const inputRegisters = await this.registerDataAccess.getAll({
             registerType: this.adapterDefinition.inputType,
@@ -30,43 +26,75 @@ export class LocalAdapterLoader<ad extends LocalAdapterLoaderDefinition<Entity, 
         return inputRegisters
     }
 
-    private async loadAndSaveRegisters(inputRegisters: Register<Entity>[]) {
+    async outputRegisters(inputRegisters: Register<Entity>[]) {
         const outputRegisters = [];
-        for (const inputRegistry of inputRegisters) {
-            try {
-                const inputEntity = inputRegistry.entity as Entity;
-                const outputEntity = await this.adapterDefinition.entityLoad(inputEntity);
-                const [outputEntityWithMeta] = getWithMetaFormat([outputEntity])
-                const register: Register<Entity> = {
-                    id: uuidv4(),
-                    entityType: this.adapterDefinition.outputType,
-                    sourceAbsoluteId: inputRegistry.sourceRelativeId,
-                    sourceRelativeId: inputRegistry.id,
-                    statusTag: outputEntityWithMeta.status || RegisterStatusTag.success,
-                    statusMeta: null,
-                    entity: outputEntityWithMeta.entity,
-                    meta: outputEntityWithMeta.meta,
-                    syncContext: this.adapterStatus.syncContext
-                }
-                outputRegisters.push(register)
-                await this.registerDataAccess.save(register)
-            } catch (error: any) {
-                const register: Register<Entity> = {
-                    id: uuidv4(),
-                    entityType: this.adapterDefinition.outputType,
-                    sourceAbsoluteId: inputRegistry.sourceRelativeId,
-                    sourceRelativeId: inputRegistry.id,
-                    statusTag: RegisterStatusTag.failed,
-                    statusMeta: error.message,
-                    entity: null,
-                    meta: null,
-                    syncContext: this.adapterStatus.syncContext
-                }
-                outputRegisters.push(register)
-                await this.registerDataAccess.save(register)
-            }
+        for (const inputRegister of inputRegisters) {
+            const outputRegister = await this.loadRegister(inputRegister)
+            const outputValidatedRegister = await this.validateRegister(outputRegister)
+            await this.registerDataAccess.save(outputValidatedRegister)
+            outputRegisters.push(outputValidatedRegister)
         }
-        return outputRegisters;
+        return outputRegisters
+    }
+
+    private async loadRegister(inputRegister: Register<Entity>): Promise<Register<object>> {
+        try {
+            const inputEntity = inputRegister.entity as Entity;
+            const outputEntity = await this.adapterDefinition.entityLoad(inputEntity);
+            const [outputEntityWithMeta] = getWithMetaFormat([outputEntity])
+            const register: Register<Entity> = {
+                id: uuidv4(),
+                entityType: this.adapterDefinition.outputType,
+                sourceAbsoluteId: inputRegister.sourceRelativeId,
+                sourceRelativeId: inputRegister.id,
+                statusTag: RegisterStatusTag.pending,
+                statusMeta: null,
+                entity: outputEntityWithMeta.entity,
+                meta: outputEntityWithMeta.meta,
+                syncContext: this.adapterStatus.syncContext
+            }
+            return register
+        } catch (error: any) {
+            const register: Register<Entity> = {
+                id: uuidv4(),
+                entityType: this.adapterDefinition.outputType,
+                sourceAbsoluteId: inputRegister.sourceRelativeId,
+                sourceRelativeId: inputRegister.id,
+                statusTag: RegisterStatusTag.failed,
+                statusMeta: error.message,
+                entity: null,
+                meta: null,
+                syncContext: this.adapterStatus.syncContext
+            }
+            return register
+        }
+    }
+
+    private async validateRegister(register: Register<Entity>): Promise<Register<object>> {
+        try {
+            const validation: any = await this.adapterDefinition.entityValidate(register.entity);
+            const validationWithMeta = getValidationResultWithMeta(validation);
+
+            if (validationWithMeta.statusTag == ValidationStatusTag.invalid) {
+                register.statusTag = RegisterStatusTag.invalid;
+            }
+
+            else if (validationWithMeta.statusTag == ValidationStatusTag.skipped) {
+                register.statusTag = RegisterStatusTag.skipped;
+            }
+
+            else if (validationWithMeta.statusTag == ValidationStatusTag.valid) {
+                register.statusTag = RegisterStatusTag.success;
+            }
+
+            register.statusMeta = validationWithMeta.meta;
+
+        } catch (error: any) {
+            register.statusTag = RegisterStatusTag.failed;
+            register.statusMeta = error.message;
+        }
+
+        return register;
     }
 }
 
@@ -76,4 +104,5 @@ export abstract class LocalAdapterLoaderDefinition<input extends Entity, output 
     abstract readonly outputType: string
     abstract readonly definitionType: string;
     abstract readonly entityLoad: (entity: input) => Promise<EntityWithMeta<output> | output>
+    abstract readonly entityValidate: (outputEntity: output | null) => Promise<ValidationResult | ValidationStatusTag> //data quality, error handling (error prevention), managin Bad Data-> triage or CleanUp
 }

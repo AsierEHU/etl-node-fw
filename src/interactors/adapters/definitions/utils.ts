@@ -1,31 +1,42 @@
 import { Entity, Register, RegisterStatusTag } from "../../registers/types";
 import { AdapterStatusSummary, EntityWithMeta, InputEntity } from "../types";
+import { ValidationResult, ValidationStatusTag } from "./types";
 
 export const getWithMetaFormat = (inputEntities: InputEntity<any>[]): EntityWithMeta<Entity>[] => {
-
     return inputEntities.map(inputEntity => {
-        if (inputEntity?.entity) {
-            const entity = {
-                entity: inputEntity?.entity,
-                meta: inputEntity?.meta || null,
-                status: inputEntity?.status
-            }
-            return entity as EntityWithMeta<Entity>;
-        }
-        else if (inputEntity) {
-            return {
-                entity: inputEntity,
-                meta: null
-            } as EntityWithMeta<Entity>;
+        if (isEntityWithMeta(inputEntity)) {
+            return inputEntity
         }
         else {
             return {
-                entity: null,
+                entity: inputEntity,
                 meta: null
-            } as EntityWithMeta<Entity>;
+            }
         }
     })
 }
+
+export const getValidationResultWithMeta = (validation: ValidationResult | ValidationStatusTag): ValidationResult => {
+    if (isValidationResult(validation)) {
+        return validation
+    } else {
+        return {
+            statusTag: validation,
+            meta: null
+        }
+    }
+}
+
+
+function isEntityWithMeta(inputEntity?: any): inputEntity is EntityWithMeta<Entity> {
+    return inputEntity?.entity != undefined
+}
+
+function isValidationResult(validation?: any): validation is ValidationResult {
+    return validation?.statusTag != undefined
+}
+
+
 
 export const calculateSummary = (outputRegisters: Register<Entity>[]): AdapterStatusSummary => {
     const statusSummary = {

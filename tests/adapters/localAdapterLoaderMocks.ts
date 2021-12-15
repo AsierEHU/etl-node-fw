@@ -1,4 +1,5 @@
 import { LocalAdapterLoaderDefinition } from "../../src/interactors/adapters/definitions/localAdapterLoader";
+import { ValidationResult, ValidationStatusTag } from "../../src/interactors/adapters/definitions/types";
 import { EntityWithMeta, InputEntity } from "../../src/interactors/adapters/types";
 import { Entity, Register, RegisterStatusTag } from "../../src/interactors/registers/types";
 import { localAdapterTransformerMocks } from "./localAdapterTransformerMocks";
@@ -36,13 +37,20 @@ export const localAdapterLoaderDefinition: LocalAdapterLoaderDefinition<outputCl
     outputType: "resultClass",
     async entityLoad(entity: outputClass) {
         if (entity.others.x == 23)
-            return { success: true } as resultClass
+            return { success: true } as resultClass;
         else if (entity.others.x == 1) {
-            return { entity: { success: false }, status: RegisterStatusTag.failed } as EntityWithMeta<resultClass>
+            return { success: false } as resultClass;
         } else {
-            throw Error("Loading error")
+            throw Error("Loading error");
         }
     },
+    async entityValidate(inputEntity: resultClass | null): Promise<ValidationResult | ValidationStatusTag> {
+        if (inputEntity?.success == true) {
+            return ValidationStatusTag.valid
+        } else {
+            return ValidationStatusTag.invalid
+        }
+    }
 }
 const mockFinalRegisters: Register<Entity>[] = [
     ...mockInitialRegisters,
@@ -68,7 +76,7 @@ const mockFinalRegisters: Register<Entity>[] = [
         entityType: "resultClass",
         sourceAbsoluteId: "b056be4c-595e-419d-aa2f-c6607cca738b",
         sourceRelativeId: "b056be4c-595e-419d-aa2f-c6607cca738b",
-        statusTag: RegisterStatusTag.failed,
+        statusTag: RegisterStatusTag.invalid,
         statusMeta: null,
         entity: {
             success: false,
@@ -92,8 +100,8 @@ const mockInitialStatus = {
 }
 const mockFinalSummary = {
     output_rows: 2,
-    rows_failed: 1,
-    rows_invalid: 0,
+    rows_failed: 0,
+    rows_invalid: 1,
     rows_skipped: 0,
     rows_success: 1,
 }

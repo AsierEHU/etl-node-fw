@@ -15,6 +15,10 @@ export class StepFactory {
 
     public createStep(definitionId: string, dependencies: any): Step<StepDefinition> {
         const stepDefinition = this.stepDefinitionsMap[definitionId];
+        if (!stepDefinition) {
+            throw Error("Not step match with definition id: " + definitionId)
+        }
+
         const stepDependencies = dependencies;
         stepDependencies.stepDefinition = stepDefinition;
 
@@ -22,7 +26,7 @@ export class StepFactory {
             return new MyStep(stepDependencies);
         }
         else {
-            throw Error("Not step match with definition id: " + definitionId)
+            throw Error("Not step match with definition type: " + stepDefinition.definitionType)
         }
 
     }

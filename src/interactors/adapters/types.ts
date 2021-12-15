@@ -23,7 +23,6 @@ export type InputEntity<e extends Entity> = (EntityWithMeta<e> | null | e)
 
 export type EntityWithMeta<e extends Entity> = {
     entity: e | null,
-    status?: RegisterStatusTag,
     meta: any,
 }
 

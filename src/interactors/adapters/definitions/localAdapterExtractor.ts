@@ -3,7 +3,7 @@ import { Entity, Register, RegisterStatusTag } from "../../registers/types";
 import { AdapterDefinition, EntityWithMeta, InputEntity } from "../types"
 import { v4 as uuidv4 } from 'uuid';
 import { FixedEntity, ToFixEntity, ValidationResult, ValidationStatusTag } from "./types";
-import { getWithMetaFormat } from "./utils";
+import { getValidationResultWithMeta, getWithMetaFormat } from "./utils";
 import { LocalAdapter } from "./localAdapter";
 
 
@@ -16,14 +16,6 @@ export class LocalAdapterExtractor<ad extends LocalAdapterExtractorDefinition<En
 
     constructor(dependencies: any) {
         super(dependencies)
-    }
-
-    async outputRegisters(inputRegisters: Register<Entity>[]) {
-        await this.validateRegisters(inputRegisters);
-        await this.fixRegisters(inputRegisters);
-        const outputRegisters = inputRegisters;
-        await this.registerDataAccess.saveAll(outputRegisters)
-        return outputRegisters
     }
 
     protected async getRegisters(): Promise<Register<Entity>[]> {
@@ -53,33 +45,33 @@ export class LocalAdapterExtractor<ad extends LocalAdapterExtractorDefinition<En
         return registers
     }
 
+    async outputRegisters(inputRegisters: Register<Entity>[]) {
+        await this.validateRegisters(inputRegisters);
+        await this.fixRegisters(inputRegisters);
+        const outputRegisters = inputRegisters;
+        await this.registerDataAccess.saveAll(outputRegisters)
+        return outputRegisters
+    }
+
     private async validateRegisters(inputRegisters: Register<Entity>[]) {
         for (const register of inputRegisters) {
             try {
-                const result: any = await this.adapterDefinition.entityValidate(register.entity);
-                let validationStatusTag;
-                let validationMeta;
-                if (result.statusTag && result.meta) {
-                    validationStatusTag = result.statusTag;
-                    validationMeta = result.meta;
-                } else {
-                    validationStatusTag = result;
-                    validationMeta = null;
-                }
+                const validation: any = await this.adapterDefinition.entityValidate(register.entity);
+                const validationWithMeta = getValidationResultWithMeta(validation);
 
-                if (validationStatusTag == ValidationStatusTag.invalid) {
+                if (validationWithMeta.statusTag == ValidationStatusTag.invalid) {
                     register.statusTag = RegisterStatusTag.invalid;
                 }
 
-                else if (validationStatusTag == ValidationStatusTag.skipped) {
+                else if (validationWithMeta.statusTag == ValidationStatusTag.skipped) {
                     register.statusTag = RegisterStatusTag.skipped;
                 }
 
-                else if (validationStatusTag == ValidationStatusTag.valid) {
+                else if (validationWithMeta.statusTag == ValidationStatusTag.valid) {
                     register.statusTag = RegisterStatusTag.success;
                 }
 
-                register.statusMeta = validationMeta;
+                register.statusMeta = validationWithMeta.meta;
 
             } catch (error: any) {
                 register.statusTag = RegisterStatusTag.failed;
