@@ -17,25 +17,6 @@
 // }
 
 
-
-// export const testTransformer: LocalAdapterTransformerDefinition<inputClass, outputClass> = {
-//     id: "testTransformer",
-//     definitionType: "LocalAdapterTransformerDefinition",
-//     inputType: "inputClass",
-//     outputType: "outputClass",
-//     async entityProcess(entity: inputClass) {
-//         if (entity.y == 30) {
-//             throw new Error("Y 30 error!!")
-//         }
-//         return {
-//             text: entity.field,
-//             others: {
-//                 x: entity.y,
-//             }
-//         };
-//     },
-// }
-
 // export const testLoader: LocalAdapterLoaderDefinition<outputClass, resultClass> = {
 //     id: "testLoader",
 //     definitionType: "LocalAdapterLoaderDefinition",

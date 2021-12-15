@@ -1,13 +1,14 @@
 import { EventEmitter } from "stream";
 import { VolatileRegisterDataAccess } from "../../src/dataAccess/volatile";
 import { AdapterFactory } from "../../src/interactors/adapters/factory";
-import { AdapterDefinition, AdapterStatus, AdapterStatusSummary, MockEntity } from "../../src/interactors/adapters/types";
+import { AdapterDefinition, AdapterStatus, AdapterStatusSummary, InputEntity } from "../../src/interactors/adapters/types";
 import { Entity, Register, RegisterDataContext, RegisterStatusTag } from "../../src/interactors/registers/types";
-import { localAdapterExtractorMocks, localAdapterExtractorDefinition } from "./localAdapterExtractorMocks"
+import { localAdapterExtractorDefinition, localAdapterExtractorMocks } from "./localAdapterExtractorMocks"
+import { localAdapterTransformerDefinition, localAdapterTransformerMocks } from "./localAdapterTransformerMocks";
 
 
 let adapterPresenter = new EventEmitter()
-let adapterDefinitions = [localAdapterExtractorDefinition];
+let adapterDefinitions = [localAdapterExtractorDefinition, localAdapterTransformerDefinition];
 let registerDataAccess = new VolatileRegisterDataAccess();
 let adapterFactory = new AdapterFactory(adapterDefinitions)
 let syncContext: RegisterDataContext = {
@@ -26,8 +27,9 @@ const adapterTest = (
         mockInitialStatus: AdapterStatus,
         mockFinalStatus: AdapterStatus,
         mockFinalSummary: AdapterStatusSummary,
-        mockRegisters: Register<Entity>[],
-        mockEntities: MockEntity[]
+        mockFinalRegisters: Register<Entity>[],
+        mockInitialRegisters: Register<Entity>[],
+        mockEntities: InputEntity[]
     }
 ) => {
     describe(definition.definitionType, () => {
@@ -35,6 +37,7 @@ const adapterTest = (
         beforeEach(() => {
             adapterPresenter.removeAllListeners("adapterStatus")
             registerDataAccess = new VolatileRegisterDataAccess()
+            registerDataAccess.saveAll(mocks.mockInitialRegisters)
             adapterDependencies = {
                 adapterPresenter,
                 registerDataAccess,
@@ -81,7 +84,7 @@ const adapterTest = (
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
             await adapter1.runOnce()
             const registers = await registerDataAccess.getAll()
-            registersEqual(registers, mocks.mockRegisters)
+            registersEqual(registers, mocks.mockFinalRegisters)
         });
 
         test("runOptions:onlyFailedEntities", async () => {
@@ -91,8 +94,8 @@ const adapterTest = (
             await adapter2.runOnce({ onlyFailedEntities: true })
             const registers = await registerDataAccess.getAll()
             const mockRegistersWithRetries = [
-                ...mocks.mockRegisters,
-                ...mocks.mockRegisters.filter(reg => reg.statusTag == RegisterStatusTag.failed)
+                ...mocks.mockFinalRegisters,
+                ...mocks.mockFinalRegisters.filter(reg => reg.statusTag == RegisterStatusTag.failed && reg.entityType == definition.outputType)
             ]
             registersEqual(registers, mockRegistersWithRetries)
         })
@@ -101,7 +104,7 @@ const adapterTest = (
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
             await adapter1.runOnce({ mockEntities: mocks.mockEntities })
             const registers = await registerDataAccess.getAll()
-            registersEqual(registers, mocks.mockRegisters)
+            registersEqual(registers, mocks.mockFinalRegisters)
         })
 
     })
@@ -116,25 +119,26 @@ const statusEqual = (adapterStatus: AdapterStatus, mockStatus: AdapterStatus) =>
     expect(adapterStatus).toEqual(mockStatus)
 }
 
-const registersEqual = (registers: Register<Entity>[], mockRegisters: Register<Entity>[]) => {
-    expect(registers.length).toBe(mockRegisters.length)
-    if (registers.length == mockRegisters.length)
+const registersEqual = (registers: Register<Entity>[], mockFinalRegisters: Register<Entity>[]) => {
+    expect(registers.length).toBe(mockFinalRegisters.length)
+    if (registers.length == mockFinalRegisters.length)
         registers.forEach((register, index) => {
-            registerEqual(register, mockRegisters[index])
+            registerEqual(register, mockFinalRegisters[index])
         })
 }
 
-const registerEqual = (register: Register<Entity>, mockRegister: Register<Entity>) => {
+const registerEqual = (register: Register<Entity>, mockFinalRegister: Register<Entity>) => {
     expect(register.id).not.toBeNull()
     expect(register.syncContext.apdaterId).not.toBeNull()
     expect(register.sourceAbsoluteId).not.toBeNull()
     expect(register.sourceRelativeId).not.toBeNull()
-    register.id = mockRegister.id
-    register.sourceAbsoluteId = mockRegister.sourceAbsoluteId
-    register.sourceRelativeId = mockRegister.sourceRelativeId
-    register.syncContext.apdaterId = mockRegister.syncContext.apdaterId
-    expect(register).toEqual(mockRegister)
+    register.id = mockFinalRegister.id
+    register.sourceAbsoluteId = mockFinalRegister.sourceAbsoluteId
+    register.sourceRelativeId = mockFinalRegister.sourceRelativeId
+    register.syncContext.apdaterId = mockFinalRegister.syncContext.apdaterId
+    expect(register).toEqual(mockFinalRegister)
 }
 
 
 adapterTest(localAdapterExtractorDefinition, localAdapterExtractorMocks)
+adapterTest(localAdapterTransformerDefinition, localAdapterTransformerMocks)

@@ -1,12 +1,14 @@
 import { LocalAdapterExtractorDefinition } from "../../src/interactors/adapters/definitions/localAdapterExtractor";
 import { ToFixEntity, ValidationStatusTag } from "../../src/interactors/adapters/definitions/types";
+import { InputEntity } from "../../src/interactors/adapters/types";
 import { Entity, Register, RegisterStatusTag } from "../../src/interactors/registers/types";
 
 type inputClass = {
     field: string,
     y: number,
 }
-const mockEntities = [
+const mockInitialRegisters: Register<Entity>[] = []
+const mockEntities: InputEntity[] = [
     {
         entity: {
             field: "Raw Object text",
@@ -94,7 +96,7 @@ export const localAdapterExtractorDefinition: LocalAdapterExtractorDefinition<in
         }
     },
 }
-const mockRegisters: Register<Entity>[] = [
+const mockFinalRegisters: Register<Entity>[] = [
     {
         id: "fb7bc93a-17c1-467c-951d-58bf119c1967",
         entityType: "inputClass",
@@ -233,4 +235,4 @@ const mockFinalStatus = {
     statusSummary: mockFinalSummary
 }
 
-export const localAdapterExtractorMocks = { mockInitialStatus, mockFinalStatus, mockFinalSummary, mockRegisters, mockEntities }
+export const localAdapterExtractorMocks = { mockInitialStatus, mockFinalStatus, mockFinalSummary, mockFinalRegisters, mockEntities, mockInitialRegisters }

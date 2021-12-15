@@ -13,6 +13,10 @@ export class AdapterFactory {
 
     public createAdapter(definitionId: string, dependencies: any): Adapter<AdapterDefinition> {
         const adapterDefinition = this.adapterDefinitionsMap[definitionId];
+        if (!adapterDefinition) {
+            throw Error("Not adapter match with definition id: " + definitionId)
+        }
+
         const adapterDependencies = dependencies;
         adapterDependencies.adapterDefinition = adapterDefinition;
 
@@ -29,7 +33,7 @@ export class AdapterFactory {
             return new LocalAdapterFlex(adapterDependencies);
         }
         else {
-            throw Error("Not adapter match with definition id: " + definitionId)
+            throw Error("Not adapter match with definition type: " + adapterDefinition.definitionType)
         }
     }
 }

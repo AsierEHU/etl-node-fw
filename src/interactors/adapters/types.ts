@@ -15,11 +15,11 @@ export interface Adapter<AdapterDefinition> {
 }
 
 export type AdapterRunOptions = { //filters, skips...
-    mockEntities?: MockEntity[],
+    mockEntities?: InputEntity[],
     onlyFailedEntities?: boolean
 }
 
-export type MockEntity = (EntityWithMeta<Entity> | null | Entity)
+export type InputEntity = (EntityWithMeta<Entity> | null | Entity)
 
 export type EntityWithMeta<input extends Entity> = {
     entity: input | null,
