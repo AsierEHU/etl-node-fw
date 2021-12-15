@@ -80,4 +80,8 @@ export class VolatileEntityFetcher implements EntityFetcher {
         return registers.map(register => { return { entity: register.entity, meta: register.meta } })
     }
 
+    getHistory(): RegisterDataFilter[] {
+        return this.fetchHistory;
+    }
+
 }

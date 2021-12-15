@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { getWithMetaFormat } from "./utils";
 import { LocalAdapter } from "./localAdapter";
 import { VolatileEntityFetcher } from "../../../dataAccess/volatile";
-import { EntityFetcher } from "./types";
+import { EntityFetcher, RegisterDataFilter } from "./types";
 
 /**
  * Local async step, persistance
@@ -16,23 +16,6 @@ export class LocalAdapterFlex<ad extends LocalAdapterFlexDefinition<Entity>> ext
 
     constructor(dependencies: any) {
         super(dependencies)
-    }
-
-    async outputRegisters(inputRegisters: Register<Entity>[]) {
-        const outputRegisters = inputRegisters;
-        await this.registerDataAccess.saveAll(outputRegisters)
-        return outputRegisters
-    }
-
-    protected async getRegisters(): Promise<Register<Entity>[]> {
-        const entityFetcher = new VolatileEntityFetcher(
-            { flowId: this.adapterStatus.syncContext.flowId },
-            this.registerDataAccess
-        )
-        const inputEntities = await this.adapterDefinition.entitiesGet(entityFetcher);
-        const inputEntitiesWithMeta = getWithMetaFormat(inputEntities)
-        const registers = await this.initRegisters(inputEntitiesWithMeta);
-        return registers;
     }
 
     protected async initRegisters(inputEntities: EntityWithMeta<Entity>[]) {
@@ -53,6 +36,37 @@ export class LocalAdapterFlex<ad extends LocalAdapterFlexDefinition<Entity>> ext
             registers.push(register)
         }
         return registers
+    }
+
+    async outputRegisters(inputRegisters: Register<Entity>[]) {
+        const outputRegisters = inputRegisters;
+        await this.registerDataAccess.saveAll(outputRegisters)
+        return outputRegisters
+    }
+
+    protected async getRegisters(): Promise<Register<Entity>[]> {
+        const entityFetcher = new VolatileEntityFetcher(
+            { flowId: this.adapterStatus.syncContext.flowId },
+            this.registerDataAccess
+        )
+        const inputEntities = await this.adapterDefinition.entitiesGet(entityFetcher);
+        const inputEntitiesWithMeta = getWithMetaFormat(inputEntities)
+        const registers = await this.initRegisters(inputEntitiesWithMeta);
+        this.calculateSourceId(registers, entityFetcher.getHistory())
+        return registers;
+    }
+
+    private calculateSourceId(registers: Register<Entity>[], history: RegisterDataFilter[]) {
+
+        const sourceId = history.reduce((id, curr) => {
+            return id + "-" + curr.registerType + "_" + curr.registerStatus
+        }, "00000000")
+
+        if (sourceId != "00000000")
+            for (const register of registers) {
+                register.sourceRelativeId = sourceId
+                register.sourceAbsoluteId = sourceId
+            }
     }
 }
 
