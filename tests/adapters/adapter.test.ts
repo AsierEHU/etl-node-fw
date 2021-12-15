@@ -5,10 +5,11 @@ import { AdapterDefinition, AdapterStatus, AdapterStatusSummary, InputEntity } f
 import { Entity, Register, RegisterDataContext, RegisterStatusTag } from "../../src/interactors/registers/types";
 import { localAdapterExtractorDefinition, localAdapterExtractorMocks } from "./localAdapterExtractorMocks"
 import { localAdapterTransformerDefinition, localAdapterTransformerMocks } from "./localAdapterTransformerMocks";
+import { localAdapterLoaderDefinition, localAdapterLoaderMocks } from "./localAdapterLoaderMocks";
 
 
 let adapterPresenter = new EventEmitter()
-let adapterDefinitions = [localAdapterExtractorDefinition, localAdapterTransformerDefinition];
+let adapterDefinitions = [localAdapterExtractorDefinition, localAdapterTransformerDefinition, localAdapterLoaderDefinition];
 let registerDataAccess = new VolatileRegisterDataAccess();
 let adapterFactory = new AdapterFactory(adapterDefinitions)
 let syncContext: RegisterDataContext = {
@@ -142,3 +143,4 @@ const registerEqual = (register: Register<Entity>, mockFinalRegister: Register<E
 
 adapterTest(localAdapterExtractorDefinition, localAdapterExtractorMocks)
 adapterTest(localAdapterTransformerDefinition, localAdapterTransformerMocks)
+adapterTest(localAdapterLoaderDefinition, localAdapterLoaderMocks)

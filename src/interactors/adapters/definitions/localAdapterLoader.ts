@@ -33,7 +33,7 @@ export class LocalAdapterLoader<ad extends LocalAdapterLoaderDefinition<Entity, 
         const outputRegisters = [];
         for (const inputRegistry of inputRegisters) {
             try {
-                const inputEntity = inputRegistry.entity;
+                const inputEntity = inputRegistry.entity as Entity;
                 const outputEntity = await this.adapterDefinition.entityLoad(inputEntity);
                 const register: Register<Entity> = {
                     id: uuidv4(),
@@ -73,5 +73,5 @@ export abstract class LocalAdapterLoaderDefinition<input extends Entity, output 
     abstract readonly inputType: string
     abstract readonly outputType: string
     abstract readonly definitionType: string;
-    abstract readonly entityLoad: (entity: input | null) => Promise<output>
+    abstract readonly entityLoad: (entity: input) => Promise<output>
 }
