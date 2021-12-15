@@ -96,10 +96,10 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
             const inputEntityId = uuidv4();
             return {
                 id: inputEntityId,
-                entityType: "Mocked",
+                entityType: this.adapterDefinition.outputType,
                 sourceAbsoluteId: inputEntityId,
                 sourceRelativeId: inputEntityId,
-                statusTag: RegisterStatusTag.success,
+                statusTag: RegisterStatusTag.pending,
                 statusMeta: null,
                 entity: inputEntity.entity,
                 meta: inputEntity.meta,

@@ -1,7 +1,6 @@
 
 import { Entity, Register, RegisterStatusTag } from "../../registers/types";
-import { AdapterDefinition, EntityWithMeta } from "../types"
-import { v4 as uuidv4 } from 'uuid';
+import { AdapterDefinition } from "../types"
 import { getWithMetaFormat } from "./utils";
 import { LocalAdapter } from "./localAdapter";
 import { VolatileEntityFetcher } from "../../../dataAccess/volatile";
@@ -18,32 +17,6 @@ export class LocalAdapterFlex<ad extends LocalAdapterFlexDefinition<Entity>> ext
         super(dependencies)
     }
 
-    protected async initRegisters(inputEntities: EntityWithMeta<Entity>[]) {
-        const registers = []
-        for (let inputEntity of inputEntities) {
-            const inputEntityId = uuidv4();
-            const register: Register<Entity> = {
-                id: inputEntityId,
-                entityType: this.adapterDefinition.outputType,
-                sourceAbsoluteId: inputEntityId,
-                sourceRelativeId: inputEntityId,
-                statusTag: RegisterStatusTag.success,
-                statusMeta: null,
-                entity: inputEntity.entity,
-                meta: inputEntity.meta,
-                syncContext: this.adapterStatus.syncContext
-            }
-            registers.push(register)
-        }
-        return registers
-    }
-
-    async outputRegisters(inputRegisters: Register<Entity>[]) {
-        const outputRegisters = inputRegisters;
-        await this.registerDataAccess.saveAll(outputRegisters)
-        return outputRegisters
-    }
-
     protected async getRegisters(): Promise<Register<Entity>[]> {
         const entityFetcher = new VolatileEntityFetcher(
             { flowId: this.adapterStatus.syncContext.flowId },
@@ -57,7 +30,6 @@ export class LocalAdapterFlex<ad extends LocalAdapterFlexDefinition<Entity>> ext
     }
 
     private calculateSourceId(registers: Register<Entity>[], history: RegisterDataFilter[]) {
-
         const sourceId = history.reduce((id, curr) => {
             return id + "-" + curr.registerType + "_" + curr.registerStatus
         }, "00000000")
@@ -67,6 +39,15 @@ export class LocalAdapterFlex<ad extends LocalAdapterFlexDefinition<Entity>> ext
                 register.sourceRelativeId = sourceId
                 register.sourceAbsoluteId = sourceId
             }
+    }
+
+    async outputRegisters(inputRegisters: Register<Entity>[]) {
+        const outputRegisters = inputRegisters;
+        outputRegisters.forEach(register => {
+            register.statusTag = RegisterStatusTag.success
+        })
+        await this.registerDataAccess.saveAll(outputRegisters)
+        return outputRegisters
     }
 }
 

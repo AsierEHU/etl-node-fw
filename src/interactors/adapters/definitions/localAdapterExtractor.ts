@@ -25,26 +25,6 @@ export class LocalAdapterExtractor<ad extends LocalAdapterExtractorDefinition<En
         return registers;
     }
 
-    protected async initRegisters(inputEntities: EntityWithMeta<Entity>[]) {
-        const registers = []
-        for (let inputEntity of inputEntities) {
-            const inputEntityId = uuidv4();
-            const register: Register<Entity> = {
-                id: inputEntityId,
-                entityType: this.adapterDefinition.outputType,
-                sourceAbsoluteId: inputEntityId,
-                sourceRelativeId: inputEntityId,
-                statusTag: RegisterStatusTag.pending,
-                statusMeta: null,
-                entity: inputEntity.entity,
-                meta: inputEntity.meta,
-                syncContext: this.adapterStatus.syncContext
-            }
-            registers.push(register)
-        }
-        return registers
-    }
-
     async outputRegisters(inputRegisters: Register<Entity>[]) {
         await this.validateRegisters(inputRegisters);
         await this.fixRegisters(inputRegisters);

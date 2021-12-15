@@ -110,6 +110,8 @@ const adapterTest = (
 
         //final status with inputOptions
 
+        //Register trazability,status...content check, ninguno puede ser pending...
+
     })
 }
 
