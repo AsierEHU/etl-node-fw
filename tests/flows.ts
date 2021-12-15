@@ -1,7 +1,7 @@
 
 // class testFlowDefinition implements MyFlowDefinition{
 //     stepsDefinition: [step1Definition]
-//     finalStep?: (registerFetcher: RegisterFetcher) => Promise<void>
+//     finalStep?: (registerFetcher: EntityFetcher) => Promise<void>
 //     id: "0";
 //     name: "test";
 //     description: "First test";

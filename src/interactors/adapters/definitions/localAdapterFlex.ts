@@ -1,10 +1,11 @@
 
-import { Entity, Register, RegisterDataContext, RegisterStatusTag } from "../../registers/types";
+import { Entity, Register, RegisterStatusTag } from "../../registers/types";
 import { AdapterDefinition, EntityWithMeta } from "../types"
 import { v4 as uuidv4 } from 'uuid';
-import { RegisterDataAccess } from "./types";
 import { getWithMetaFormat } from "./utils";
 import { LocalAdapter } from "./localAdapter";
+import { VolatileEntityFetcher } from "../../../dataAccess/volatile";
+import { EntityFetcher } from "./types";
 
 /**
  * Local async step, persistance
@@ -24,7 +25,11 @@ export class LocalAdapterFlex<ad extends LocalAdapterFlexDefinition<Entity>> ext
     }
 
     protected async getRegisters(): Promise<Register<Entity>[]> {
-        const inputEntities = await this.adapterDefinition.entitiesGet(this.registerDataAccess, this.adapterStatus.syncContext);
+        const entityFetcher = new VolatileEntityFetcher(
+            { flowId: this.adapterStatus.syncContext.flowId },
+            this.registerDataAccess
+        )
+        const inputEntities = await this.adapterDefinition.entitiesGet(entityFetcher);
         const inputEntitiesWithMeta = getWithMetaFormat(inputEntities)
         const registers = await this.initRegisters(inputEntitiesWithMeta);
         return registers;
@@ -55,5 +60,6 @@ export abstract class LocalAdapterFlexDefinition<output extends Entity> implemen
     abstract readonly id: string;
     abstract readonly outputType: string
     abstract readonly definitionType: string;
-    abstract readonly entitiesGet: (registerDataAccess: RegisterDataAccess<Entity>, syncContext: RegisterDataContext) => Promise<output[]>
+    abstract readonly entitiesGet: (entityFetcher: EntityFetcher) => Promise<output[]>
 }
+

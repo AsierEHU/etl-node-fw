@@ -1,5 +1,5 @@
 import { AdapterRunOptions } from "../adapters/types";
-import { RegisterDataContext } from "../registers/types";
+import { SyncContext } from "../registers/types";
 
 export interface Step<sd extends StepDefinition> {
     runOnce(stepRunOptions?: StepRunOptions): Promise<StepStatusTag> //start, if registers -> filter input by ids, if skip -> compare hash to skip
@@ -37,13 +37,13 @@ export type StepStatus = {
     timeFinished: Date | null   //debugging
     // exceptionTrace: object, //debugging
     runOptions: StepRunOptions | null
-    syncContext: RegisterDataContext
+    syncContext: SyncContext
     statusSummary: StepStatusSummary | null
 }
 
 export interface StepDependencies<sp extends StepDefinition> {
     stepDefinition: sp
-    syncContext: RegisterDataContext
+    syncContext: SyncContext
 }
 
 export type StepStatusSummary = { //Audit

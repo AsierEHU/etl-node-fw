@@ -1,7 +1,7 @@
-import { RegisterDataAccess, RegisterDataFilter } from "../interactors/adapters/definitions/types";
-import { Entity, Register } from "../interactors/registers/types";
+import { EntityFetcher, RegisterDataAccess, RegisterDataFilter } from "../interactors/adapters/definitions/types";
+import { Entity, Register, SyncContext } from "../interactors/registers/types";
 
-export class VolatileRegisterDataAccess implements RegisterDataAccess<Entity>{
+export class VolatileRegisterDataAccess implements RegisterDataAccess {
 
     private readonly repo: {
         [x: string]: Register<Entity>
@@ -56,5 +56,28 @@ export class VolatileRegisterDataAccess implements RegisterDataAccess<Entity>{
 
         return repoRegisters;
     };
+
+}
+
+export class VolatileEntityFetcher implements EntityFetcher {
+
+    private readonly syncContext: SyncContext
+    private readonly registerDataAccess: RegisterDataAccess
+    private readonly fetchHistory: RegisterDataFilter[]
+
+    constructor(syncContext: SyncContext, registerDataAccess: RegisterDataAccess) {
+        this.syncContext = syncContext
+        this.registerDataAccess = registerDataAccess
+        this.fetchHistory = []
+    }
+
+    async getEntities(filter?: RegisterDataFilter) {
+        if (filter) {
+            filter = { ...filter, ...this.syncContext }
+            this.fetchHistory.push(filter)
+        }
+        const registers = await this.registerDataAccess.getAll(filter)
+        return registers.map(register => { return { entity: register.entity, meta: register.meta } })
+    }
 
 }

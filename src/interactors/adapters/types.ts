@@ -1,4 +1,4 @@
-import { Entity, RegisterDataContext } from "../registers/types"
+import { Entity, SyncContext } from "../registers/types"
 
 export interface AdapterDefinition {
     readonly id: string
@@ -31,7 +31,7 @@ export type AdapterStatus = {
     outputType: string
     statusSummary: AdapterStatusSummary | null,
     runOptions: AdapterRunOptions | null
-    syncContext: RegisterDataContext
+    syncContext: SyncContext
 }
 
 export type AdapterStatusSummary = { //Audit
@@ -44,5 +44,5 @@ export type AdapterStatusSummary = { //Audit
 
 export interface AdapterDependencies<ad extends AdapterDefinition> {
     adapterDefinition: ad
-    syncContext?: RegisterDataContext
+    syncContext?: SyncContext
 }

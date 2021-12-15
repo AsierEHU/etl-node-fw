@@ -2,7 +2,7 @@ import { EventEmitter } from "stream";
 import { VolatileRegisterDataAccess } from "../../src/dataAccess/volatile";
 import { AdapterFactory } from "../../src/interactors/adapters/factory";
 import { AdapterDefinition, AdapterStatus, AdapterStatusSummary, InputEntity } from "../../src/interactors/adapters/types";
-import { Entity, Register, RegisterDataContext, RegisterStatusTag } from "../../src/interactors/registers/types";
+import { Entity, Register, SyncContext, RegisterStatusTag } from "../../src/interactors/registers/types";
 import { localAdapterExtractorDefinition, localAdapterExtractorMocks } from "./localAdapterExtractorMocks"
 import { localAdapterTransformerDefinition, localAdapterTransformerMocks } from "./localAdapterTransformerMocks";
 import { localAdapterLoaderDefinition, localAdapterLoaderMocks } from "./localAdapterLoaderMocks";
@@ -13,7 +13,7 @@ let adapterPresenter = new EventEmitter()
 let adapterDefinitions = [localAdapterExtractorDefinition, localAdapterTransformerDefinition, localAdapterLoaderDefinition, localAdapterFlexDefinition];
 let registerDataAccess = new VolatileRegisterDataAccess();
 let adapterFactory = new AdapterFactory(adapterDefinitions)
-let syncContext: RegisterDataContext = {
+let syncContext: SyncContext = {
     flowId: "testFlow",
     stepId: "testStep"
 }

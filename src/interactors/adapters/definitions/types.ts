@@ -1,11 +1,11 @@
 import EventEmitter from "events"
 import { Entity, Register, RegisterStatusTag } from "../../registers/types"
-import { AdapterDefinition, AdapterDependencies } from "../types"
+import { AdapterDefinition, AdapterDependencies, EntityWithMeta } from "../types"
 
 
 export interface MyAdapterDependencies<ad extends AdapterDefinition> extends AdapterDependencies<ad> {
     adapterPresenter: EventEmitter
-    registerDataAccess: RegisterDataAccess<Entity>
+    registerDataAccess: RegisterDataAccess
 }
 
 export enum ValidationStatusTag {
@@ -29,11 +29,15 @@ export type FixedEntity<e extends Entity> = {
     meta: any
 }
 
-export interface RegisterDataAccess<e extends Entity> {//For a specific syncContext
-    save: (register: Register<e>) => Promise<void>
-    saveAll: (registers: Register<e>[]) => Promise<void>
-    get: (id: string) => Promise<Register<e> | null>
-    getAll: (filter?: RegisterDataFilter, registersIds?: string[]) => Promise<Register<e>[]>
+export interface RegisterDataAccess {//For a specific syncContext
+    save: (register: Register<Entity>) => Promise<void>
+    saveAll: (registers: Register<Entity>[]) => Promise<void>
+    get: (id: string) => Promise<Register<Entity> | null>
+    getAll: (filter?: RegisterDataFilter, registersIds?: string[]) => Promise<Register<Entity>[]>
+}
+
+export interface EntityFetcher {//For a specific syncContext
+    getEntities: (filter?: RegisterDataFilter) => Promise<EntityWithMeta<Entity>[]>
 }
 
 export type RegisterDataFilter = {

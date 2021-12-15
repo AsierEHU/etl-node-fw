@@ -1,5 +1,5 @@
 import EventEmitter from "events";
-import { Entity, Register, RegisterDataContext, RegisterStatusTag } from "../../registers/types";
+import { Entity, Register, SyncContext, RegisterStatusTag } from "../../registers/types";
 import { Adapter, AdapterStatus, AdapterDefinition, EntityWithMeta, AdapterRunOptions, AdapterStatusSummary } from "../types"
 import { v4 as uuidv4 } from 'uuid';
 import { MyAdapterDependencies, RegisterDataAccess } from "./types";
@@ -20,9 +20,9 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
 
     protected readonly adapterDefinition: ad;
     protected readonly adapterPresenter: EventEmitter
-    protected readonly registerDataAccess: RegisterDataAccess<Entity>;
+    protected readonly registerDataAccess: RegisterDataAccess;
     protected readonly adapterStatus: AdapterStatus
-    protected readonly syncUpperContext?: RegisterDataContext
+    protected readonly syncUpperContext?: SyncContext
 
 
     constructor(dependencies: MyAdapterDependencies<ad>) {

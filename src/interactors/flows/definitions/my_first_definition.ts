@@ -1,5 +1,5 @@
 // import { StepStatusTag } from "../types/data"
-// import { RegisterFetcher, FixedEntity, ToFixEntity, ValidationResult } from "./types"
+// import { EntityFetcher, FixedEntity, ToFixEntity, ValidationResult } from "./types"
 // import { AdapterDefinition, FlowDefinition, FlowDefinitionOptions, StepDefinition } from "../types/entities"
 
 // export abstract class MyFlowDefinition implements FlowDefinition<MyFlowDefinitionOptions> {
@@ -7,7 +7,7 @@
 //     readonly name:string
 //     readonly description:string
 //     readonly stepsDefinition:[LocalStepDefinition<object>]
-//     finalStep?:(registerFetcher: RegisterFetcher)=>Promise<void> //always reached
+//     finalStep?:(registerFetcher: EntityFetcher)=>Promise<void> //always reached
 //     shouldProcessConinue:(entities, stepStatusTag:StepStatusTag) => Promise<boolean>
 // }
 

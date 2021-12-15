@@ -1,7 +1,7 @@
 import EventEmitter from "events";
 import { AdapterFactory } from "../../adapters/factory";
 import { AdapterDefinition, AdapterDependencies, AdapterRunOptions } from "../../adapters/types";
-import { RegisterDataContext } from "../../registers/types";
+import { SyncContext } from "../../registers/types";
 import { Step, StepStatus, StepStatusTag, StepRunOptions, StepDefinition, StepStatusSummary } from "../types"
 import { v4 as uuidv4 } from 'uuid';
 import { MyStepDependencies } from "./types";
@@ -17,7 +17,7 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
     private readonly stepStatus: StepStatus;
     private readonly stepPresenter: EventEmitter;
     private readonly adapterDependencies: AdapterDependencies<AdapterDefinition>;
-    protected readonly syncUpperContext: RegisterDataContext
+    protected readonly syncUpperContext: SyncContext
 
     constructor(dependencies: MyStepDependencies<sd>) {
         this.stepDefinition = dependencies.stepDefinition;

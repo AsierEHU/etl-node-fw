@@ -2,7 +2,7 @@
 // // Entities (custom implementation)
 
 // import { StepStatusTag } from "../types/data"
-// import { RegisterFetcher } from "../types/dataAccess"
+// import { EntityFetcher } from "../types/dataAccess"
 // import { FlowDefinition, FlowDefinitionOptions, StepDefinition, Sync } from "../types/entities"
 
 // //type FlowPresenter = (flowStatus: FlowStatus)=>Promise<void> //output data

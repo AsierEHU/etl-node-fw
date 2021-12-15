@@ -7,7 +7,7 @@ export type Register<e extends Entity> = {
     statusMeta: RegisterMeta
     entity: e | null, //register itself
     meta: RegisterMeta, //save here for example every info need for final step (Alerts, csv name...)
-    syncContext: RegisterDataContext
+    syncContext: SyncContext
 }
 
 export type RegisterMeta = string | object | null
@@ -20,7 +20,7 @@ export enum RegisterStatusTag {
     skipped = "skipped", //Business
 }
 
-export type RegisterDataContext = {
+export type SyncContext = {
     flowId?: string,
     stepId?: string,
     apdaterId?: string,

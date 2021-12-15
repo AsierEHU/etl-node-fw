@@ -1,7 +1,7 @@
 import { LocalAdapterFlexDefinition } from "../../src/interactors/adapters/definitions/localAdapterFlex";
-import { RegisterDataAccess, RegisterDataFilter } from "../../src/interactors/adapters/definitions/types";
+import { EntityFetcher, RegisterDataAccess, RegisterDataFilter } from "../../src/interactors/adapters/definitions/types";
 import { InputEntity } from "../../src/interactors/adapters/types";
-import { Entity, Register, RegisterDataContext, RegisterStatusTag } from "../../src/interactors/registers/types";
+import { Entity, Register, SyncContext, RegisterStatusTag } from "../../src/interactors/registers/types";
 import { localAdapterLoaderMocks } from "./localAdapterLoaderMocks";
 
 type result2Class = {
@@ -15,14 +15,12 @@ export const localAdapterFlexDefinition: LocalAdapterFlexDefinition<result2Class
     id: "testFlex",
     outputType: "result2Class",
     definitionType: "LocalAdapterFlexDefinition",
-    async entitiesGet(registerDataAccess: RegisterDataAccess<Entity>, syncContext: RegisterDataContext) {
+    async entitiesGet(entityFetcher: EntityFetcher) {
         const filter: RegisterDataFilter = {
-            flowId: syncContext.flowId,
             registerType: "resultClass",
             registerStatus: RegisterStatusTag.success
         }
-        const registers = await registerDataAccess.getAll(filter)
-        const entities = registers.map(reg => reg.entity)
+        const entities = await entityFetcher.getEntities(filter)
         return [{
             successTotal: entities.length
         }]
