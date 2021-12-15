@@ -47,7 +47,7 @@ export const localAdapterLoaderDefinition: LocalAdapterLoaderDefinition<outputCl
 const mockFinalRegisters: Register<Entity>[] = [
     ...mockInitialRegisters,
     {
-        id: "ebd1c577-a6aa-40b1-bdee-52f3ee0ea642",
+        id: "ebd1c577-a6aa-40b1-bdee-52f3ee0ea643",
         entityType: "resultClass",
         sourceAbsoluteId: "fb7bc93a-17c1-467c-951d-58bf119c1967",
         sourceRelativeId: "fb7bc93a-17c1-467c-951d-58bf119c1967",
@@ -64,7 +64,7 @@ const mockFinalRegisters: Register<Entity>[] = [
         },
     },
     {
-        id: "96a0a645-5bd7-46b3-aab5-0f30de460684",
+        id: "96a0a645-5bd7-46b3-aab5-0f30de460685",
         entityType: "resultClass",
         sourceAbsoluteId: "b056be4c-595e-419d-aa2f-c6607cca738b",
         sourceRelativeId: "b056be4c-595e-419d-aa2f-c6607cca738b",

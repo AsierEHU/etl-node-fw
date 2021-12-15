@@ -8,7 +8,12 @@ export class AdapterFactory {
     private readonly adapterDefinitionsMap: { [key: string]: AdapterDefinition }
 
     constructor(adapterDefinitions: Array<AdapterDefinition>) {
-        this.adapterDefinitionsMap = adapterDefinitions.reduce((map, adapterDefinition) => ({ ...map, [adapterDefinition.id]: adapterDefinition }), {})
+        this.adapterDefinitionsMap = {}
+        for (const adapterDefinition of adapterDefinitions) {
+            if (this.adapterDefinitionsMap[adapterDefinition.id])
+                throw new Error(`Adapter with id ${adapterDefinition.id} already exist`);
+            this.adapterDefinitionsMap[adapterDefinition.id] = adapterDefinition
+        }
     }
 
     public createAdapter(definitionId: string, dependencies: any): Adapter<AdapterDefinition> {

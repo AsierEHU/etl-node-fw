@@ -6,10 +6,11 @@ import { Entity, Register, RegisterDataContext, RegisterStatusTag } from "../../
 import { localAdapterExtractorDefinition, localAdapterExtractorMocks } from "./localAdapterExtractorMocks"
 import { localAdapterTransformerDefinition, localAdapterTransformerMocks } from "./localAdapterTransformerMocks";
 import { localAdapterLoaderDefinition, localAdapterLoaderMocks } from "./localAdapterLoaderMocks";
+import { localAdapterFlexDefinition, localAdapterFlexMocks } from "./localAdapterFlexMocks";
 
 
 let adapterPresenter = new EventEmitter()
-let adapterDefinitions = [localAdapterExtractorDefinition, localAdapterTransformerDefinition, localAdapterLoaderDefinition];
+let adapterDefinitions = [localAdapterExtractorDefinition, localAdapterTransformerDefinition, localAdapterLoaderDefinition, localAdapterFlexDefinition];
 let registerDataAccess = new VolatileRegisterDataAccess();
 let adapterFactory = new AdapterFactory(adapterDefinitions)
 let syncContext: RegisterDataContext = {
@@ -37,8 +38,7 @@ const adapterTest = (
 
         beforeEach(() => {
             adapterPresenter.removeAllListeners("adapterStatus")
-            registerDataAccess = new VolatileRegisterDataAccess()
-            registerDataAccess.saveAll(mocks.mockInitialRegisters)
+            registerDataAccess = new VolatileRegisterDataAccess(mocks.mockInitialRegisters)
             adapterDependencies = {
                 adapterPresenter,
                 registerDataAccess,
@@ -108,6 +108,8 @@ const adapterTest = (
             registersEqual(registers, mocks.mockFinalRegisters)
         })
 
+        //final status with inputOptions
+
     })
 }
 
@@ -144,3 +146,4 @@ const registerEqual = (register: Register<Entity>, mockFinalRegister: Register<E
 adapterTest(localAdapterExtractorDefinition, localAdapterExtractorMocks)
 adapterTest(localAdapterTransformerDefinition, localAdapterTransformerMocks)
 adapterTest(localAdapterLoaderDefinition, localAdapterLoaderMocks)
+adapterTest(localAdapterFlexDefinition, localAdapterFlexMocks)

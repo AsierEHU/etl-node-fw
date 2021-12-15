@@ -1,17 +1,23 @@
 import { RegisterDataAccess, RegisterDataFilter } from "../interactors/adapters/definitions/types";
-import { Register } from "../interactors/registers/types";
+import { Entity, Register } from "../interactors/registers/types";
 
-export class VolatileRegisterDataAccess implements RegisterDataAccess<any>{
+export class VolatileRegisterDataAccess implements RegisterDataAccess<Entity>{
 
-    private repo: {
-        [x: string]: Register<any>
+    private readonly repo: {
+        [x: string]: Register<Entity>
     };
 
-    constructor(dependencies?: any) {
-        this.repo = dependencies?.repo || {}
+    constructor(registers?: Register<Entity>[]) {
+        this.repo = {}
+        if (registers)
+            for (const register of registers) {
+                if (this.repo[register.id])
+                    throw new Error(`Register with id ${register.id} already exist`);
+                this.repo[register.id] = register
+            }
     }
 
-    async save(register: Register<any>) {
+    async save(register: Register<Entity>) {
         this.repo[register.id] = register
     };
 
@@ -19,7 +25,7 @@ export class VolatileRegisterDataAccess implements RegisterDataAccess<any>{
         return this.repo[id]
     }
 
-    async saveAll(registers: Register<any>[]) {
+    async saveAll(registers: Register<Entity>[]) {
         for (const register of registers) {
             await this.save(register)
         }

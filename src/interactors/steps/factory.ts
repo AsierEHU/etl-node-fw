@@ -5,7 +5,12 @@ export class StepFactory {
     private readonly stepDefinitionsMap: { [key: string]: StepDefinition }
 
     constructor(stepDefinitions: Array<StepDefinition>) {
-        this.stepDefinitionsMap = stepDefinitions.reduce((map, stepDefinition) => ({ ...map, [stepDefinition.id]: stepDefinition }), {})
+        this.stepDefinitionsMap = {}
+        for (const stepDefinition of stepDefinitions) {
+            if (this.stepDefinitionsMap[stepDefinition.id])
+                throw new Error(`Adapter with id ${stepDefinition.id} already exist`);
+            this.stepDefinitionsMap[stepDefinition.id] = stepDefinition
+        }
     }
 
     public createStep(definitionId: string, dependencies: any): Step<StepDefinition> {
