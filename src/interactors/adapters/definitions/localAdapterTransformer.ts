@@ -40,7 +40,7 @@ export class LocalAdapterTransformer<ad extends LocalAdapterTransformerDefinitio
                 const register: Register<Entity> = {
                     id: uuidv4(),
                     entityType: this.adapterDefinition.outputType,
-                    sourceAbsoluteId: inputRegistry.sourceRelativeId,
+                    sourceAbsoluteId: inputRegistry.sourceAbsoluteId,
                     sourceRelativeId: inputRegistry.id,
                     statusTag: RegisterStatusTag.success,
                     statusMeta: null,
@@ -53,7 +53,7 @@ export class LocalAdapterTransformer<ad extends LocalAdapterTransformerDefinitio
                 const register: Register<Entity> = {
                     id: uuidv4(),
                     entityType: this.adapterDefinition.outputType,
-                    sourceAbsoluteId: inputRegistry.sourceRelativeId,
+                    sourceAbsoluteId: inputRegistry.sourceAbsoluteId,
                     sourceRelativeId: inputRegistry.id,
                     statusTag: RegisterStatusTag.failed,
                     statusMeta: error.message,

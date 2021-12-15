@@ -1,6 +1,6 @@
 import { LocalAdapterLoaderDefinition } from "../../src/interactors/adapters/definitions/localAdapterLoader";
 import { ValidationResult, ValidationStatusTag } from "../../src/interactors/adapters/definitions/types";
-import { EntityWithMeta, InputEntity } from "../../src/interactors/adapters/types";
+import { InputEntity } from "../../src/interactors/adapters/types";
 import { Entity, Register, RegisterStatusTag } from "../../src/interactors/registers/types";
 import { localAdapterTransformerMocks } from "./localAdapterTransformerMocks";
 

@@ -2,9 +2,9 @@ import EventEmitter from "events";
 import { Entity, Register, SyncContext, RegisterStatusTag } from "../../registers/types";
 import { Adapter, AdapterStatus, AdapterDefinition, EntityWithMeta, AdapterRunOptions, AdapterStatusSummary } from "../types"
 import { v4 as uuidv4 } from 'uuid';
-import { MyAdapterDependencies, RegisterDataAccess } from "./types";
+import { EntityInitValues, MyAdapterDependencies, RegisterDataAccess } from "./types";
 import { calculateSummary, getWithMetaFormat } from "./utils";
-import { cloneDeep } from 'lodash'
+import { cloneDeep, uniqBy } from 'lodash'
 
 
 
@@ -79,9 +79,17 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
                 registerStatus: RegisterStatusTag.failed,
                 ...this.syncUpperContext
             })
-            const oldInputRegistersIds = outputRegisters.map(outputRegister => outputRegister.sourceRelativeId) as string[]
+            const uniqueOutputRegisters = uniqBy(outputRegisters, 'sourceRelativeId')
+            const oldInputRegistersIds = uniqueOutputRegisters.map(outputRegister => outputRegister.sourceRelativeId) as string[]
             const oldInputRegisters = await this.registerDataAccess.getAll(undefined, oldInputRegistersIds)
-            const inputEntitiesWithMeta = oldInputRegisters.map(oir => { return { entity: oir.entity, meta: oir.meta } })
+            const inputEntitiesWithMeta = oldInputRegisters.map(oir => {
+                return {
+                    entity: oir.entity,
+                    meta: oir.meta,
+                    sourceAbsoluteId: oir.sourceAbsoluteId,
+                    sourceRelativeId: oir.id
+                }
+            })
             inputRegisters = await this.initRegisters(inputEntitiesWithMeta)
         }
         else {
@@ -91,18 +99,19 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
         return cloneDeep(inputRegisters);
     }
 
-    protected async initRegisters(inputEntities: EntityWithMeta<Entity>[]): Promise<Register<Entity>[]> {
-        return inputEntities.map(inputEntity => {
+    protected async initRegisters(inputEntities: (EntityInitValues<Entity> | EntityWithMeta<Entity>)[]): Promise<Register<Entity>[]> {
+        return inputEntities.map((inputEntity) => {
+            const entity: EntityInitValues<Entity> = inputEntity as EntityInitValues<Entity>
             const inputEntityId = uuidv4();
             return {
                 id: inputEntityId,
                 entityType: this.adapterDefinition.outputType,
-                sourceAbsoluteId: inputEntityId,
-                sourceRelativeId: inputEntityId,
+                sourceAbsoluteId: entity.sourceAbsoluteId || inputEntityId,
+                sourceRelativeId: entity.sourceRelativeId || inputEntityId,
                 statusTag: RegisterStatusTag.pending,
                 statusMeta: null,
-                entity: inputEntity.entity,
-                meta: inputEntity.meta,
+                entity: entity.entity,
+                meta: entity.meta,
                 syncContext: this.adapterStatus.syncContext,
             }
         })

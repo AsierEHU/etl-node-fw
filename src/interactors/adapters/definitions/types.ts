@@ -29,6 +29,13 @@ export type FixedEntity<e extends Entity> = {
     meta: any
 }
 
+export type EntityInitValues<e extends Entity> = {
+    entity: e | null,
+    meta: any,
+    sourceAbsoluteId: any,
+    sourceRelativeId: any,
+}
+
 export interface RegisterDataAccess {//For a specific syncContext
     save: (register: Register<Entity>) => Promise<void>
     saveAll: (registers: Register<Entity>[]) => Promise<void>

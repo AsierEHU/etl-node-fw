@@ -72,10 +72,7 @@ export class VolatileEntityFetcher implements EntityFetcher {
     }
 
     async getEntities(filter?: RegisterDataFilter) {
-        if (filter) {
-            filter = { ...filter, ...this.syncContext }
-            this.fetchHistory.push(filter)
-        }
+        filter = { ...filter, ...this.syncContext }
         const registers = await this.registerDataAccess.getAll(filter)
         return registers.map(register => { return { entity: register.entity, meta: register.meta } })
     }
