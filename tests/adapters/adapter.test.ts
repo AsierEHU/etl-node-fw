@@ -30,7 +30,7 @@ const adapterTest = (
         mockFinalSummary: AdapterStatusSummary,
         mockFinalRegisters: Register<Entity>[],
         mockInitialRegisters: Register<Entity>[],
-        mockEntities: InputEntity[]
+        mockEntities: InputEntity<Entity>[]
     }
 ) => {
     describe(definition.definitionType, () => {

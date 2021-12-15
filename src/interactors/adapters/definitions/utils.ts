@@ -1,24 +1,28 @@
 import { Entity, Register, RegisterStatusTag } from "../../registers/types";
-import { AdapterStatusSummary, EntityWithMeta } from "../types";
+import { AdapterStatusSummary, EntityWithMeta, InputEntity } from "../types";
 
-export const getWithMetaFormat = (inputEntities: any[]): EntityWithMeta<Entity>[] => {
+export const getWithMetaFormat = (inputEntities: InputEntity<any>[]): EntityWithMeta<Entity>[] => {
 
     return inputEntities.map(inputEntity => {
-        if (inputEntity?.entity && inputEntity?.meta) {
-            return inputEntity;
-
+        if (inputEntity?.entity) {
+            const entity = {
+                entity: inputEntity?.entity,
+                meta: inputEntity?.meta || null,
+                status: inputEntity?.status
+            }
+            return entity as EntityWithMeta<Entity>;
         }
         else if (inputEntity) {
             return {
                 entity: inputEntity,
-                meta: null,
-            }
+                meta: null
+            } as EntityWithMeta<Entity>;
         }
         else {
             return {
                 entity: null,
-                meta: null,
-            }
+                meta: null
+            } as EntityWithMeta<Entity>;
         }
     })
 }

@@ -8,7 +8,7 @@ type inputClass = {
     y: number,
 }
 const mockInitialRegisters: Register<Entity>[] = []
-const mockEntities: InputEntity[] = [
+const mockEntities: InputEntity<inputClass>[] = [
     {
         entity: {
             field: "Raw Object text",
@@ -140,14 +140,7 @@ const mockFinalRegisters: Register<Entity>[] = [
         sourceAbsoluteId: "b056be4c-595e-419d-aa2f-c6607cca738b",
         sourceRelativeId: "b056be4c-595e-419d-aa2f-c6607cca738b",
         statusTag: RegisterStatusTag.success,
-        statusMeta: {
-            type: "0 error",
-            action: "trigger alarm",
-            severity: "low",
-            fixMeta: {
-                note: "Fixed changing to 1",
-            },
-        },
+        statusMeta: { note: "Fixed changing to 1" },
         entity: {
             field: "Raw Object text 2",
             y: 1,

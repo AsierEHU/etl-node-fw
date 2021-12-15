@@ -1,6 +1,6 @@
 
 import { Entity, Register, RegisterDataContext, RegisterStatusTag } from "../../registers/types";
-import { AdapterDefinition, EntityWithMeta, AdapterRunOptions } from "../types"
+import { AdapterDefinition, EntityWithMeta } from "../types"
 import { v4 as uuidv4 } from 'uuid';
 import { RegisterDataAccess } from "./types";
 import { getWithMetaFormat } from "./utils";

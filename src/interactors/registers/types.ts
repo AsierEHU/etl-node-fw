@@ -1,15 +1,16 @@
-export type Register<entity extends Entity> = {
+export type Register<e extends Entity> = {
     id: string //datalineage, unique
     entityType: string
     sourceRelativeId: string | null //datalineage
     sourceAbsoluteId: string | null //datalineage
     statusTag: RegisterStatusTag  //managing bad data
-    statusMeta: any
-    entity: entity | null, //register itself
-    meta: any, //save here for example every info need for final step (Alerts, csv name...)
+    statusMeta: RegisterMeta
+    entity: e | null, //register itself
+    meta: RegisterMeta, //save here for example every info need for final step (Alerts, csv name...)
     syncContext: RegisterDataContext
-    // hash:string,
 }
+
+export type RegisterMeta = string | object | null
 
 export enum RegisterStatusTag {
     pending = "pending",
@@ -25,5 +26,4 @@ export type RegisterDataContext = {
     apdaterId?: string,
 }
 
-export interface Entity {
-}
+export type Entity = object

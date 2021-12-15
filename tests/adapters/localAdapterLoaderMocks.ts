@@ -1,5 +1,5 @@
 import { LocalAdapterLoaderDefinition } from "../../src/interactors/adapters/definitions/localAdapterLoader";
-import { InputEntity } from "../../src/interactors/adapters/types";
+import { EntityWithMeta, InputEntity } from "../../src/interactors/adapters/types";
 import { Entity, Register, RegisterStatusTag } from "../../src/interactors/registers/types";
 import { localAdapterTransformerMocks } from "./localAdapterTransformerMocks";
 
@@ -15,7 +15,7 @@ type resultClass = {
 }
 
 const mockInitialRegisters: Register<Entity>[] = localAdapterTransformerMocks.mockFinalRegisters
-const mockEntities: InputEntity[] = [
+const mockEntities: InputEntity<outputClass>[] = [
     {
         text: "Raw Object text",
         others: {
@@ -35,9 +35,13 @@ export const localAdapterLoaderDefinition: LocalAdapterLoaderDefinition<outputCl
     inputType: "outputClass",
     outputType: "resultClass",
     async entityLoad(entity: outputClass) {
-        return {
-            success: true,
-        } as resultClass;
+        if (entity.others.x == 23)
+            return { success: true } as resultClass
+        else if (entity.others.x == 1) {
+            return { entity: { success: false }, status: RegisterStatusTag.failed } as EntityWithMeta<resultClass>
+        } else {
+            throw Error("Loading error")
+        }
     },
 }
 const mockFinalRegisters: Register<Entity>[] = [
@@ -48,11 +52,11 @@ const mockFinalRegisters: Register<Entity>[] = [
         sourceAbsoluteId: "fb7bc93a-17c1-467c-951d-58bf119c1967",
         sourceRelativeId: "fb7bc93a-17c1-467c-951d-58bf119c1967",
         statusTag: RegisterStatusTag.success,
-        statusMeta: undefined,
+        statusMeta: null,
         entity: {
             success: true,
         },
-        meta: undefined,
+        meta: null,
         syncContext: {
             flowId: "testFlow",
             stepId: "testStep",
@@ -64,12 +68,12 @@ const mockFinalRegisters: Register<Entity>[] = [
         entityType: "resultClass",
         sourceAbsoluteId: "b056be4c-595e-419d-aa2f-c6607cca738b",
         sourceRelativeId: "b056be4c-595e-419d-aa2f-c6607cca738b",
-        statusTag: RegisterStatusTag.success,
-        statusMeta: undefined,
+        statusTag: RegisterStatusTag.failed,
+        statusMeta: null,
         entity: {
-            success: true,
+            success: false,
         },
-        meta: undefined,
+        meta: null,
         syncContext: {
             flowId: "testFlow",
             stepId: "testStep",
@@ -88,10 +92,10 @@ const mockInitialStatus = {
 }
 const mockFinalSummary = {
     output_rows: 2,
-    rows_failed: 0,
+    rows_failed: 1,
     rows_invalid: 0,
     rows_skipped: 0,
-    rows_success: 2,
+    rows_success: 1,
 }
 const mockFinalStatus = {
     ...mockInitialStatus,

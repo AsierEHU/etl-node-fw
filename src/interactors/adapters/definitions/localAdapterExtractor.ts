@@ -1,6 +1,6 @@
 
 import { Entity, Register, RegisterStatusTag } from "../../registers/types";
-import { AdapterDefinition, EntityWithMeta, AdapterRunOptions, InputEntity } from "../types"
+import { AdapterDefinition, EntityWithMeta, InputEntity } from "../types"
 import { v4 as uuidv4 } from 'uuid';
 import { FixedEntity, ToFixEntity, ValidationResult, ValidationStatusTag } from "./types";
 import { getWithMetaFormat } from "./utils";
@@ -100,7 +100,7 @@ export class LocalAdapterExtractor<ad extends LocalAdapterExtractorDefinition<En
                 if (fixedEntity) {
                     toFixRegister.entity = fixedEntity.entity;
                     toFixRegister.statusTag = RegisterStatusTag.success;
-                    toFixRegister.statusMeta = { ...toFixRegister.statusMeta, fixMeta: fixedEntity.meta }
+                    toFixRegister.statusMeta = fixedEntity.meta
                 } else {
                     toFixRegister.statusTag = RegisterStatusTag.invalid;
                 }
@@ -117,7 +117,7 @@ export abstract class LocalAdapterExtractorDefinition<input extends Entity> impl
     abstract readonly definitionType: string;
     abstract readonly id: string;
     abstract readonly outputType: string
-    abstract readonly entitiesGet: () => Promise<InputEntity[]>
+    abstract readonly entitiesGet: () => Promise<InputEntity<input>[]>
     abstract readonly entityValidate: (inputEntity: input | null) => Promise<ValidationResult | ValidationStatusTag> //data quality, error handling (error prevention), managin Bad Data-> triage or CleanUp
     abstract readonly entityFix: (toFixEntity: ToFixEntity<input>) => Promise<FixedEntity<input> | null> //error handling (error response), managin Bad Data-> CleanUp
 }

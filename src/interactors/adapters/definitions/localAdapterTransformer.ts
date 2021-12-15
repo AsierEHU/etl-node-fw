@@ -1,6 +1,6 @@
 
 import { Entity, Register, RegisterStatusTag } from "../../registers/types";
-import { AdapterDefinition, AdapterRunOptions } from "../types"
+import { AdapterDefinition } from "../types"
 import { v4 as uuidv4 } from 'uuid';
 import { LocalAdapter } from "./localAdapter";
 
@@ -43,9 +43,9 @@ export class LocalAdapterTransformer<ad extends LocalAdapterTransformerDefinitio
                     sourceAbsoluteId: inputRegistry.sourceRelativeId,
                     sourceRelativeId: inputRegistry.id,
                     statusTag: RegisterStatusTag.success,
-                    statusMeta: undefined,
+                    statusMeta: null,
                     entity: outputEntity,
-                    meta: undefined,
+                    meta: null,
                     syncContext: this.adapterStatus.syncContext
                 }
                 outputRegisters.push(register)
@@ -58,7 +58,7 @@ export class LocalAdapterTransformer<ad extends LocalAdapterTransformerDefinitio
                     statusTag: RegisterStatusTag.failed,
                     statusMeta: error.message,
                     entity: null,
-                    meta: undefined,
+                    meta: null,
                     syncContext: this.adapterStatus.syncContext
                 }
                 outputRegisters.push(register)

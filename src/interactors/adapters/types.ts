@@ -1,4 +1,4 @@
-import { Entity, RegisterDataContext } from "../registers/types"
+import { Entity, RegisterDataContext, RegisterMeta, RegisterStatusTag } from "../registers/types"
 
 export interface AdapterDefinition {
     readonly id: string
@@ -15,14 +15,15 @@ export interface Adapter<AdapterDefinition> {
 }
 
 export type AdapterRunOptions = { //filters, skips...
-    mockEntities?: InputEntity[],
+    mockEntities?: InputEntity<Entity>[],
     onlyFailedEntities?: boolean
 }
 
-export type InputEntity = (EntityWithMeta<Entity> | null | Entity)
+export type InputEntity<e extends Entity> = (EntityWithMeta<e> | null | e)
 
-export type EntityWithMeta<input extends Entity> = {
-    entity: input | null,
+export type EntityWithMeta<e extends Entity> = {
+    entity: e | null,
+    status?: RegisterStatusTag,
     meta: any,
 }
 

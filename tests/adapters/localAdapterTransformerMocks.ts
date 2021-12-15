@@ -14,7 +14,7 @@ type outputClass = {
     }
 }
 const mockInitialRegisters: Register<Entity>[] = localAdapterExtractorMocks.mockFinalRegisters
-const mockEntities: InputEntity[] = [
+const mockEntities: InputEntity<inputClass>[] = [
     {
         entity: {
             field: "Raw Object text",
@@ -56,14 +56,14 @@ const mockFinalRegisters: Register<Entity>[] = [
         sourceAbsoluteId: "fb7bc93a-17c1-467c-951d-58bf119c1967",
         sourceRelativeId: "fb7bc93a-17c1-467c-951d-58bf119c1967",
         statusTag: RegisterStatusTag.success,
-        statusMeta: undefined,
+        statusMeta: null,
         entity: {
             text: "Raw Object text",
             others: {
                 x: 23,
             },
         },
-        meta: undefined,
+        meta: null,
         syncContext: {
             flowId: "testFlow",
             stepId: "testStep",
@@ -76,14 +76,14 @@ const mockFinalRegisters: Register<Entity>[] = [
         sourceAbsoluteId: "b056be4c-595e-419d-aa2f-c6607cca738b",
         sourceRelativeId: "b056be4c-595e-419d-aa2f-c6607cca738b",
         statusTag: RegisterStatusTag.success,
-        statusMeta: undefined,
+        statusMeta: null,
         entity: {
             text: "Raw Object text 2",
             others: {
                 x: 1,
             },
         },
-        meta: undefined,
+        meta: null,
         syncContext: {
             flowId: "testFlow",
             stepId: "testStep",
@@ -98,7 +98,7 @@ const mockFinalRegisters: Register<Entity>[] = [
         statusTag: RegisterStatusTag.failed,
         statusMeta: "Y 30 error!!",
         entity: null,
-        meta: undefined,
+        meta: null,
         syncContext: {
             flowId: "testFlow",
             stepId: "testStep",

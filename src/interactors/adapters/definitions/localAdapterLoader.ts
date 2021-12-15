@@ -1,8 +1,9 @@
 
 import { Entity, Register, RegisterStatusTag } from "../../registers/types";
-import { AdapterDefinition, AdapterRunOptions } from "../types"
+import { AdapterDefinition, EntityWithMeta } from "../types"
 import { v4 as uuidv4 } from 'uuid';
 import { LocalAdapter } from "./localAdapter";
+import { getWithMetaFormat } from "./utils";
 
 /**
  * Local async step, persistance
@@ -35,15 +36,16 @@ export class LocalAdapterLoader<ad extends LocalAdapterLoaderDefinition<Entity, 
             try {
                 const inputEntity = inputRegistry.entity as Entity;
                 const outputEntity = await this.adapterDefinition.entityLoad(inputEntity);
+                const [outputEntityWithMeta] = getWithMetaFormat([outputEntity])
                 const register: Register<Entity> = {
                     id: uuidv4(),
                     entityType: this.adapterDefinition.outputType,
                     sourceAbsoluteId: inputRegistry.sourceRelativeId,
                     sourceRelativeId: inputRegistry.id,
-                    statusTag: RegisterStatusTag.success,
-                    statusMeta: undefined,
-                    entity: outputEntity,
-                    meta: undefined,
+                    statusTag: outputEntityWithMeta.status || RegisterStatusTag.success,
+                    statusMeta: null,
+                    entity: outputEntityWithMeta.entity,
+                    meta: outputEntityWithMeta.meta,
                     syncContext: this.adapterStatus.syncContext
                 }
                 outputRegisters.push(register)
@@ -57,7 +59,7 @@ export class LocalAdapterLoader<ad extends LocalAdapterLoaderDefinition<Entity, 
                     statusTag: RegisterStatusTag.failed,
                     statusMeta: error.message,
                     entity: null,
-                    meta: undefined,
+                    meta: null,
                     syncContext: this.adapterStatus.syncContext
                 }
                 outputRegisters.push(register)
@@ -73,5 +75,5 @@ export abstract class LocalAdapterLoaderDefinition<input extends Entity, output 
     abstract readonly inputType: string
     abstract readonly outputType: string
     abstract readonly definitionType: string;
-    abstract readonly entityLoad: (entity: input) => Promise<output>
+    abstract readonly entityLoad: (entity: input) => Promise<EntityWithMeta<output> | output>
 }
