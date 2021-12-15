@@ -4,6 +4,8 @@ import { Adapter, AdapterStatus, AdapterDefinition, EntityWithMeta, AdapterRunOp
 import { v4 as uuidv4 } from 'uuid';
 import { MyAdapterDependencies, RegisterDataAccess } from "./types";
 import { calculateSummary, getWithMetaFormat } from "./utils";
+import { cloneDeep } from 'lodash'
+
 
 
 
@@ -53,10 +55,10 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
             rows_invalid: 0,
             rows_skipped: 0,
         };
-        this.adapterStatus.runOptions = runOptions || null;
+        this.adapterStatus.runOptions = cloneDeep(runOptions) || null;
 
         const inputRegisters = await this.inputRegisters(runOptions);
-        const outputRegisters = await this.outputRegisters(inputRegisters, runOptions);
+        const outputRegisters = await this.outputRegisters(inputRegisters);
 
         this.adapterStatus.statusSummary = calculateSummary(outputRegisters);
         this.adapterPresenter.emit("adapterStatus", this.adapterStatus)
@@ -86,7 +88,7 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
             inputRegisters = await this.getRegisters()
         }
 
-        return inputRegisters;
+        return cloneDeep(inputRegisters);
     }
 
     protected async initRegisters(inputEntities: EntityWithMeta<Entity>[]): Promise<Register<Entity>[]> {
@@ -108,7 +110,7 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
 
     protected abstract getRegisters(): Promise<Register<Entity>[]>
 
-    protected abstract outputRegisters(inputRegisters: Register<Entity>[], runOptions?: AdapterRunOptions): Promise<Register<Entity>[]>
+    protected abstract outputRegisters(inputRegisters: Register<Entity>[]): Promise<Register<Entity>[]>
 
     async getStatus() {
         return this.adapterStatus;

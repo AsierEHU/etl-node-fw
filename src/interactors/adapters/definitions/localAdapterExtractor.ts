@@ -18,7 +18,7 @@ export class LocalAdapterExtractor<ad extends LocalAdapterExtractorDefinition<En
         super(dependencies)
     }
 
-    async outputRegisters(inputRegisters: Register<Entity>[], runOptions?: AdapterRunOptions) {
+    async outputRegisters(inputRegisters: Register<Entity>[]) {
         await this.validateRegisters(inputRegisters);
         await this.fixRegisters(inputRegisters);
         const outputRegisters = inputRegisters;

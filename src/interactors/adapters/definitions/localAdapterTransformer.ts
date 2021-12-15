@@ -16,7 +16,7 @@ export class LocalAdapterTransformer<ad extends LocalAdapterTransformerDefinitio
         super(dependencies)
     }
 
-    async outputRegisters(inputRegisters: Register<Entity>[], runOptions?: AdapterRunOptions) {
+    async outputRegisters(inputRegisters: Register<Entity>[]) {
         const outputRegisters = await this.processRegisters(inputRegisters);
         await this.registerDataAccess.saveAll(outputRegisters)
         return outputRegisters

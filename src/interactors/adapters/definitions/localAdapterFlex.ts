@@ -17,7 +17,7 @@ export class LocalAdapterFlex<ad extends LocalAdapterFlexDefinition<Entity>> ext
         super(dependencies)
     }
 
-    async outputRegisters(inputRegisters: Register<Entity>[], runOptions?: AdapterRunOptions) {
+    async outputRegisters(inputRegisters: Register<Entity>[]) {
         const outputRegisters = inputRegisters;
         await this.registerDataAccess.saveAll(outputRegisters)
         return outputRegisters

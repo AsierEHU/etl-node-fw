@@ -1,7 +1,7 @@
 import { EventEmitter } from "stream";
 import { VolatileRegisterDataAccess } from "../../src/dataAccess/volatile";
 import { AdapterFactory } from "../../src/interactors/adapters/factory";
-import { AdapterDefinition, AdapterStatus, AdapterStatusSummary } from "../../src/interactors/adapters/types";
+import { AdapterDefinition, AdapterStatus, AdapterStatusSummary, MockEntity } from "../../src/interactors/adapters/types";
 import { Entity, Register, RegisterDataContext, RegisterStatusTag } from "../../src/interactors/registers/types";
 import { localAdapterExtractorMocks, localAdapterExtractorDefinition } from "./localAdapterExtractorMocks"
 
@@ -26,7 +26,8 @@ const adapterTest = (
         mockInitialStatus: AdapterStatus,
         mockFinalStatus: AdapterStatus,
         mockFinalSummary: AdapterStatusSummary,
-        mockRegisters: Register<Entity>[]
+        mockRegisters: Register<Entity>[],
+        mockEntities: MockEntity[]
     }
 ) => {
     describe(definition.definitionType, () => {
@@ -89,11 +90,18 @@ const adapterTest = (
             const adapter2 = adapterFactory.createAdapter(definition.id, adapterDependencies)
             await adapter2.runOnce({ onlyFailedEntities: true })
             const registers = await registerDataAccess.getAll()
-            const mockRegistersWithFailedRegister = [
+            const mockRegistersWithRetries = [
                 ...mocks.mockRegisters,
                 ...mocks.mockRegisters.filter(reg => reg.statusTag == RegisterStatusTag.failed)
             ]
-            registersEqual(registers, mockRegistersWithFailedRegister)
+            registersEqual(registers, mockRegistersWithRetries)
+        })
+
+        test("runOptions:mockEntities", async () => {
+            const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
+            await adapter1.runOnce({ mockEntities: mocks.mockEntities })
+            const registers = await registerDataAccess.getAll()
+            registersEqual(registers, mocks.mockRegisters)
         })
 
     })

@@ -5,6 +5,7 @@ import { RegisterDataContext } from "../../../registers/types";
 import { Step, StepStatus, StepStatusTag, StepRunOptions } from "../../types"
 import { v4 as uuidv4 } from 'uuid';
 import { MyStepDefinition, MyStepDependencies } from "./types";
+import { cloneDeep } from "lodash";
 
 /**
  * Local async step, persistance
@@ -49,9 +50,9 @@ export class MyStep<sd extends MyStepDefinition> implements Step<sd>{
 
         this.stepStatus.statusTag = StepStatusTag.active
         this.stepStatus.timeStarted = new Date();
-        this.stepStatus.runOptions = runOptions || null;
+        this.stepStatus.runOptions = cloneDeep(runOptions) || null;
         this.stepPresenter.emit("stepStatus", this.stepStatus)
-        await this.tryRunAdapter(runOptions?.adapterRunOptions);
+        await this.tryRunAdapter(this.stepStatus.runOptions?.adapterRunOptions);
         this.stepStatus.timeFinished = new Date();
         this.stepPresenter.emit("stepStatus", this.stepStatus)
         return this.stepStatus.statusTag;

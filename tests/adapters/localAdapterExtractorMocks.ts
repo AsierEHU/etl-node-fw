@@ -6,45 +6,44 @@ type inputClass = {
     field: string,
     y: number,
 }
-
+const mockEntities = [
+    {
+        entity: {
+            field: "Raw Object text",
+            y: 23,
+        },
+        meta: "rawMocked to success"
+    },
+    null,
+    {
+        field: "Raw Object text 2",
+        y: 0,
+    },
+    {
+        entity: {
+            field: "Raw Object text 3",
+            y: -34,
+        },
+        meta: "rawMocked to skip"
+    },
+    {
+        entity: {
+            field: "Raw Object text 3",
+            y: 30,
+        },
+        meta: "rawMocked to fail"
+    },
+    {
+        field: "Raw Object text 4",
+        y: -1,
+    }
+];
 export const localAdapterExtractorDefinition: LocalAdapterExtractorDefinition<inputClass> = {
     id: "testExtractor",
     definitionType: "LocalAdapterExtractorDefinition",
     outputType: "inputClass",
     async entitiesGet() {
-        const rawMockedInput = [
-            {
-                entity: {
-                    field: "Raw Object text",
-                    y: 23,
-                },
-                meta: "rawMocked to success"
-            },
-            null,
-            {
-                field: "Raw Object text 2",
-                y: 0,
-            },
-            {
-                entity: {
-                    field: "Raw Object text 3",
-                    y: -34,
-                },
-                meta: "rawMocked to skip"
-            },
-            {
-                entity: {
-                    field: "Raw Object text 3",
-                    y: 30,
-                },
-                meta: "rawMocked to fail"
-            },
-            {
-                field: "Raw Object text 4",
-                y: -1,
-            }
-        ];
-        return rawMockedInput;
+        return mockEntities;
     },
     async entityValidate(entity: inputClass | null) {
         if (entity == null) {
@@ -95,7 +94,6 @@ export const localAdapterExtractorDefinition: LocalAdapterExtractorDefinition<in
         }
     },
 }
-
 const mockRegisters: Register<Entity>[] = [
     {
         id: "fb7bc93a-17c1-467c-951d-58bf119c1967",
@@ -235,4 +233,4 @@ const mockFinalStatus = {
     statusSummary: mockFinalSummary
 }
 
-export const localAdapterExtractorMocks = { mockInitialStatus, mockFinalStatus, mockFinalSummary, mockRegisters }
+export const localAdapterExtractorMocks = { mockInitialStatus, mockFinalStatus, mockFinalSummary, mockRegisters, mockEntities }
