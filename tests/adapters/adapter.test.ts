@@ -34,7 +34,7 @@ const adapterTest = (
         mockEntities: InputEntity<Entity>[]
     }
 ) => {
-    describe(definition.definitionType, () => {
+    describe(definition.definitionType + " status test", () => {
 
         beforeEach(() => {
             adapterPresenter.removeAllListeners("adapterStatus")
@@ -66,6 +66,13 @@ const adapterTest = (
             expect(adapterStatusSummary).toEqual(mocks.mockFinalSummary)
         })
 
+        test("Final status", async () => {
+            const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
+            await adapter1.runOnce();
+            const adapterStatus = await adapter1.getStatus()
+            statusEqual(adapterStatus, mocks.mockFinalStatus)
+        })
+
         test("Final presenter", (done) => {
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
             adapterPresenter.on("adapterStatus", (adapterStatus) => {
@@ -75,10 +82,42 @@ const adapterTest = (
             adapter1.runOnce()
         })
 
+        test("Final status: runOptions", async () => {
+            const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
+            const runOptions = { onlyFailedEntities: true, mockEntities: mocks.mockEntities }
+            await adapter1.runOnce(runOptions);
+            const adapterStatus = await adapter1.getStatus()
+            expect(adapterStatus.runOptions).toEqual(runOptions)
+        })
+
+        test("Final presenter: runOptions", (done) => {
+            const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
+            const runOptions = { onlyFailedEntities: true, mockEntities: mocks.mockEntities }
+            adapterPresenter.on("adapterStatus", (adapterStatus) => {
+                expect(adapterStatus.runOptions).toEqual(runOptions)
+                done()
+            })
+            adapter1.runOnce({ onlyFailedEntities: true, mockEntities: mocks.mockEntities })
+        })
+
         test("Run once exception", async () => {
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
             adapter1.runOnce()
             await expect(adapter1.runOnce()).rejects.toEqual(new Error("Run once"))
+        });
+
+    })
+
+    describe(definition.definitionType + " registers test", () => {
+
+        beforeEach(() => {
+            adapterPresenter.removeAllListeners("adapterStatus")
+            registerDataAccess = new VolatileRegisterDataAccess(mocks.mockInitialRegisters)
+            adapterDependencies = {
+                adapterPresenter,
+                registerDataAccess,
+                syncContext,
+            }
         });
 
         test("Registers result", async () => {
@@ -108,9 +147,19 @@ const adapterTest = (
             registersEqual(registers, mocks.mockFinalRegisters)
         })
 
-        //final status with inputOptions
+        test("Not pending registers", async () => {
+            const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
+            await adapter1.runOnce()
+            const registers = await registerDataAccess.getAll()
+            registers.forEach(register => {
+                expect(register.statusTag).not.toBe(RegisterStatusTag.pending)
+            })
+        })
 
-        //Register trazability,status...content check, ninguno puede ser pending...
+        test("Relative and Absolute ids", async () => {
+            //TODO: obtenemos todos los registros nuevos
+            // recuperamos sus registros relacionados absolutos y relativos.
+        })
 
     })
 }
