@@ -17,7 +17,7 @@ export const case2Definition: LocalAdapterExtractorDefinition<inputClass> = {
         throw new Error("My custom run error")
     },
     async entityValidate(entity: inputClass | null) {
-        return ValidationStatusTag.valid;
+        return ValidationStatusTag.invalid;
     },
     async entityFix(toFixEntity: ToFixEntity<inputClass>) {
         return null

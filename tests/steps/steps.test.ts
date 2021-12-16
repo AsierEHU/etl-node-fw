@@ -4,11 +4,11 @@ import { AdapterFactory } from "../../src/interactors/adapters/factory";
 import { SyncContext } from "../../src/interactors/registers/types";
 import { StepFactory } from "../../src/interactors/steps/factory";
 import { StepDefinition, StepStatus } from "../../src/interactors/steps/types";
-import { localAdapterTransformerDefinition } from "../adapters/localAdapterTransformerMocks";
+import { case3Definition } from "../adapters/localAdapterTranformerMocks/case3Mocks";
 import { localStepDefinition, localStepMocks } from "./localStepMocks";
 
 let presenter = new EventEmitter()
-let adapterDefinitions = [localAdapterTransformerDefinition];
+let adapterDefinitions = [case3Definition];
 let registerDataAccess = new VolatileRegisterDataAccess();
 let adapterFactory = new AdapterFactory(adapterDefinitions)
 let adapterDependencies = {

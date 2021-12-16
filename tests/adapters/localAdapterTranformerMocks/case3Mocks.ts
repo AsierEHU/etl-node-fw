@@ -1,7 +1,7 @@
-import { LocalAdapterTransformerDefinition } from "../../src/interactors/adapters/definitions/localAdapterTransformer";
-import { InputEntity } from "../../src/interactors/adapters/types";
-import { Entity, Register, RegisterStatusTag } from "../../src/interactors/registers/types";
-import { case1Mocks } from "./localAdapterExtractorMocks/case1Mocks";
+import { LocalAdapterTransformerDefinition } from "../../../src/interactors/adapters/definitions/localAdapterTransformer";
+import { InputEntity } from "../../../src/interactors/adapters/types";
+import { Entity, Register, RegisterStatusTag } from "../../../src/interactors/registers/types";
+import { case1Mocks } from "../localAdapterExtractorMocks/case1Mocks";
 
 type inputClass = {
     field: string,
@@ -31,8 +31,8 @@ const inputEntities: InputEntity<inputClass>[] = [
         y: 30,
     },
 ];
-export const localAdapterTransformerDefinition: LocalAdapterTransformerDefinition<inputClass, outputClass> = {
-    id: "testTransformer",
+export const case3Definition: LocalAdapterTransformerDefinition<inputClass, outputClass> = {
+    id: "case3Transformer",
     definitionType: "LocalAdapterTransformerDefinition",
     inputType: "inputClass",
     outputType: "outputClass",
@@ -110,7 +110,7 @@ const mockFinalRegisters: Register<Entity>[] = [
     ...mockNewRegisters
 ]
 const mockInitialStatus = {
-    definitionId: "testTransformer",
+    definitionId: "case3Transformer",
     definitionType: "LocalAdapterTransformerDefinition",
     id: "testAdapter",
     outputType: "outputClass",
@@ -130,4 +130,4 @@ const mockFinalStatus = {
     statusSummary: mockFinalSummary
 }
 
-export const localAdapterTransformerMocks = { mockInitialStatus, mockFinalStatus, mockFinalSummary, mockFinalRegisters, mockInitialRegisters, inputEntities, mockNewRegisters }
+export const case3Mocks = { mockInitialStatus, mockFinalStatus, mockFinalSummary, mockFinalRegisters, mockInitialRegisters, inputEntities, mockNewRegisters }

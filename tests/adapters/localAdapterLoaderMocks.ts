@@ -2,7 +2,7 @@ import { LocalAdapterLoaderDefinition } from "../../src/interactors/adapters/def
 import { ValidationResult, ValidationStatusTag } from "../../src/interactors/adapters/definitions/types";
 import { InputEntity } from "../../src/interactors/adapters/types";
 import { Entity, Register, RegisterStatusTag } from "../../src/interactors/registers/types";
-import { localAdapterTransformerMocks } from "./localAdapterTransformerMocks";
+import { case3Mocks } from "./localAdapterTranformerMocks/case3Mocks";
 
 type outputClass = {
     text: string,
@@ -15,7 +15,7 @@ type resultClass = {
     success: boolean,
 }
 
-const mockInitialRegisters: Register<Entity>[] = localAdapterTransformerMocks.mockFinalRegisters
+const mockInitialRegisters: Register<Entity>[] = case3Mocks.mockFinalRegisters
 const inputEntities: InputEntity<outputClass>[] = [
     {
         text: "Raw Object text",

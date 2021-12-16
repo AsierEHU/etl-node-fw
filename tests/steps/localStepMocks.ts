@@ -3,7 +3,7 @@ import { StepStatus, StepStatusSummary, StepStatusTag } from "../../src/interact
 
 export const localStepDefinition: LocalStepDefinition = {
     id: "testLocalStep",
-    adapterDefinitionId: "testTransformer",
+    adapterDefinitionId: "case3Transformer",
     retartTries: 3,
     definitionType: "LocalStepDefinition",
     isFailedStatus: function (statusSummary: StepStatusSummary): boolean {

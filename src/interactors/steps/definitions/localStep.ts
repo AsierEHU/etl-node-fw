@@ -81,9 +81,10 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
             }
 
         } catch (error: any) {
-            this.stepStatus.statusMeta = error.message
             if (this.canRetry()) {
                 await this.tryRunAdapter(adapterRunOptions, this.stepStatus.tryNumber + 1);
+            } else {
+                this.stepStatus.statusMeta = error.message
             }
         }
 
