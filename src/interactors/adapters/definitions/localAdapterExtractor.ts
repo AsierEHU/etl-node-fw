@@ -63,8 +63,9 @@ export class LocalAdapterExtractor<ad extends LocalAdapterExtractorDefinition<En
                     toFixRegister.statusTag = RegisterStatusTag.invalid;
                 }
 
-            } catch (error) {
-                toFixRegister.statusTag = RegisterStatusTag.invalid;
+            } catch (error: any) {
+                toFixRegister.statusTag = RegisterStatusTag.failed;
+                toFixRegister.statusMeta = error.message;
             }
         }
     }

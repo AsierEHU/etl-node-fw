@@ -29,7 +29,7 @@ const mockFinalRegisters: Register<Entity>[] = [
     ...mockNewRegisters
 ]
 const mockInitialStatus = {
-    definitionId: "testExtractor",
+    definitionId: "case2Extractor",
     definitionType: "LocalAdapterExtractorDefinition",
     id: "testAdapter",
     outputType: "inputClass",

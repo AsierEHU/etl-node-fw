@@ -38,7 +38,11 @@ const inputEntities: InputEntity<inputClass>[] = [
     {
         field: "Raw Object text 4",
         y: -1,
-    }
+    },
+    {
+        field: "Raw Object text 5",
+        y: 1,
+    },
 ];
 export const case1Definition: LocalAdapterExtractorDefinition<inputClass> = {
     id: "case1Extractor",
@@ -73,6 +77,15 @@ export const case1Definition: LocalAdapterExtractorDefinition<inputClass> = {
                     severity: "low"
                 }
             };
+        } else if (entity.y == 1) {
+            return {
+                statusTag: ValidationStatusTag.invalid,
+                meta: {
+                    type: "1 error",
+                    action: "trigger alarm",
+                    severity: "high"
+                }
+            };
         }
         else {
             return ValidationStatusTag.valid;
@@ -91,6 +104,8 @@ export const case1Definition: LocalAdapterExtractorDefinition<inputClass> = {
                     note: "Fixed changing to 1"
                 }
             };
+        } else if (toFixEntity.validationMeta.type == "1 error") {
+            throw new Error("Exception Fixing")
         } else {
             return null;
         }
@@ -206,6 +221,24 @@ const mockNewRegisters: Register<Entity>[] = [
             apdaterId: "testAdapter",
         },
     },
+    {
+        id: "df4hsdf-564e-4dgh-8458-2hgfff5633ds4",
+        entityType: "inputClass",
+        sourceAbsoluteId: "df4hsdf-564e-4dgh-8458-2hgfff5633ds4",
+        sourceRelativeId: "df4hsdf-564e-4dgh-8458-2hgfff5633ds4",
+        statusTag: RegisterStatusTag.failed,
+        statusMeta: "Exception Fixing",
+        entity: {
+            field: "Raw Object text 5",
+            y: 1,
+        },
+        meta: null,
+        syncContext: {
+            flowId: "testFlow",
+            stepId: "testStep",
+            apdaterId: "testAdapter",
+        },
+    },
 ]
 const mockFinalRegisters: Register<Entity>[] = [
     ...mockInitialRegisters,
@@ -221,8 +254,8 @@ const mockInitialStatus = {
     syncContext: { apdaterId: "testAdapter", stepId: "testStep", flowId: "testFlow" }
 }
 const mockFinalSummary = {
-    output_rows: 6,
-    rows_failed: 1,
+    output_rows: 7,
+    rows_failed: 2,
     rows_invalid: 1,
     rows_skipped: 1,
     rows_success: 3,

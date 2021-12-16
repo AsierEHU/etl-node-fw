@@ -147,46 +147,70 @@ const adapterTest = (
 
         test("Registers result", async () => {
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
-            await adapter1.runOnce()
-            const registers = await registerDataAccess.getAll()
-            registersEqual(registers, mocks.mockFinalRegisters)
+            try {
+                await adapter1.runOnce();
+                const registers = await registerDataAccess.getAll()
+                registersEqual(registers, mocks.mockFinalRegisters)
+            } catch (error: any) {
+                expect(error.message).toBe("My custom run error")
+            }
         });
 
         test("runOptions:onlyFailedEntities", async () => {
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
-            await adapter1.runOnce()
+            try {
+                await adapter1.runOnce();
+            } catch (error: any) {
+                expect(error.message).toBe("My custom run error")
+            }
             const adapter2 = adapterFactory.createAdapter(definition.id, adapterDependencies)
-            await adapter2.runOnce({ onlyFailedEntities: true })
-            const registers = await registerDataAccess.getAll()
-            const mockRegistersWithRetries = [
-                ...mocks.mockFinalRegisters,
-                ...mocks.mockFinalRegisters.filter(reg => reg.statusTag == RegisterStatusTag.failed && reg.entityType == definition.outputType)
-            ]
-            registersEqual(registers, mockRegistersWithRetries)
+            try {
+                await adapter2.runOnce({ onlyFailedEntities: true });
+                const registers = await registerDataAccess.getAll()
+                const mockRegistersWithRetries = [
+                    ...mocks.mockFinalRegisters,
+                    ...mocks.mockFinalRegisters.filter(reg => reg.statusTag == RegisterStatusTag.failed && reg.entityType == definition.outputType)
+                ]
+                registersEqual(registers, mockRegistersWithRetries)
+            } catch (error: any) {
+                expect(error.message).toBe("My custom run error")
+            }
         })
 
         test("runOptions:inputEntities", async () => {
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
-            await adapter1.runOnce({ inputEntities: mocks.inputEntities })
-            const registers = await registerDataAccess.getAll()
-            registersEqual(registers, mocks.mockFinalRegisters)
+            try {
+                await adapter1.runOnce({ inputEntities: mocks.inputEntities })
+                const registers = await registerDataAccess.getAll()
+                registersEqual(registers, mocks.mockFinalRegisters)
+            } catch (error: any) {
+                expect(error.message).toBe("My custom run error")
+            }
         })
 
         test("Not pending registers", async () => {
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
-            await adapter1.runOnce()
-            const registers = await registerDataAccess.getAll()
-            registers.forEach(register => {
-                expect(register.statusTag).not.toBe(RegisterStatusTag.pending)
-            })
+            try {
+                await adapter1.runOnce()
+                const registers = await registerDataAccess.getAll()
+                registers.forEach(register => {
+                    expect(register.statusTag).not.toBe(RegisterStatusTag.pending)
+                })
+            } catch (error: any) {
+                expect(error.message).toBe("My custom run error")
+            }
         })
 
         test("Relative and Absolute ids", async () => {
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
-            await adapter1.runOnce()
-            const registers = await registerDataAccess.getAll()
-            for (const register of registers) {
-                await testSources(register);
+            try {
+                await adapter1.runOnce()
+                const registers = await registerDataAccess.getAll()
+                for (const register of registers) {
+                    await testSources(register);
+                }
+            } catch (error: any) {
+                expect(error.message).toBe("My custom run error")
             }
         })
     })
