@@ -7,6 +7,7 @@ import { localAdapterExtractorDefinition, localAdapterExtractorMocks } from "./l
 import { localAdapterTransformerDefinition, localAdapterTransformerMocks } from "./localAdapterTransformerMocks";
 import { localAdapterLoaderDefinition, localAdapterLoaderMocks } from "./localAdapterLoaderMocks";
 import { localAdapterFlexDefinition, localAdapterFlexMocks } from "./localAdapterFlexMocks";
+import { isByGroupSource, isByRowSource, isOrigin } from "../../src/interactors/registers/utils";
 
 
 let adapterPresenter = new EventEmitter()
@@ -29,6 +30,7 @@ const adapterTest = (
         mockInitialStatus: AdapterStatus,
         mockFinalStatus: AdapterStatus,
         mockFinalSummary: AdapterStatusSummary,
+        mockNewRegisters: Register<Entity>[],
         mockFinalRegisters: Register<Entity>[],
         mockInitialRegisters: Register<Entity>[],
         inputEntities: InputEntity<Entity>[]
@@ -157,11 +159,49 @@ const adapterTest = (
         })
 
         test("Relative and Absolute ids", async () => {
-            //TODO: obtenemos todos los registros nuevos
-            // recuperamos sus registros relacionados absolutos y relativos.
+            const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
+            await adapter1.runOnce()
+            const registers = await registerDataAccess.getAll()
+            for (const register of registers) {
+                await testSources(register);
+            }
         })
-
     })
+}
+
+const testSources = async (register: Register<Entity>) => {
+    if (isByGroupSource(register)) {
+        if (register.id == register.sourceAbsoluteId && register.id == register.sourceRelativeId) {
+            throw Error("Imposible case")
+        }
+        else if (register.sourceRelativeId == register.sourceAbsoluteId) {
+            expect(isOrigin(register)).toBe(true)
+        } else if (register.sourceRelativeId != register.sourceAbsoluteId) {
+            expect(isOrigin(register)).toBe(false)
+            const relativeRegister = await registerDataAccess.get(register.sourceRelativeId as string)
+            await testSources(relativeRegister)
+        }
+        else {
+            throw new Error("Unexpected case")
+        }
+    } else if (isByRowSource(register)) {
+        if (register.id == register.sourceAbsoluteId && register.id == register.sourceRelativeId) {
+            expect(isOrigin(register)).toBe(true)
+        }
+        else if (register.sourceRelativeId == register.sourceAbsoluteId) {
+            expect(isOrigin(register)).toBe(false)
+            const relativeRegister = await registerDataAccess.get(register.sourceRelativeId as string)
+            expect(isOrigin(relativeRegister)).toBe(true)
+        } else if (register.sourceRelativeId != register.sourceAbsoluteId) {
+            expect(isOrigin(register)).toBe(false)
+            const relativeRegister = await registerDataAccess.get(register.sourceRelativeId as string)
+            await testSources(relativeRegister)
+        }
+        else {
+            throw new Error("Unexpected case")
+        }
+    }
+    else throw Error("Unexpected source")
 }
 
 const statusEqual = (adapterStatus: AdapterStatus, mockStatus: AdapterStatus) => {

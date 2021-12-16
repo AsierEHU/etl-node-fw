@@ -96,7 +96,7 @@ export const localAdapterExtractorDefinition: LocalAdapterExtractorDefinition<in
         }
     },
 }
-const mockFinalRegisters: Register<Entity>[] = [
+const mockNewRegisters: Register<Entity>[] = [
     {
         id: "fb7bc93a-17c1-467c-951d-58bf119c1967",
         entityType: "inputClass",
@@ -207,6 +207,10 @@ const mockFinalRegisters: Register<Entity>[] = [
         },
     },
 ]
+const mockFinalRegisters: Register<Entity>[] = [
+    ...mockInitialRegisters,
+    ...mockNewRegisters
+]
 const mockInitialStatus = {
     definitionId: "testExtractor",
     definitionType: "LocalAdapterExtractorDefinition",
@@ -228,4 +232,4 @@ const mockFinalStatus = {
     statusSummary: mockFinalSummary
 }
 
-export const localAdapterExtractorMocks = { mockInitialStatus, mockFinalStatus, mockFinalSummary, mockFinalRegisters, inputEntities, mockInitialRegisters }
+export const localAdapterExtractorMocks = { mockInitialStatus, mockFinalStatus, mockFinalSummary, mockFinalRegisters, inputEntities, mockInitialRegisters, mockNewRegisters }

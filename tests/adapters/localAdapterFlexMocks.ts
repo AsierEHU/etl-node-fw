@@ -29,8 +29,7 @@ export const localAdapterFlexDefinition: LocalAdapterFlexDefinition<result2Class
         return ValidationStatusTag.valid
     }
 }
-const mockFinalRegisters: Register<Entity>[] = [
-    ...mockInitialRegisters,
+const mockNewRegisters: Register<Entity>[] = [
     {
         id: "ebd1c577-a6aa-40b1-bdee-52f3ee0ea644",
         entityType: "result2Class",
@@ -48,6 +47,10 @@ const mockFinalRegisters: Register<Entity>[] = [
             apdaterId: "testAdapter",
         },
     }
+]
+const mockFinalRegisters: Register<Entity>[] = [
+    ...mockInitialRegisters,
+    ...mockNewRegisters
 ]
 const mockInitialStatus = {
     definitionId: "testFlex",
@@ -70,4 +73,4 @@ const mockFinalStatus = {
     statusSummary: mockFinalSummary
 }
 
-export const localAdapterFlexMocks = { mockInitialStatus, mockFinalStatus, mockFinalSummary, mockFinalRegisters, mockInitialRegisters, inputEntities }
+export const localAdapterFlexMocks = { mockInitialStatus, mockFinalStatus, mockFinalSummary, mockFinalRegisters, mockInitialRegisters, inputEntities, mockNewRegisters }
