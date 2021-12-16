@@ -1,7 +1,6 @@
 
 import { Entity, Register, RegisterStatusTag } from "../../registers/types";
-import { AdapterDefinition, EntityWithMeta, InputEntity } from "../types"
-import { v4 as uuidv4 } from 'uuid';
+import { AdapterDefinition, InputEntity } from "../types"
 import { FixedEntity, ToFixEntity, ValidationResult, ValidationStatusTag } from "./types";
 import { getValidationResultWithMeta, getWithMetaFormat, validationTagToRegisterTag } from "./utils";
 import { LocalAdapter } from "./localAdapter";

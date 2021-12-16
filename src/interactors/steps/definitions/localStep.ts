@@ -13,7 +13,7 @@ import { cloneDeep } from "lodash";
 export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
 
     private readonly stepDefinition: sd;
-    private readonly adapterBuilder: AdapterFactory;
+    private readonly adapterFactory: AdapterFactory;
     private readonly stepStatus: StepStatus;
     private readonly stepPresenter: EventEmitter;
     private readonly adapterDependencies: AdapterDependencies<AdapterDefinition>;
@@ -21,7 +21,7 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
 
     constructor(dependencies: MyStepDependencies<sd>) {
         this.stepDefinition = dependencies.stepDefinition;
-        this.adapterBuilder = dependencies.adapterBuilder;
+        this.adapterFactory = dependencies.adapterFactory;
         this.stepPresenter = dependencies.stepPresenter;
         this.syncUpperContext = dependencies.syncContext;
         const id = uuidv4();
@@ -51,7 +51,6 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
         this.stepStatus.statusTag = StepStatusTag.active
         this.stepStatus.timeStarted = new Date();
         this.stepStatus.runOptions = cloneDeep(runOptions) || null;
-        this.stepPresenter.emit("stepStatus", this.stepStatus)
         await this.tryRunAdapter(this.stepStatus.runOptions?.adapterRunOptions);
         this.stepStatus.timeFinished = new Date();
         this.stepPresenter.emit("stepStatus", this.stepStatus)
@@ -60,7 +59,7 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
 
     private async tryRunAdapter(adapterRunOptions?: AdapterRunOptions, tryNumber?: number) {
         this.stepStatus.tryNumber = tryNumber || 1;
-        const adapter = this.adapterBuilder.createAdapter(this.stepDefinition.adapterDefinitionId, this.adapterDependencies)
+        const adapter = this.adapterFactory.createAdapter(this.stepDefinition.adapterDefinitionId, this.adapterDependencies)
 
         if (!this.stepStatus.statusSummary) {
             this.stepStatus.statusSummary = {
