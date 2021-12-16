@@ -1,18 +1,18 @@
-import { LocalAdapterFlexDefinition } from "../../src/interactors/adapters/definitions/localAdapterFlex";
-import { EntityFetcher, RegisterDataFilter, ValidationStatusTag } from "../../src/interactors/adapters/definitions/types";
-import { InputEntity } from "../../src/interactors/adapters/types";
-import { Entity, Register, RegisterStatusTag } from "../../src/interactors/registers/types";
-import { localAdapterLoaderMocks } from "./localAdapterLoaderMocks";
+import { LocalAdapterFlexDefinition } from "../../../src/interactors/adapters/definitions/localAdapterFlex";
+import { EntityFetcher, RegisterDataFilter, ValidationStatusTag } from "../../../src/interactors/adapters/definitions/types";
+import { AdapterStatus, AdapterStatusSummary, AdapterStatusTag, InputEntity } from "../../../src/interactors/adapters/types";
+import { Entity, Register, RegisterStatusTag } from "../../../src/interactors/registers/types";
+import { case4Mocks } from "../localAdapterLoaderMocks/case4Mocks";
 
 type result2Class = {
     successTotal: number
 }
-const mockInitialRegisters: Register<Entity>[] = localAdapterLoaderMocks.mockFinalRegisters
+const mockInitialRegisters: Register<Entity>[] = case4Mocks.mockFinalRegisters
 const inputEntities: InputEntity<result2Class>[] = [
     { successTotal: 1 }
 ];
-export const localAdapterFlexDefinition: LocalAdapterFlexDefinition<result2Class> = {
-    id: "testFlex",
+export const case5Definition: LocalAdapterFlexDefinition<result2Class> = {
+    id: "case5Flex",
     outputType: "result2Class",
     definitionType: "LocalAdapterFlexDefinition",
     async entitiesGet(entityFetcher: EntityFetcher) {
@@ -52,25 +52,28 @@ const mockFinalRegisters: Register<Entity>[] = [
     ...mockInitialRegisters,
     ...mockNewRegisters
 ]
-const mockInitialStatus = {
-    definitionId: "testFlex",
+const mockInitialStatus: AdapterStatus = {
+    definitionId: "case5Flex",
     definitionType: "LocalAdapterFlexDefinition",
     id: "testAdapter",
     outputType: "result2Class",
     runOptions: null,
     statusSummary: null,
-    syncContext: { apdaterId: "testAdapter", stepId: "testStep", flowId: "testFlow" }
+    syncContext: { apdaterId: "testAdapter", stepId: "testStep", flowId: "testFlow" },
+    statusTag: AdapterStatusTag.pending,
+    statusMeta: null
 }
-const mockFinalSummary = {
+const mockFinalSummary: AdapterStatusSummary = {
     output_rows: 1,
     rows_failed: 0,
     rows_invalid: 0,
     rows_skipped: 0,
     rows_success: 1,
 }
-const mockFinalStatus = {
+const mockFinalStatus: AdapterStatus = {
     ...mockInitialStatus,
-    statusSummary: mockFinalSummary
+    statusSummary: mockFinalSummary,
+    statusTag: AdapterStatusTag.success,
 }
 
-export const localAdapterFlexMocks = { mockInitialStatus, mockFinalStatus, mockFinalSummary, mockFinalRegisters, mockInitialRegisters, inputEntities, mockNewRegisters }
+export const case5Mocks = { mockInitialStatus, mockFinalStatus, mockFinalRegisters, mockInitialRegisters, inputEntities, mockNewRegisters }

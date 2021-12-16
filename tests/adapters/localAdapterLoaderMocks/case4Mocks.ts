@@ -1,8 +1,8 @@
-import { LocalAdapterLoaderDefinition } from "../../src/interactors/adapters/definitions/localAdapterLoader";
-import { ValidationResult, ValidationStatusTag } from "../../src/interactors/adapters/definitions/types";
-import { InputEntity } from "../../src/interactors/adapters/types";
-import { Entity, Register, RegisterStatusTag } from "../../src/interactors/registers/types";
-import { case3Mocks } from "./localAdapterTranformerMocks/case3Mocks";
+import { LocalAdapterLoaderDefinition } from "../../../src/interactors/adapters/definitions/localAdapterLoader";
+import { ValidationResult, ValidationStatusTag } from "../../../src/interactors/adapters/definitions/types";
+import { AdapterStatus, AdapterStatusSummary, AdapterStatusTag, InputEntity } from "../../../src/interactors/adapters/types";
+import { Entity, Register, RegisterStatusTag } from "../../../src/interactors/registers/types";
+import { case3Mocks } from "../localAdapterTranformerMocks/case3Mocks";
 
 type outputClass = {
     text: string,
@@ -30,8 +30,8 @@ const inputEntities: InputEntity<outputClass>[] = [
         },
     }
 ];
-export const localAdapterLoaderDefinition: LocalAdapterLoaderDefinition<outputClass, resultClass> = {
-    id: "testLoader",
+export const case4Definition: LocalAdapterLoaderDefinition<outputClass, resultClass> = {
+    id: "case4Loader",
     definitionType: "LocalAdapterLoaderDefinition",
     inputType: "outputClass",
     outputType: "resultClass",
@@ -92,25 +92,28 @@ const mockFinalRegisters: Register<Entity>[] = [
     ...mockInitialRegisters,
     ...mockNewRegisters
 ]
-const mockInitialStatus = {
-    definitionId: "testLoader",
+const mockInitialStatus: AdapterStatus = {
+    definitionId: "case4Loader",
     definitionType: "LocalAdapterLoaderDefinition",
     id: "testAdapter",
     outputType: "resultClass",
     runOptions: null,
     statusSummary: null,
-    syncContext: { apdaterId: "testAdapter", stepId: "testStep", flowId: "testFlow" }
+    syncContext: { apdaterId: "testAdapter", stepId: "testStep", flowId: "testFlow" },
+    statusTag: AdapterStatusTag.pending,
+    statusMeta: null
 }
-const mockFinalSummary = {
+const mockFinalSummary: AdapterStatusSummary = {
     output_rows: 2,
     rows_failed: 0,
     rows_invalid: 1,
     rows_skipped: 0,
     rows_success: 1,
 }
-const mockFinalStatus = {
+const mockFinalStatus: AdapterStatus = {
     ...mockInitialStatus,
-    statusSummary: mockFinalSummary
+    statusSummary: mockFinalSummary,
+    statusTag: AdapterStatusTag.success,
 }
 
-export const localAdapterLoaderMocks = { mockInitialStatus, mockFinalStatus, mockFinalSummary, mockFinalRegisters, mockInitialRegisters, inputEntities, mockNewRegisters }
+export const case4Mocks = { mockInitialStatus, mockFinalStatus, mockFinalRegisters, mockInitialRegisters, inputEntities, mockNewRegisters }

@@ -1,19 +1,16 @@
 import { EventEmitter } from "stream";
 import { VolatileRegisterDataAccess } from "../../src/dataAccess/volatile";
 import { AdapterFactory } from "../../src/interactors/adapters/factory";
-import { AdapterDefinition, AdapterStatus, AdapterStatusSummary, InputEntity } from "../../src/interactors/adapters/types";
+import { AdapterDefinition, AdapterStatus, InputEntity } from "../../src/interactors/adapters/types";
 import { Entity, Register, SyncContext, RegisterStatusTag } from "../../src/interactors/registers/types";
-import { localAdapterExtractorMocksSuite } from "./localAdapterExtractorMocks"
-import { localAdapterTransformerMocksSuite } from "./localAdapterTranformerMocks";
 import { isByGroupSource, isByRowSource, isOrigin } from "../../src/interactors/registers/utils";
+import { adapterMocksSuites } from "./mocks";
+
 
 
 let adapterPresenter = new EventEmitter()
 let adapterDefinitions: AdapterDefinition[] = [];
-localAdapterExtractorMocksSuite.forEach(suite => {
-    adapterDefinitions.push(suite.definition)
-})
-localAdapterTransformerMocksSuite.forEach(suite => {
+adapterMocksSuites.forEach(suite => {
     adapterDefinitions.push(suite.definition)
 })
 let registerDataAccess = new VolatileRegisterDataAccess();
@@ -273,9 +270,9 @@ const registerEqual = (register: Register<Entity>, mockFinalRegister: Register<E
     expect(register).toEqual(mockFinalRegister)
 }
 
-localAdapterExtractorMocksSuite.forEach(suite => {
+adapterMocksSuites.forEach(suite => {
     adapterTest(suite.definition, suite.mocks)
 })
-localAdapterTransformerMocksSuite.forEach(suite => {
+adapterMocksSuites.forEach(suite => {
     adapterTest(suite.definition, suite.mocks)
 })
