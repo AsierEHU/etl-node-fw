@@ -3,15 +3,15 @@ import { VolatileRegisterDataAccess } from "../../src/dataAccess/volatile";
 import { AdapterFactory } from "../../src/interactors/adapters/factory";
 import { AdapterDefinition, AdapterStatus, AdapterStatusSummary, InputEntity } from "../../src/interactors/adapters/types";
 import { Entity, Register, SyncContext, RegisterStatusTag } from "../../src/interactors/registers/types";
-import { localAdapterExtractorDefinition, localAdapterExtractorMocks } from "./localAdapterExtractorMocks"
-import { localAdapterTransformerDefinition, localAdapterTransformerMocks } from "./localAdapterTransformerMocks";
-import { localAdapterLoaderDefinition, localAdapterLoaderMocks } from "./localAdapterLoaderMocks";
-import { localAdapterFlexDefinition, localAdapterFlexMocks } from "./localAdapterFlexMocks";
+import { localAdapterExtractorMocksSuite } from "./localAdapterExtractorMocks"
 import { isByGroupSource, isByRowSource, isOrigin } from "../../src/interactors/registers/utils";
 
 
 let adapterPresenter = new EventEmitter()
-let adapterDefinitions = [localAdapterExtractorDefinition, localAdapterTransformerDefinition, localAdapterLoaderDefinition, localAdapterFlexDefinition];
+let adapterDefinitions: AdapterDefinition[] = [];
+localAdapterExtractorMocksSuite.forEach(suite => {
+    adapterDefinitions.push(suite.definition)
+})
 let registerDataAccess = new VolatileRegisterDataAccess();
 let adapterFactory = new AdapterFactory(adapterDefinitions)
 let syncContext: SyncContext = {
@@ -36,7 +36,7 @@ const adapterTest = (
         inputEntities: InputEntity<Entity>[]
     }
 ) => {
-    describe(definition.definitionType + " status test", () => {
+    describe(definition.definitionType + " - " + definition.id + " status test", () => {
 
         beforeEach(() => {
             adapterPresenter.removeAllListeners("adapterStatus")
@@ -64,15 +64,24 @@ const adapterTest = (
 
         test("Final summary", async () => {
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
-            const adapterStatusSummary = await adapter1.runOnce();
-            expect(adapterStatusSummary).toEqual(mocks.mockFinalSummary)
+            try {
+                const adapterStatusSummary = await adapter1.runOnce();
+                expect(adapterStatusSummary).toEqual(mocks.mockFinalSummary)
+            } catch (error: any) {
+                expect(error.message).toBe("My custom run error")
+            }
         })
 
         test("Final status", async () => {
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
-            await adapter1.runOnce();
-            const adapterStatus = await adapter1.getStatus()
-            statusEqual(adapterStatus, mocks.mockFinalStatus)
+            try {
+                await adapter1.runOnce();
+                const adapterStatus = await adapter1.getStatus()
+                statusEqual(adapterStatus, mocks.mockFinalStatus)
+            } catch (error: any) {
+                expect(error.message).toBe("My custom run error")
+            }
+
         })
 
         test("Final presenter", (done) => {
@@ -81,15 +90,22 @@ const adapterTest = (
                 statusEqual(adapterStatus, mocks.mockFinalStatus)
                 done()
             })
-            adapter1.runOnce()
+            adapter1.runOnce().catch(error => {
+                expect(error.message).toBe("My custom run error")
+                done()
+            })
         })
 
         test("Final status: runOptions", async () => {
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
             const runOptions = { onlyFailedEntities: true, inputEntities: mocks.inputEntities }
-            await adapter1.runOnce(runOptions);
-            const adapterStatus = await adapter1.getStatus()
-            expect(adapterStatus.runOptions).toEqual(runOptions)
+            try {
+                await adapter1.runOnce(runOptions);
+                const adapterStatus = await adapter1.getStatus()
+                expect(adapterStatus.runOptions).toEqual(runOptions)
+            } catch (error: any) {
+                expect(error.message).toBe("My custom run error")
+            }
         })
 
         test("Final presenter: runOptions", (done) => {
@@ -99,18 +115,25 @@ const adapterTest = (
                 expect(adapterStatus.runOptions).toEqual(runOptions)
                 done()
             })
-            adapter1.runOnce({ onlyFailedEntities: true, inputEntities: mocks.inputEntities })
+            adapter1.runOnce(runOptions).catch(error => {
+                expect(error.message).toBe("My custom run error")
+                done()
+            })
         })
 
         test("Run once exception", async () => {
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
-            adapter1.runOnce()
-            await expect(adapter1.runOnce()).rejects.toEqual(new Error("Run once"))
+            try {
+                await adapter1.runOnce();
+                await expect(adapter1.runOnce()).rejects.toEqual(new Error("Run once"))
+            } catch (error: any) {
+                expect(error.message).toBe("My custom run error")
+            }
         });
 
     })
 
-    describe(definition.definitionType + " registers test", () => {
+    describe(definition.definitionType + " - " + definition.id + " registers test", () => {
 
         beforeEach(() => {
             adapterPresenter.removeAllListeners("adapterStatus")
@@ -233,8 +256,6 @@ const registerEqual = (register: Register<Entity>, mockFinalRegister: Register<E
     expect(register).toEqual(mockFinalRegister)
 }
 
-
-adapterTest(localAdapterExtractorDefinition, localAdapterExtractorMocks)
-adapterTest(localAdapterTransformerDefinition, localAdapterTransformerMocks)
-adapterTest(localAdapterLoaderDefinition, localAdapterLoaderMocks)
-adapterTest(localAdapterFlexDefinition, localAdapterFlexMocks)
+localAdapterExtractorMocksSuite.forEach(suite => {
+    adapterTest(suite.definition, suite.mocks)
+})

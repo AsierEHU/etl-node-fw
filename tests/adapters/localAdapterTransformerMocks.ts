@@ -1,7 +1,7 @@
 import { LocalAdapterTransformerDefinition } from "../../src/interactors/adapters/definitions/localAdapterTransformer";
 import { InputEntity } from "../../src/interactors/adapters/types";
 import { Entity, Register, RegisterStatusTag } from "../../src/interactors/registers/types";
-import { localAdapterExtractorMocks } from "./localAdapterExtractorMocks";
+import { case1Mocks } from "./localAdapterExtractorMocks/case1Mocks";
 
 type inputClass = {
     field: string,
@@ -13,7 +13,7 @@ type outputClass = {
         x: number,
     }
 }
-const mockInitialRegisters: Register<Entity>[] = localAdapterExtractorMocks.mockFinalRegisters
+const mockInitialRegisters: Register<Entity>[] = case1Mocks.mockFinalRegisters
 const inputEntities: InputEntity<inputClass>[] = [
     {
         entity: {

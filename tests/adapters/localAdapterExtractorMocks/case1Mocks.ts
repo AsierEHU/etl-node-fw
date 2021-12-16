@@ -1,7 +1,7 @@
-import { LocalAdapterExtractorDefinition } from "../../src/interactors/adapters/definitions/localAdapterExtractor";
-import { ToFixEntity, ValidationStatusTag } from "../../src/interactors/adapters/definitions/types";
-import { InputEntity } from "../../src/interactors/adapters/types";
-import { Entity, Register, RegisterStatusTag } from "../../src/interactors/registers/types";
+import { LocalAdapterExtractorDefinition } from "../../../src/interactors/adapters/definitions/localAdapterExtractor";
+import { ToFixEntity, ValidationStatusTag } from "../../../src/interactors/adapters/definitions/types";
+import { InputEntity } from "../../../src/interactors/adapters/types";
+import { Entity, Register, RegisterStatusTag } from "../../../src/interactors/registers/types";
 
 type inputClass = {
     field: string,
@@ -40,8 +40,8 @@ const inputEntities: InputEntity<inputClass>[] = [
         y: -1,
     }
 ];
-export const localAdapterExtractorDefinition: LocalAdapterExtractorDefinition<inputClass> = {
-    id: "testExtractor",
+export const case1Definition: LocalAdapterExtractorDefinition<inputClass> = {
+    id: "case1Extractor",
     definitionType: "LocalAdapterExtractorDefinition",
     outputType: "inputClass",
     async entitiesGet() {
@@ -212,7 +212,7 @@ const mockFinalRegisters: Register<Entity>[] = [
     ...mockNewRegisters
 ]
 const mockInitialStatus = {
-    definitionId: "testExtractor",
+    definitionId: "case1Extractor",
     definitionType: "LocalAdapterExtractorDefinition",
     id: "testAdapter",
     outputType: "inputClass",
@@ -232,4 +232,4 @@ const mockFinalStatus = {
     statusSummary: mockFinalSummary
 }
 
-export const localAdapterExtractorMocks = { mockInitialStatus, mockFinalStatus, mockFinalSummary, mockFinalRegisters, inputEntities, mockInitialRegisters, mockNewRegisters }
+export const case1Mocks = { mockInitialStatus, mockFinalStatus, mockFinalSummary, mockFinalRegisters, inputEntities, mockInitialRegisters, mockNewRegisters }
