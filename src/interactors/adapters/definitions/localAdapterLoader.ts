@@ -3,7 +3,7 @@ import { Entity, Register, RegisterStatusTag } from "../../registers/types";
 import { AdapterDefinition, EntityWithMeta } from "../types"
 import { v4 as uuidv4 } from 'uuid';
 import { LocalAdapter } from "./localAdapter";
-import { getValidationResultWithMeta, getWithMetaFormat } from "./utils";
+import { getValidationResultWithMeta, getWithMetaFormat, validationTagToRegisterTag } from "./utils";
 import { ValidationResult, ValidationStatusTag } from "./types";
 
 /**
@@ -74,26 +74,12 @@ export class LocalAdapterLoader<ad extends LocalAdapterLoaderDefinition<Entity, 
         try {
             const validation = await this.adapterDefinition.entityValidate(register.entity);
             const validationWithMeta = getValidationResultWithMeta(validation);
-
-            if (validationWithMeta.statusTag == ValidationStatusTag.invalid) {
-                register.statusTag = RegisterStatusTag.invalid;
-            }
-
-            else if (validationWithMeta.statusTag == ValidationStatusTag.skipped) {
-                register.statusTag = RegisterStatusTag.skipped;
-            }
-
-            else if (validationWithMeta.statusTag == ValidationStatusTag.valid) {
-                register.statusTag = RegisterStatusTag.success;
-            }
-
+            register.statusTag = validationTagToRegisterTag(validationWithMeta.statusTag)
             register.statusMeta = validationWithMeta.meta;
-
         } catch (error: any) {
             register.statusTag = RegisterStatusTag.failed;
             register.statusMeta = error.message;
         }
-
         return register;
     }
 }

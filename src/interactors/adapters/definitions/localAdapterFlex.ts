@@ -1,9 +1,8 @@
 
 import { Entity, Register, RegisterStatusTag } from "../../registers/types";
 import { AdapterDefinition } from "../types"
-import { getValidationResultWithMeta, getWithMetaFormat } from "./utils";
+import { getValidationResultWithMeta, getWithMetaFormat, ContextEntityFetcher, validationTagToRegisterTag } from "./utils";
 import { LocalAdapter } from "./localAdapter";
-import { VolatileEntityFetcher } from "../../../dataAccess/volatile";
 import { EntityFetcher, RegisterDataFilter, ValidationResult, ValidationStatusTag } from "./types";
 
 /**
@@ -18,7 +17,7 @@ export class LocalAdapterFlex<ad extends LocalAdapterFlexDefinition<Entity>> ext
     }
 
     protected async getRegisters(): Promise<Register<Entity>[]> {
-        const entityFetcher = new VolatileEntityFetcher(
+        const entityFetcher = new ContextEntityFetcher(
             { flowId: this.adapterStatus.syncContext.flowId },
             this.registerDataAccess
         )
@@ -53,21 +52,8 @@ export class LocalAdapterFlex<ad extends LocalAdapterFlexDefinition<Entity>> ext
             try {
                 const validation = await this.adapterDefinition.entityValidate(register.entity);
                 const validationWithMeta = getValidationResultWithMeta(validation);
-
-                if (validationWithMeta.statusTag == ValidationStatusTag.invalid) {
-                    register.statusTag = RegisterStatusTag.invalid;
-                }
-
-                else if (validationWithMeta.statusTag == ValidationStatusTag.skipped) {
-                    register.statusTag = RegisterStatusTag.skipped;
-                }
-
-                else if (validationWithMeta.statusTag == ValidationStatusTag.valid) {
-                    register.statusTag = RegisterStatusTag.success;
-                }
-
+                register.statusTag = validationTagToRegisterTag(validationWithMeta.statusTag)
                 register.statusMeta = validationWithMeta.meta;
-
             } catch (error: any) {
                 register.statusTag = RegisterStatusTag.failed;
                 register.statusMeta = error.message;

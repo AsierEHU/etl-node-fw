@@ -1,6 +1,7 @@
-import { Entity, Register, RegisterStatusTag } from "../../registers/types";
+import { uniqBy } from "lodash";
+import { Entity, Register, RegisterStatusTag, SyncContext } from "../../registers/types";
 import { AdapterStatusSummary, EntityWithMeta, InputEntity } from "../types";
-import { ValidationResult, ValidationStatusTag } from "./types";
+import { EntityFetcher, RegisterDataAccess, RegisterDataFilter, ValidationResult, ValidationStatusTag } from "./types";
 
 export const getWithMetaFormat = (inputEntities: InputEntity<Entity>[]): EntityWithMeta<Entity>[] => {
     return inputEntities.map(inputEntity => {
@@ -27,7 +28,6 @@ export const getValidationResultWithMeta = (validation: ValidationResult | Valid
     }
 }
 
-
 function isEntityWithMeta(inputEntity?: any): inputEntity is EntityWithMeta<Entity> {
     return inputEntity?.entity != undefined
 }
@@ -35,8 +35,6 @@ function isEntityWithMeta(inputEntity?: any): inputEntity is EntityWithMeta<Enti
 function isValidationResult(validation?: any): validation is ValidationResult {
     return validation?.statusTag != undefined
 }
-
-
 
 export const calculateSummary = (outputRegisters: Register<Entity>[]): AdapterStatusSummary => {
     const statusSummary = {
@@ -47,4 +45,61 @@ export const calculateSummary = (outputRegisters: Register<Entity>[]): AdapterSt
         rows_skipped: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.skipped).length,
     };
     return statusSummary;
+}
+
+export class ContextEntityFetcher implements EntityFetcher {
+
+    private readonly syncContext: SyncContext
+    private readonly registerDataAccess: RegisterDataAccess
+    private readonly fetchHistory: RegisterDataFilter[]
+
+    constructor(syncContext: SyncContext, registerDataAccess: RegisterDataAccess) {
+        this.syncContext = syncContext
+        this.registerDataAccess = registerDataAccess
+        this.fetchHistory = []
+    }
+
+    async getEntities(filter?: RegisterDataFilter) {
+        filter = { ...filter, ...this.syncContext }
+        this.fetchHistory.push(filter)
+        const registers = await this.registerDataAccess.getAll(filter)
+        return registers.map(register => { return { entity: register.entity, meta: register.meta } })
+    }
+
+    getHistory(): RegisterDataFilter[] {
+        return this.fetchHistory;
+    }
+
+}
+
+export class AdvancedRegisterFetcher {
+
+    private readonly registerDataAccess: RegisterDataAccess
+
+    constructor(registerDataAccess: RegisterDataAccess) {
+        this.registerDataAccess = registerDataAccess
+    }
+
+    async getRelativeRegisters(baseRegisters: Register<Entity>[]): Promise<Register<Entity>[]> {
+        const uniqueBaseRegisters = uniqBy(baseRegisters, 'sourceRelativeId')
+        const targetRegistersIds = uniqueBaseRegisters.map(baseRegister => baseRegister.sourceRelativeId) as string[]
+        const targetRegisters = await this.registerDataAccess.getAll(undefined, targetRegistersIds)
+        return targetRegisters
+    }
+
+    async getAbsoluteRegisters(baseRegisters: Register<Entity>[]): Promise<Register<Entity>[]> {
+        const uniqueBaseRegisters = uniqBy(baseRegisters, 'sourceAbsoluteId')
+        const targetRegistersIds = uniqueBaseRegisters.map(baseRegister => baseRegister.sourceAbsoluteId) as string[]
+        const targetRegisters = await this.registerDataAccess.getAll(undefined, targetRegistersIds)
+        return targetRegisters
+    }
+}
+
+export const validationTagToRegisterTag = (validationStatusTag: ValidationStatusTag) => {
+    const validationMap = {
+        [ValidationStatusTag.invalid]: RegisterStatusTag.invalid,
+        [ValidationStatusTag.skipped]: RegisterStatusTag.skipped,
+        [ValidationStatusTag.valid]: RegisterStatusTag.success,
+    }
+    return validationMap[validationStatusTag]
 }

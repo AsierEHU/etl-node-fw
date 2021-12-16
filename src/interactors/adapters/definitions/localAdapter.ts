@@ -3,8 +3,8 @@ import { Entity, Register, SyncContext, RegisterStatusTag } from "../../register
 import { Adapter, AdapterStatus, AdapterDefinition, EntityWithMeta, AdapterRunOptions, AdapterStatusSummary } from "../types"
 import { v4 as uuidv4 } from 'uuid';
 import { EntityInitValues, MyAdapterDependencies, RegisterDataAccess } from "./types";
-import { calculateSummary, getWithMetaFormat } from "./utils";
-import { cloneDeep, uniqBy } from 'lodash'
+import { AdvancedRegisterFetcher, calculateSummary, getWithMetaFormat } from "./utils";
+import { cloneDeep } from 'lodash'
 
 
 
@@ -74,14 +74,13 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
             inputRegisters = await this.initRegisters(inputEntitiesWithMeta)
         }
         else if (runOptions?.onlyFailedEntities) {
-            const outputRegisters = await this.registerDataAccess.getAll({
+            const failedRegisters = await this.registerDataAccess.getAll({
                 registerType: this.adapterDefinition.outputType,
                 registerStatus: RegisterStatusTag.failed,
                 ...this.syncUpperContext
             })
-            const uniqueOutputRegisters = uniqBy(outputRegisters, 'sourceRelativeId')
-            const oldInputRegistersIds = uniqueOutputRegisters.map(outputRegister => outputRegister.sourceRelativeId) as string[]
-            const oldInputRegisters = await this.registerDataAccess.getAll(undefined, oldInputRegistersIds)
+            const arg = new AdvancedRegisterFetcher(this.registerDataAccess);
+            const oldInputRegisters = await arg.getRelativeRegisters(failedRegisters)
             const inputEntitiesWithMeta = oldInputRegisters.map(oir => {
                 return {
                     entity: oir.entity,
