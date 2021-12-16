@@ -1,10 +1,10 @@
 
 import { Entity, Register, RegisterStatusTag } from "../../registers/types";
 import { AdapterDefinition } from "../types"
-import { getWithMetaFormat } from "./utils";
+import { getValidationResultWithMeta, getWithMetaFormat } from "./utils";
 import { LocalAdapter } from "./localAdapter";
 import { VolatileEntityFetcher } from "../../../dataAccess/volatile";
-import { EntityFetcher, RegisterDataFilter } from "./types";
+import { EntityFetcher, RegisterDataFilter, ValidationResult, ValidationStatusTag } from "./types";
 
 /**
  * Local async step, persistance
@@ -42,12 +42,37 @@ export class LocalAdapterFlex<ad extends LocalAdapterFlexDefinition<Entity>> ext
     }
 
     async outputRegisters(inputRegisters: Register<Entity>[]) {
+        await this.validateRegisters(inputRegisters);
         const outputRegisters = inputRegisters;
-        outputRegisters.forEach(register => {
-            register.statusTag = RegisterStatusTag.success
-        })
         await this.registerDataAccess.saveAll(outputRegisters)
         return outputRegisters
+    }
+
+    private async validateRegisters(inputRegisters: Register<Entity>[]) {
+        for (const register of inputRegisters) {
+            try {
+                const validation = await this.adapterDefinition.entityValidate(register.entity);
+                const validationWithMeta = getValidationResultWithMeta(validation);
+
+                if (validationWithMeta.statusTag == ValidationStatusTag.invalid) {
+                    register.statusTag = RegisterStatusTag.invalid;
+                }
+
+                else if (validationWithMeta.statusTag == ValidationStatusTag.skipped) {
+                    register.statusTag = RegisterStatusTag.skipped;
+                }
+
+                else if (validationWithMeta.statusTag == ValidationStatusTag.valid) {
+                    register.statusTag = RegisterStatusTag.success;
+                }
+
+                register.statusMeta = validationWithMeta.meta;
+
+            } catch (error: any) {
+                register.statusTag = RegisterStatusTag.failed;
+                register.statusMeta = error.message;
+            }
+        }
     }
 }
 
@@ -56,5 +81,6 @@ export abstract class LocalAdapterFlexDefinition<output extends Entity> implemen
     abstract readonly outputType: string
     abstract readonly definitionType: string;
     abstract readonly entitiesGet: (entityFetcher: EntityFetcher) => Promise<output[]>
+    abstract readonly entityValidate: (outputEntity: output | null) => Promise<ValidationResult | ValidationStatusTag> //data quality, error handling (error prevention), managin Bad Data-> triage or CleanUp
 }
 

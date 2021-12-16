@@ -1,5 +1,5 @@
 import { LocalAdapterFlexDefinition } from "../../src/interactors/adapters/definitions/localAdapterFlex";
-import { EntityFetcher, RegisterDataFilter } from "../../src/interactors/adapters/definitions/types";
+import { EntityFetcher, RegisterDataFilter, ValidationStatusTag } from "../../src/interactors/adapters/definitions/types";
 import { InputEntity } from "../../src/interactors/adapters/types";
 import { Entity, Register, RegisterStatusTag } from "../../src/interactors/registers/types";
 import { localAdapterLoaderMocks } from "./localAdapterLoaderMocks";
@@ -19,11 +19,14 @@ export const localAdapterFlexDefinition: LocalAdapterFlexDefinition<result2Class
         const filter: RegisterDataFilter = {
             registerType: "resultClass",
             registerStatus: RegisterStatusTag.success
-        }
-        const entities = await entityFetcher.getEntities(filter)
+        };
+        const entities = await entityFetcher.getEntities(filter);
         return [{
             successTotal: entities.length
-        }]
+        }];
+    },
+    async entityValidate(outputEntity: result2Class | null) {
+        return ValidationStatusTag.valid
     }
 }
 const mockFinalRegisters: Register<Entity>[] = [
