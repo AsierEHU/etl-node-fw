@@ -1,7 +1,7 @@
 import { LocalAdapterExtractorDefinition } from "../../../src/interactors/adapters/definitions/localAdapterExtractor";
 import { ToFixEntity, ValidationStatusTag } from "../../../src/interactors/adapters/definitions/types";
-import { InputEntity } from "../../../src/interactors/adapters/types";
-import { Entity, Register, RegisterStatusTag } from "../../../src/interactors/registers/types";
+import { AdapterStatus, AdapterStatusSummary, AdapterStatusTag, InputEntity } from "../../../src/interactors/adapters/types";
+import { Entity, Register } from "../../../src/interactors/registers/types";
 
 type inputClass = {
     field: string,
@@ -14,7 +14,7 @@ export const case2Definition: LocalAdapterExtractorDefinition<inputClass> = {
     definitionType: "LocalAdapterExtractorDefinition",
     outputType: "inputClass",
     async entitiesGet() {
-        throw new Error("My custom run error")
+        throw new Error("Getting entities error")
     },
     async entityValidate(entity: inputClass | null) {
         return ValidationStatusTag.invalid;
@@ -28,25 +28,23 @@ const mockFinalRegisters: Register<Entity>[] = [
     ...mockInitialRegisters,
     ...mockNewRegisters
 ]
-const mockInitialStatus = {
+const mockInitialStatus: AdapterStatus = {
     definitionId: "case2Extractor",
     definitionType: "LocalAdapterExtractorDefinition",
     id: "testAdapter",
     outputType: "inputClass",
     runOptions: null,
     statusSummary: null,
-    syncContext: { apdaterId: "testAdapter", stepId: "testStep", flowId: "testFlow" }
+    statusTag: AdapterStatusTag.pending,
+    statusMeta: null,
+    syncContext: { apdaterId: "testAdapter", stepId: "testStep", flowId: "testFlow" },
 }
-const mockFinalSummary = {
-    output_rows: 0,
-    rows_failed: 0,
-    rows_invalid: 0,
-    rows_skipped: 0,
-    rows_success: 0,
-}
-const mockFinalStatus = {
+const mockFinalSummary = null
+const mockFinalStatus: AdapterStatus = {
     ...mockInitialStatus,
-    statusSummary: mockFinalSummary
+    statusSummary: mockFinalSummary,
+    statusTag: AdapterStatusTag.failed,
+    statusMeta: "Getting entities error"
 }
 
-export const case2Mocks = { mockInitialStatus, mockFinalStatus, mockFinalSummary, mockFinalRegisters, inputEntities, mockInitialRegisters, mockNewRegisters }
+export const case2Mocks = { mockInitialStatus, mockFinalStatus, mockFinalRegisters, inputEntities, mockInitialRegisters, mockNewRegisters }

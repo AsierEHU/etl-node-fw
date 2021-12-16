@@ -1,6 +1,6 @@
 import EventEmitter from "events";
 import { AdapterFactory } from "../../adapters/factory";
-import { AdapterDefinition, AdapterDependencies, AdapterRunOptions } from "../../adapters/types";
+import { AdapterDefinition, AdapterDependencies, AdapterRunOptions, AdapterStatus, AdapterStatusSummary, AdapterStatusTag } from "../../adapters/types";
 import { SyncContext } from "../../registers/types";
 import { Step, StepStatus, StepStatusTag, StepRunOptions, StepDefinition, StepStatusSummary } from "../types"
 import { v4 as uuidv4 } from 'uuid';
@@ -51,55 +51,79 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
         this.stepStatus.statusTag = StepStatusTag.active
         this.stepStatus.timeStarted = new Date();
         this.stepStatus.runOptions = cloneDeep(runOptions) || null;
+        this.stepPresenter.emit("stepStatus", this.stepStatus)
+
         await this.tryRunAdapter(this.stepStatus.runOptions?.adapterRunOptions);
+
         this.stepStatus.timeFinished = new Date();
         this.stepPresenter.emit("stepStatus", this.stepStatus)
+
         return this.stepStatus.statusTag;
     }
 
     private async tryRunAdapter(adapterRunOptions?: AdapterRunOptions, tryNumber?: number) {
         this.stepStatus.tryNumber = tryNumber || 1;
-        const adapter = this.adapterFactory.createAdapter(this.stepDefinition.adapterDefinitionId, this.adapterDependencies)
-
-        if (!this.stepStatus.statusSummary) {
-            this.stepStatus.statusSummary = {
-                output_rows: 0,
-                rows_success: 0,
-                rows_failed: 0,
-                rows_invalid: 0,
-                rows_skipped: 0
-            }
-        }
 
         try {
-            const adapterStatusSummary = await adapter.runOnce(adapterRunOptions)
-            if (adapterRunOptions?.onlyFailedEntities) {
-                this.stepStatus.statusSummary.rows_success += adapterStatusSummary.rows_success
-                this.stepStatus.statusSummary.rows_failed = adapterStatusSummary.rows_failed
-            } else {
-                this.stepStatus.statusSummary = adapterStatusSummary
+            const adapter = this.adapterFactory.createAdapter(this.stepDefinition.adapterDefinitionId, this.adapterDependencies)
+            const adapterStatusTag = await adapter.runOnce(adapterRunOptions)
+            if (adapterStatusTag == AdapterStatusTag.failed && this.canRetry()) {
+                await this.retryRunAdapter(adapterRunOptions)
+            }
+            else {
+                const adapterStatus = await adapter.getStatus()
+                this.stepStatus.statusSummary = this.getSummary(adapterStatus)
+                if (this.stepStatus.statusSummary.rows_failed > 0 && this.canRetry()) {
+                    await this.retryRunAdapter(adapterRunOptions)
+                }
+                else {
+                    if (this.stepDefinition.isFailedStatus(this.stepStatus.statusSummary)) {
+                        this.stepStatus.statusTag = StepStatusTag.failed;
+                    } else {
+                        this.stepStatus.statusTag = StepStatusTag.success;
+                    }
+                }
             }
 
         } catch (error: any) {
             if (this.canRetry()) {
                 await this.tryRunAdapter(adapterRunOptions, this.stepStatus.tryNumber + 1);
-            } else {
-                this.stepStatus.statusMeta = error.message
             }
-        }
-
-        if (this.stepStatus.statusSummary.rows_failed > 0 && this.canRetry()) {
-            const restartAdapterRunOptions = { ...adapterRunOptions, onlyFailedEntities: true }
-            await this.tryRunAdapter(restartAdapterRunOptions, this.stepStatus.tryNumber + 1);
-        }
-        else {
-            if (this.stepDefinition.isFailedStatus(this.stepStatus.statusSummary)) {
+            else {
+                this.stepStatus.statusMeta = error.message
                 this.stepStatus.statusTag = StepStatusTag.failed;
-            } else {
-                this.stepStatus.statusTag = StepStatusTag.success;
             }
         }
     }
+
+    private async retryRunAdapter(adapterRunOptions?: AdapterRunOptions) {
+        const restartAdapterRunOptions = { ...adapterRunOptions, onlyFailedEntities: true }
+        await this.tryRunAdapter(restartAdapterRunOptions, this.stepStatus.tryNumber + 1);
+    }
+
+    private getSummary(adapterStatus: AdapterStatus): StepStatusSummary {
+        const adapterStatusSummary = adapterStatus.statusSummary
+        const adapterRunOptions = adapterStatus.runOptions
+        let actualSummary = this.stepStatus.statusSummary;
+
+        if (!actualSummary) {
+            actualSummary = {
+                output_rows: 0,
+                rows_success: 0,
+                rows_failed: 0,
+                rows_invalid: 0,
+                rows_skipped: 0,
+            }
+        }
+
+        if (adapterStatusSummary && adapterRunOptions?.onlyFailedEntities) {
+            actualSummary.rows_success += adapterStatusSummary.rows_success
+            actualSummary.rows_failed = adapterStatusSummary.rows_failed
+        }
+
+        return actualSummary
+    }
+
 
     private canRetry(): boolean {
         return this.stepStatus.tryNumber <= this.stepDefinition.retartTries

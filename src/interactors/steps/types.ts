@@ -32,7 +32,7 @@ export type StepStatus = {
     definitionType: string
     tryNumber: number //retries
     statusTag: StepStatusTag //debugging
-    statusMeta: string | object | null
+    statusMeta: StepMeta
     timeStarted: Date | null  //debugging
     timeFinished: Date | null   //debugging
     // exceptionTrace: object, //debugging
@@ -40,6 +40,8 @@ export type StepStatus = {
     syncContext: SyncContext
     statusSummary: StepStatusSummary | null
 }
+
+export type StepMeta = string | object | null
 
 export interface StepDependencies<sp extends StepDefinition> {
     stepDefinition: sp

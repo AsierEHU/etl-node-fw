@@ -33,7 +33,6 @@ const adapterTest = (
     mocks: {
         mockInitialStatus: AdapterStatus,
         mockFinalStatus: AdapterStatus,
-        mockFinalSummary: AdapterStatusSummary,
         mockNewRegisters: Register<Entity>[],
         mockFinalRegisters: Register<Entity>[],
         mockInitialRegisters: Register<Entity>[],
@@ -66,16 +65,6 @@ const adapterTest = (
             adapterFactory.createAdapter(definition.id, adapterDependencies)
         })
 
-        test("Final summary", async () => {
-            const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
-            try {
-                const adapterStatusSummary = await adapter1.runOnce();
-                expect(adapterStatusSummary).toEqual(mocks.mockFinalSummary)
-            } catch (error: any) {
-                expect(error.message).toBe("My custom run error")
-            }
-        })
-
         test("Final status", async () => {
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
             try {
@@ -83,22 +72,22 @@ const adapterTest = (
                 const adapterStatus = await adapter1.getStatus()
                 statusEqual(adapterStatus, mocks.mockFinalStatus)
             } catch (error: any) {
-                expect(error.message).toBe("My custom run error")
+                expect(error.message).toBe("Test custom Error")
             }
 
         })
 
-        test("Final presenter", (done) => {
-            const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
-            adapterPresenter.on("adapterStatus", (adapterStatus) => {
-                statusEqual(adapterStatus, mocks.mockFinalStatus)
-                done()
-            })
-            adapter1.runOnce().catch(error => {
-                expect(error.message).toBe("My custom run error")
-                done()
-            })
-        })
+        // test("Presenter steps", (done) => {
+        //     const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
+        //     adapterPresenter.once("adapterStatus", (adapterStatus) => {
+        //         statusEqual(adapterStatus, mocks.mockFinalStatus)
+        //         done()
+        //     })
+        //     adapter1.runOnce().catch(error => {
+        //         expect(error.message).toBe("Test custom Error")
+        //         done()
+        //     })
+        // })
 
         test("Final status: runOptions", async () => {
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
@@ -108,7 +97,7 @@ const adapterTest = (
                 const adapterStatus = await adapter1.getStatus()
                 expect(adapterStatus.runOptions).toEqual(runOptions)
             } catch (error: any) {
-                expect(error.message).toBe("My custom run error")
+                expect(error.message).toBe("Test custom Error")
             }
         })
 
@@ -120,7 +109,7 @@ const adapterTest = (
                 done()
             })
             adapter1.runOnce(runOptions).catch(error => {
-                expect(error.message).toBe("My custom run error")
+                expect(error.message).toBe("Test custom Error")
                 done()
             })
         })
@@ -131,7 +120,7 @@ const adapterTest = (
                 await adapter1.runOnce();
                 await expect(adapter1.runOnce()).rejects.toEqual(new Error("Run once"))
             } catch (error: any) {
-                expect(error.message).toBe("My custom run error")
+                expect(error.message).toBe("Test custom Error")
             }
         });
 
@@ -156,7 +145,7 @@ const adapterTest = (
                 const registers = await registerDataAccess.getAll()
                 registersEqual(registers, mocks.mockFinalRegisters)
             } catch (error: any) {
-                expect(error.message).toBe("My custom run error")
+                expect(error.message).toBe("Test custom Error")
             }
         });
 
@@ -165,7 +154,7 @@ const adapterTest = (
             try {
                 await adapter1.runOnce();
             } catch (error: any) {
-                expect(error.message).toBe("My custom run error")
+                expect(error.message).toBe("Test custom Error")
             }
             const adapter2 = adapterFactory.createAdapter(definition.id, adapterDependencies)
             try {
@@ -177,7 +166,7 @@ const adapterTest = (
                 ]
                 registersEqual(registers, mockRegistersWithRetries)
             } catch (error: any) {
-                expect(error.message).toBe("My custom run error")
+                expect(error.message).toBe("Test custom Error")
             }
         })
 
@@ -188,7 +177,7 @@ const adapterTest = (
                 const registers = await registerDataAccess.getAll()
                 registersEqual(registers, mocks.mockFinalRegisters)
             } catch (error: any) {
-                expect(error.message).toBe("My custom run error")
+                expect(error.message).toBe("Test custom Error")
             }
         })
 
@@ -201,7 +190,7 @@ const adapterTest = (
                     expect(register.statusTag).not.toBe(RegisterStatusTag.pending)
                 })
             } catch (error: any) {
-                expect(error.message).toBe("My custom run error")
+                expect(error.message).toBe("Test custom Error")
             }
         })
 
@@ -214,7 +203,7 @@ const adapterTest = (
                     await testSources(register);
                 }
             } catch (error: any) {
-                expect(error.message).toBe("My custom run error")
+                expect(error.message).toBe("Test custom Error")
             }
         })
     })

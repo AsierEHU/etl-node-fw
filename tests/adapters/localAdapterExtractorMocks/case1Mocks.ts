@@ -1,6 +1,6 @@
 import { LocalAdapterExtractorDefinition } from "../../../src/interactors/adapters/definitions/localAdapterExtractor";
 import { ToFixEntity, ValidationStatusTag } from "../../../src/interactors/adapters/definitions/types";
-import { InputEntity } from "../../../src/interactors/adapters/types";
+import { AdapterStatus, AdapterStatusSummary, AdapterStatusTag, InputEntity } from "../../../src/interactors/adapters/types";
 import { Entity, Register, RegisterStatusTag } from "../../../src/interactors/registers/types";
 
 type inputClass = {
@@ -244,25 +244,28 @@ const mockFinalRegisters: Register<Entity>[] = [
     ...mockInitialRegisters,
     ...mockNewRegisters
 ]
-const mockInitialStatus = {
+const mockInitialStatus: AdapterStatus = {
     definitionId: "case1Extractor",
     definitionType: "LocalAdapterExtractorDefinition",
     id: "testAdapter",
     outputType: "inputClass",
     runOptions: null,
     statusSummary: null,
-    syncContext: { apdaterId: "testAdapter", stepId: "testStep", flowId: "testFlow" }
+    syncContext: { apdaterId: "testAdapter", stepId: "testStep", flowId: "testFlow" },
+    statusTag: AdapterStatusTag.pending,
+    statusMeta: null
 }
-const mockFinalSummary = {
+const mockFinalSummary: AdapterStatusSummary = {
     output_rows: 7,
     rows_failed: 2,
     rows_invalid: 1,
     rows_skipped: 1,
     rows_success: 3,
 }
-const mockFinalStatus = {
+const mockFinalStatus: AdapterStatus = {
     ...mockInitialStatus,
-    statusSummary: mockFinalSummary
+    statusSummary: mockFinalSummary,
+    statusTag: AdapterStatusTag.success
 }
 
-export const case1Mocks = { mockInitialStatus, mockFinalStatus, mockFinalSummary, mockFinalRegisters, inputEntities, mockInitialRegisters, mockNewRegisters }
+export const case1Mocks = { mockInitialStatus, mockFinalStatus, mockFinalRegisters, inputEntities, mockInitialRegisters, mockNewRegisters }

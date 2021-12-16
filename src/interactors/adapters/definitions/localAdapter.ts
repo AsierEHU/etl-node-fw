@@ -1,6 +1,6 @@
 import EventEmitter from "events";
 import { Entity, Register, SyncContext, RegisterStatusTag } from "../../registers/types";
-import { Adapter, AdapterStatus, AdapterDefinition, EntityWithMeta, AdapterRunOptions, AdapterStatusSummary } from "../types"
+import { Adapter, AdapterStatus, AdapterDefinition, EntityWithMeta, AdapterRunOptions, AdapterStatusSummary, AdapterStatusTag } from "../types"
 import { v4 as uuidv4 } from 'uuid';
 import { EntityInitValues, MyAdapterDependencies, RegisterDataAccess } from "./types";
 import { AdvancedRegisterFetcher, calculateSummary, getWithMetaFormat } from "./utils";
@@ -37,6 +37,8 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
             definitionId: this.adapterDefinition.id,
             definitionType: this.adapterDefinition.definitionType,
             outputType: this.adapterDefinition.outputType,
+            statusTag: AdapterStatusTag.pending,
+            statusMeta: null,
             statusSummary: null,
             runOptions: null,
             syncContext: { ...this.syncUpperContext, apdaterId: id }
@@ -44,25 +46,26 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
         this.adapterPresenter.emit("adapterStatus", this.adapterStatus)
     }
 
-    async runOnce(runOptions?: AdapterRunOptions): Promise<AdapterStatusSummary> {
-        if (this.adapterStatus.statusSummary)
+    async runOnce(runOptions?: AdapterRunOptions) {
+        if (this.adapterStatus.statusTag != AdapterStatusTag.pending)
             throw new Error("Run once")
 
-        this.adapterStatus.statusSummary = {
-            output_rows: 0,
-            rows_success: 0,
-            rows_failed: 0,
-            rows_invalid: 0,
-            rows_skipped: 0,
-        };
         this.adapterStatus.runOptions = cloneDeep(runOptions) || null;
+        this.adapterStatus.statusTag = AdapterStatusTag.active
+        this.adapterPresenter.emit("stepStatus", this.adapterStatus)
 
-        const inputRegisters = await this.inputRegisters(runOptions);
-        const outputRegisters = await this.outputRegisters(inputRegisters);
+        try {
+            const inputRegisters = await this.inputRegisters(runOptions);
+            const outputRegisters = await this.outputRegisters(inputRegisters);
+            this.adapterStatus.statusSummary = calculateSummary(outputRegisters);
+            this.adapterStatus.statusTag = AdapterStatusTag.success
+        } catch (error: any) {
+            this.adapterStatus.statusTag = AdapterStatusTag.failed
+            this.adapterStatus.statusMeta = error.message
+        }
 
-        this.adapterStatus.statusSummary = calculateSummary(outputRegisters);
         this.adapterPresenter.emit("adapterStatus", this.adapterStatus)
-        return this.adapterStatus.statusSummary;
+        return this.adapterStatus.statusTag;
     }
 
     private async inputRegisters(runOptions?: AdapterRunOptions): Promise<Register<Entity>[]> {

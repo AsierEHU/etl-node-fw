@@ -48,19 +48,13 @@ const stepTest = (
             statusEqual(stepStatus, mocks.mockInitialStatus)
         })
 
-        test("Initial presenter", (done) => {
+        test("Initial Presenter", (done) => {
             presenter.on("stepStatus", (stepStatus) => {
                 statusEqual(stepStatus, mocks.mockInitialStatus)
                 done()
             })
             stepFactory.createStep(definition.id, stepDependencies)
         })
-
-        // test("Final summary", async () => {
-        //     const step1 = stepFactory.createStep(definition.id, stepDependencies)
-        //     const adapterStatusSummary = await adapter1.runOnce();
-        //     expect(adapterStatusSummary).toEqual(mocks.mockFinalSummary)
-        // })
 
         test("Final status", async () => {
             const step1 = stepFactory.createStep(definition.id, stepDependencies)
@@ -69,14 +63,14 @@ const stepTest = (
             statusEqual(stepStatus, mocks.mockFinalStatus)
         })
 
-        test("Final presenter", (done) => {
-            const step1 = stepFactory.createStep(definition.id, stepDependencies)
-            presenter.on("stepStatus", (stepStatus) => {
-                statusEqual(stepStatus, mocks.mockFinalStatus)
-                done()
-            })
-            step1.runOnce()
-        })
+        // test("Presenter steps", (done) => {
+        //     const step1 = stepFactory.createStep(definition.id, stepDependencies)
+        //     presenter.on("stepStatus", (stepStatus) => {
+        //         statusEqual(stepStatus, mocks.mockFinalStatus)
+        //         done()
+        //     })
+        //     step1.runOnce()
+        // })
 
         // test("Final status: runOptions", async () => {
         //     const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)

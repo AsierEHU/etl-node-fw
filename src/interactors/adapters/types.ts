@@ -8,7 +8,7 @@ export interface AdapterDefinition {
 }
 
 export interface Adapter<AdapterDefinition> {
-    runOnce(runOptions?: AdapterRunOptions): Promise<AdapterStatusSummary> //start, if registers -> filter input by ids, if skip -> compare hash to skip
+    runOnce(runOptions?: AdapterRunOptions): Promise<AdapterStatusTag> //start, if registers -> filter input by ids, if skip -> compare hash to skip
     getStatus(): Promise<AdapterStatus>
 }
 
@@ -29,10 +29,23 @@ export type AdapterStatus = {
     definitionId: string
     definitionType: string
     outputType: string
+    statusTag: AdapterStatusTag //debugging
+    statusMeta: AdapterMeta
     statusSummary: AdapterStatusSummary | null,
     runOptions: AdapterRunOptions | null
     syncContext: SyncContext
 }
+
+export type AdapterMeta = string | object | null
+
+
+export enum AdapterStatusTag {
+    pending = "pending", //pendiente de ejecución
+    active = "active", //Ejecutandose
+    success = "success", //sin erroes
+    failed = "failed", //Software error or all records in (failed, invalid)
+}
+
 
 export type AdapterStatusSummary = { //Audit
     output_rows: number
