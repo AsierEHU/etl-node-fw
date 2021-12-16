@@ -14,7 +14,7 @@ type outputClass = {
     }
 }
 const mockInitialRegisters: Register<Entity>[] = localAdapterExtractorMocks.mockFinalRegisters
-const mockEntities: InputEntity<inputClass>[] = [
+const inputEntities: InputEntity<inputClass>[] = [
     {
         entity: {
             field: "Raw Object text",
@@ -127,4 +127,4 @@ const mockFinalStatus = {
     statusSummary: mockFinalSummary
 }
 
-export const localAdapterTransformerMocks = { mockInitialStatus, mockFinalStatus, mockFinalSummary, mockFinalRegisters, mockInitialRegisters, mockEntities }
+export const localAdapterTransformerMocks = { mockInitialStatus, mockFinalStatus, mockFinalSummary, mockFinalRegisters, mockInitialRegisters, inputEntities }

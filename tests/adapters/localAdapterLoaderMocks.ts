@@ -16,7 +16,7 @@ type resultClass = {
 }
 
 const mockInitialRegisters: Register<Entity>[] = localAdapterTransformerMocks.mockFinalRegisters
-const mockEntities: InputEntity<outputClass>[] = [
+const inputEntities: InputEntity<outputClass>[] = [
     {
         text: "Raw Object text",
         others: {
@@ -110,4 +110,4 @@ const mockFinalStatus = {
     statusSummary: mockFinalSummary
 }
 
-export const localAdapterLoaderMocks = { mockInitialStatus, mockFinalStatus, mockFinalSummary, mockFinalRegisters, mockInitialRegisters, mockEntities }
+export const localAdapterLoaderMocks = { mockInitialStatus, mockFinalStatus, mockFinalSummary, mockFinalRegisters, mockInitialRegisters, inputEntities }

@@ -8,7 +8,7 @@ type result2Class = {
     successTotal: number
 }
 const mockInitialRegisters: Register<Entity>[] = localAdapterLoaderMocks.mockFinalRegisters
-const mockEntities: InputEntity<result2Class>[] = [
+const inputEntities: InputEntity<result2Class>[] = [
     { successTotal: 1 }
 ];
 export const localAdapterFlexDefinition: LocalAdapterFlexDefinition<result2Class> = {
@@ -67,4 +67,4 @@ const mockFinalStatus = {
     statusSummary: mockFinalSummary
 }
 
-export const localAdapterFlexMocks = { mockInitialStatus, mockFinalStatus, mockFinalSummary, mockFinalRegisters, mockInitialRegisters, mockEntities }
+export const localAdapterFlexMocks = { mockInitialStatus, mockFinalStatus, mockFinalSummary, mockFinalRegisters, mockInitialRegisters, inputEntities }

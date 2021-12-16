@@ -31,7 +31,7 @@ const adapterTest = (
         mockFinalSummary: AdapterStatusSummary,
         mockFinalRegisters: Register<Entity>[],
         mockInitialRegisters: Register<Entity>[],
-        mockEntities: InputEntity<Entity>[]
+        inputEntities: InputEntity<Entity>[]
     }
 ) => {
     describe(definition.definitionType + " status test", () => {
@@ -84,7 +84,7 @@ const adapterTest = (
 
         test("Final status: runOptions", async () => {
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
-            const runOptions = { onlyFailedEntities: true, mockEntities: mocks.mockEntities }
+            const runOptions = { onlyFailedEntities: true, inputEntities: mocks.inputEntities }
             await adapter1.runOnce(runOptions);
             const adapterStatus = await adapter1.getStatus()
             expect(adapterStatus.runOptions).toEqual(runOptions)
@@ -92,12 +92,12 @@ const adapterTest = (
 
         test("Final presenter: runOptions", (done) => {
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
-            const runOptions = { onlyFailedEntities: true, mockEntities: mocks.mockEntities }
+            const runOptions = { onlyFailedEntities: true, inputEntities: mocks.inputEntities }
             adapterPresenter.on("adapterStatus", (adapterStatus) => {
                 expect(adapterStatus.runOptions).toEqual(runOptions)
                 done()
             })
-            adapter1.runOnce({ onlyFailedEntities: true, mockEntities: mocks.mockEntities })
+            adapter1.runOnce({ onlyFailedEntities: true, inputEntities: mocks.inputEntities })
         })
 
         test("Run once exception", async () => {
@@ -140,9 +140,9 @@ const adapterTest = (
             registersEqual(registers, mockRegistersWithRetries)
         })
 
-        test("runOptions:mockEntities", async () => {
+        test("runOptions:inputEntities", async () => {
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
-            await adapter1.runOnce({ mockEntities: mocks.mockEntities })
+            await adapter1.runOnce({ inputEntities: mocks.inputEntities })
             const registers = await registerDataAccess.getAll()
             registersEqual(registers, mocks.mockFinalRegisters)
         })

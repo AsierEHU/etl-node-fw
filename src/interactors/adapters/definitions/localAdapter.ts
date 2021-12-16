@@ -68,8 +68,8 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
     private async inputRegisters(runOptions?: AdapterRunOptions): Promise<Register<Entity>[]> {
         let inputRegisters = [];
 
-        if (runOptions?.mockEntities) {
-            const inputEntities = runOptions?.mockEntities || [];
+        if (runOptions?.inputEntities) {
+            const inputEntities = runOptions?.inputEntities || [];
             const inputEntitiesWithMeta = getWithMetaFormat(inputEntities)
             inputRegisters = await this.initRegisters(inputEntitiesWithMeta)
         }

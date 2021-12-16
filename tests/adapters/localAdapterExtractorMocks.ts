@@ -8,7 +8,7 @@ type inputClass = {
     y: number,
 }
 const mockInitialRegisters: Register<Entity>[] = []
-const mockEntities: InputEntity<inputClass>[] = [
+const inputEntities: InputEntity<inputClass>[] = [
     {
         entity: {
             field: "Raw Object text",
@@ -45,7 +45,7 @@ export const localAdapterExtractorDefinition: LocalAdapterExtractorDefinition<in
     definitionType: "LocalAdapterExtractorDefinition",
     outputType: "inputClass",
     async entitiesGet() {
-        return mockEntities;
+        return inputEntities;
     },
     async entityValidate(entity: inputClass | null) {
         if (entity == null) {
@@ -228,4 +228,4 @@ const mockFinalStatus = {
     statusSummary: mockFinalSummary
 }
 
-export const localAdapterExtractorMocks = { mockInitialStatus, mockFinalStatus, mockFinalSummary, mockFinalRegisters, mockEntities, mockInitialRegisters }
+export const localAdapterExtractorMocks = { mockInitialStatus, mockFinalStatus, mockFinalSummary, mockFinalRegisters, inputEntities, mockInitialRegisters }
