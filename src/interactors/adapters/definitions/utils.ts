@@ -1,7 +1,7 @@
 import { uniqBy } from "lodash";
 import { Entity, Register, RegisterStatusTag, SyncContext } from "../../registers/types";
-import { AdapterStatusSummary, EntityWithMeta, InputEntity } from "../types";
-import { EntityFetcher, RegisterDataAccess, RegisterDataFilter, ValidationResult, ValidationStatusTag } from "./types";
+import { AdapterStatusSummary, EntityWithMeta, InputEntity, RegisterDataAccess, RegisterDataFilter } from "../types";
+import { EntityFetcher, ValidationResult, ValidationStatusTag } from "./types";
 
 export const getWithMetaFormat = (inputEntities: InputEntity<Entity>[]): EntityWithMeta<Entity>[] => {
     return inputEntities.map(inputEntity => {
@@ -36,17 +36,6 @@ function isValidationResult(validation?: any): validation is ValidationResult {
     return validation?.statusTag != undefined
 }
 
-export const calculateSummary = (outputRegisters: Register<Entity>[]): AdapterStatusSummary => {
-    const statusSummary = {
-        output_rows: outputRegisters.length,
-        rows_success: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.success).length,
-        rows_failed: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.failed).length,
-        rows_invalid: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.invalid).length,
-        rows_skipped: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.skipped).length,
-    };
-    return statusSummary;
-}
-
 export class ContextEntityFetcher implements EntityFetcher {
 
     private readonly syncContext: SyncContext
@@ -71,7 +60,6 @@ export class ContextEntityFetcher implements EntityFetcher {
     }
 
 }
-
 export class AdvancedRegisterFetcher {
 
     private readonly registerDataAccess: RegisterDataAccess

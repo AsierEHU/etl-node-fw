@@ -1,9 +1,9 @@
 
 import { Entity, Register, RegisterStatusTag } from "../../registers/types";
-import { AdapterDefinition } from "../types"
+import { AdapterDefinition, RegisterDataFilter } from "../types"
 import { getValidationResultWithMeta, getWithMetaFormat, ContextEntityFetcher, validationTagToRegisterTag } from "./utils";
 import { LocalAdapter } from "./localAdapter";
-import { EntityFetcher, RegisterDataFilter, ValidationResult, ValidationStatusTag } from "./types";
+import { EntityFetcher, ValidationResult, ValidationStatusTag } from "./types";
 
 /**
  * Local async step, persistance

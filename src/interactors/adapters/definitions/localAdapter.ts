@@ -1,9 +1,9 @@
 import EventEmitter from "events";
 import { Entity, Register, SyncContext, RegisterStatusTag } from "../../registers/types";
-import { Adapter, AdapterStatus, AdapterDefinition, EntityWithMeta, AdapterRunOptions, AdapterStatusSummary, AdapterStatusTag } from "../types"
+import { Adapter, AdapterStatus, AdapterDefinition, EntityWithMeta, AdapterRunOptions, AdapterStatusSummary, AdapterStatusTag, RegisterDataAccess } from "../types"
 import { v4 as uuidv4 } from 'uuid';
-import { EntityInitValues, MyAdapterDependencies, RegisterDataAccess } from "./types";
-import { AdvancedRegisterFetcher, calculateSummary, getWithMetaFormat } from "./utils";
+import { EntityInitValues, MyAdapterDependencies } from "./types";
+import { AdvancedRegisterFetcher, getWithMetaFormat } from "./utils";
 import { cloneDeep } from 'lodash'
 
 
@@ -57,7 +57,7 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
         try {
             const inputRegisters = await this.inputRegisters(runOptions);
             const outputRegisters = await this.outputRegisters(inputRegisters);
-            this.adapterStatus.statusSummary = calculateSummary(outputRegisters);
+            this.adapterStatus.statusSummary = this.calculateSummary(outputRegisters);
             this.adapterStatus.statusTag = AdapterStatusTag.success
         } catch (error: any) {
             this.adapterStatus.statusTag = AdapterStatusTag.failed
@@ -127,6 +127,18 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
         const status = await this.getStatus()
         this.adapterPresenter.emit("adapterStatus", status)
     }
+
+    private calculateSummary(outputRegisters: Register<Entity>[]): AdapterStatusSummary {
+        const statusSummary = {
+            output_rows: outputRegisters.length,
+            rows_success: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.success).length,
+            rows_failed: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.failed).length,
+            rows_invalid: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.invalid).length,
+            rows_skipped: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.skipped).length,
+        };
+        return statusSummary;
+    }
+
 
     async getStatus() {
         return cloneDeep(this.adapterStatus);
