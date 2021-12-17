@@ -25,6 +25,10 @@ let adapterDependencies = {
     syncContext
 }
 
+let adapterPresenterCallback = jest.fn(adapterStatus => {
+    return adapterStatus
+})
+
 const adapterTest = (
     definition: AdapterDefinition,
     mocks: {
@@ -40,6 +44,9 @@ const adapterTest = (
 
         beforeEach(() => {
             adapterPresenter.removeAllListeners("adapterStatus")
+            adapterPresenterCallback = jest.fn(adapterStatus => {
+                return adapterStatus
+            })
             registerDataAccess = new VolatileRegisterDataAccess(mocks.mockInitialRegisters)
             adapterDependencies = {
                 adapterPresenter,
@@ -54,14 +61,6 @@ const adapterTest = (
             statusEqual(adapterStatus, mocks.mockInitialStatus)
         })
 
-        test("Initial presenter", (done) => {
-            adapterPresenter.on("adapterStatus", (adapterStatus) => {
-                statusEqual(adapterStatus, mocks.mockInitialStatus)
-                done()
-            })
-            adapterFactory.createAdapter(definition.id, adapterDependencies)
-        })
-
         test("Final status", async () => {
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
             try {
@@ -74,17 +73,18 @@ const adapterTest = (
 
         })
 
-        // test("Presenter steps", (done) => {
-        //     const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
-        //     adapterPresenter.once("adapterStatus", (adapterStatus) => {
-        //         statusEqual(adapterStatus, mocks.mockFinalStatus)
-        //         done()
-        //     })
-        //     adapter1.runOnce().catch(error => {
-        //         expect(error.message).toBe("Test custom Error")
-        //         done()
-        //     })
-        // })
+        test("Presenter calls", async () => {
+            adapterPresenter.on("adapterStatus", adapterPresenterCallback)
+            const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
+            try {
+                await adapter1.runOnce();
+                expect(adapterPresenterCallback.mock.calls.length).toBe(3)
+                statusEqual(adapterPresenterCallback.mock.results[0].value, mocks.mockInitialStatus)
+                statusEqual(adapterPresenterCallback.mock.results[2].value, mocks.mockFinalStatus)
+            } catch (error: any) {
+                expect(error.message).toBe("Test custom Error")
+            }
+        })
 
         test("Final status: runOptions", async () => {
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
@@ -98,17 +98,17 @@ const adapterTest = (
             }
         })
 
-        test("Final presenter: runOptions", (done) => {
+        test("Presenter calls: runOptions", async () => {
+            adapterPresenter.on("adapterStatus", adapterPresenterCallback)
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
             const runOptions = { onlyFailedEntities: true, inputEntities: mocks.inputEntities }
-            adapterPresenter.on("adapterStatus", (adapterStatus) => {
-                expect(adapterStatus.runOptions).toEqual(runOptions)
-                done()
-            })
-            adapter1.runOnce(runOptions).catch(error => {
+            try {
+                await adapter1.runOnce(runOptions);
+                expect(adapterPresenterCallback.mock.results[0].value.runOptions).toBe(null)
+                expect(adapterPresenterCallback.mock.results[2].value.runOptions).toEqual(runOptions)
+            } catch (error: any) {
                 expect(error.message).toBe("Test custom Error")
-                done()
-            })
+            }
         })
 
         test("Run once exception", async () => {
@@ -270,9 +270,6 @@ const registerEqual = (register: Register<Entity>, mockFinalRegister: Register<E
     expect(register).toEqual(mockFinalRegister)
 }
 
-adapterMocksSuites.forEach(suite => {
-    adapterTest(suite.definition, suite.mocks)
-})
 adapterMocksSuites.forEach(suite => {
     adapterTest(suite.definition, suite.mocks)
 })

@@ -40,7 +40,7 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
         }
         this.adapterDependencies = dependencies.adapterDependencies;
         this.adapterDependencies.syncContext = this.stepStatus.syncContext;
-        this.stepPresenter.emit("stepStatus", this.stepStatus)
+        this.presentStatus()
     }
 
     async runOnce(runOptions?: StepRunOptions) {
@@ -51,12 +51,12 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
         this.stepStatus.statusTag = StepStatusTag.active
         this.stepStatus.timeStarted = new Date();
         this.stepStatus.runOptions = cloneDeep(runOptions) || null;
-        this.stepPresenter.emit("stepStatus", this.stepStatus)
+        await this.presentStatus()
 
         await this.tryRunAdapter(this.stepStatus.runOptions?.adapterRunOptions);
 
         this.stepStatus.timeFinished = new Date();
-        this.stepPresenter.emit("stepStatus", this.stepStatus)
+        await this.presentStatus()
 
         return this.stepStatus.statusTag;
     }
@@ -124,13 +124,17 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
         return actualSummary
     }
 
-
     private canRetry(): boolean {
         return this.stepStatus.tryNumber <= this.stepDefinition.retartTries
     }
 
+    private async presentStatus() {
+        const status = await this.getStatus()
+        this.stepPresenter.emit("stepStatus", status)
+    }
+
     async getStatus() {
-        return this.stepStatus;
+        return cloneDeep(this.stepStatus);
     }
 
 }

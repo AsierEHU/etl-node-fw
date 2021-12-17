@@ -27,33 +27,30 @@ const stepDependencies = {
     adapterFactory,
     syncContext
 }
+let stepPresenterCallback = jest.fn(stepStatus => {
+    return stepStatus
+})
 
 const stepTest = (
     definition: StepDefinition,
     mocks: {
         mockInitialStatus: StepStatus,
         mockFinalStatus: StepStatus,
-        // mockFinalSummary: StepStatusSummary,
     }
 ) => {
     describe(definition.definitionType + " status test", () => {
 
         beforeEach(() => {
             presenter.removeAllListeners("stepStatus")
+            stepPresenterCallback = jest.fn(stepStatus => {
+                return stepStatus
+            })
         });
 
         test("Initial status", async () => {
             const step1 = stepFactory.createStep(definition.id, stepDependencies)
             const stepStatus = await step1.getStatus();
             statusEqual(stepStatus, mocks.mockInitialStatus)
-        })
-
-        test("Initial Presenter", (done) => {
-            presenter.on("stepStatus", (stepStatus) => {
-                statusEqual(stepStatus, mocks.mockInitialStatus)
-                done()
-            })
-            stepFactory.createStep(definition.id, stepDependencies)
         })
 
         test("Final status", async () => {
@@ -63,14 +60,18 @@ const stepTest = (
             statusEqual(stepStatus, mocks.mockFinalStatus)
         })
 
-        // test("Presenter steps", (done) => {
-        //     const step1 = stepFactory.createStep(definition.id, stepDependencies)
-        //     presenter.on("stepStatus", (stepStatus) => {
-        //         statusEqual(stepStatus, mocks.mockFinalStatus)
-        //         done()
-        //     })
-        //     step1.runOnce()
-        // })
+        test("Presenter calls", async () => {
+            presenter.on("stepStatus", stepPresenterCallback)
+            const step1 = stepFactory.createStep(definition.id, stepDependencies)
+            try {
+                await step1.runOnce();
+                expect(stepPresenterCallback.mock.calls.length).toBe(3)
+                statusEqual(stepPresenterCallback.mock.results[0].value, mocks.mockInitialStatus)
+                statusEqual(stepPresenterCallback.mock.results[2].value, mocks.mockFinalStatus)
+            } catch (error: any) {
+                expect(error.message).toBe("Test custom Error")
+            }
+        })
 
         // test("Final status: runOptions", async () => {
         //     const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)

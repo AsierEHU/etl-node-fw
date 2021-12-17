@@ -43,7 +43,7 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
             runOptions: null,
             syncContext: { ...this.syncUpperContext, apdaterId: id }
         }
-        this.adapterPresenter.emit("adapterStatus", this.adapterStatus)
+        this.presentStatus()
     }
 
     async runOnce(runOptions?: AdapterRunOptions) {
@@ -52,7 +52,7 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
 
         this.adapterStatus.runOptions = cloneDeep(runOptions) || null;
         this.adapterStatus.statusTag = AdapterStatusTag.active
-        this.adapterPresenter.emit("stepStatus", this.adapterStatus)
+        await this.presentStatus()
 
         try {
             const inputRegisters = await this.inputRegisters(runOptions);
@@ -64,7 +64,7 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
             this.adapterStatus.statusMeta = error.message
         }
 
-        this.adapterPresenter.emit("adapterStatus", this.adapterStatus)
+        await this.presentStatus()
         return this.adapterStatus.statusTag;
     }
 
@@ -123,7 +123,12 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
 
     protected abstract outputRegisters(inputRegisters: Register<Entity>[]): Promise<Register<Entity>[]>
 
+    private async presentStatus() {
+        const status = await this.getStatus()
+        this.adapterPresenter.emit("adapterStatus", status)
+    }
+
     async getStatus() {
-        return this.adapterStatus;
+        return cloneDeep(this.adapterStatus);
     }
 }
