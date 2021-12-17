@@ -63,62 +63,41 @@ const adapterTest = (
 
         test("Final status", async () => {
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
-            try {
-                await adapter1.runOnce();
-                const adapterStatus = await adapter1.getStatus()
-                statusEqual(adapterStatus, mocks.mockFinalStatus)
-            } catch (error: any) {
-                expect(error.message).toBe("Test custom Error")
-            }
-
+            await adapter1.runOnce();
+            const adapterStatus = await adapter1.getStatus()
+            statusEqual(adapterStatus, mocks.mockFinalStatus)
         })
 
         test("Presenter calls", async () => {
             adapterPresenter.on("adapterStatus", adapterPresenterCallback)
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
-            try {
-                await adapter1.runOnce();
-                expect(adapterPresenterCallback.mock.calls.length).toBe(3)
-                statusEqual(adapterPresenterCallback.mock.results[0].value, mocks.mockInitialStatus)
-                statusEqual(adapterPresenterCallback.mock.results[2].value, mocks.mockFinalStatus)
-            } catch (error: any) {
-                expect(error.message).toBe("Test custom Error")
-            }
+            await adapter1.runOnce();
+            expect(adapterPresenterCallback.mock.calls.length).toBe(3)
+            statusEqual(adapterPresenterCallback.mock.results[0].value, mocks.mockInitialStatus)
+            statusEqual(adapterPresenterCallback.mock.results[2].value, mocks.mockFinalStatus)
         })
 
         test("Final status: runOptions", async () => {
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
             const runOptions = { onlyFailedEntities: true, inputEntities: mocks.inputEntities }
-            try {
-                await adapter1.runOnce(runOptions);
-                const adapterStatus = await adapter1.getStatus()
-                expect(adapterStatus.runOptions).toEqual(runOptions)
-            } catch (error: any) {
-                expect(error.message).toBe("Test custom Error")
-            }
+            await adapter1.runOnce(runOptions);
+            const adapterStatus = await adapter1.getStatus()
+            expect(adapterStatus.runOptions).toEqual(runOptions)
         })
 
         test("Presenter calls: runOptions", async () => {
             adapterPresenter.on("adapterStatus", adapterPresenterCallback)
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
             const runOptions = { onlyFailedEntities: true, inputEntities: mocks.inputEntities }
-            try {
-                await adapter1.runOnce(runOptions);
-                expect(adapterPresenterCallback.mock.results[0].value.runOptions).toBe(null)
-                expect(adapterPresenterCallback.mock.results[2].value.runOptions).toEqual(runOptions)
-            } catch (error: any) {
-                expect(error.message).toBe("Test custom Error")
-            }
+            await adapter1.runOnce(runOptions);
+            expect(adapterPresenterCallback.mock.results[0].value.runOptions).toBe(null)
+            expect(adapterPresenterCallback.mock.results[2].value.runOptions).toEqual(runOptions)
         })
 
         test("Run once exception", async () => {
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
-            try {
-                await adapter1.runOnce();
-                await expect(adapter1.runOnce()).rejects.toEqual(new Error("Run once"))
-            } catch (error: any) {
-                expect(error.message).toBe("Test custom Error")
-            }
+            await adapter1.runOnce();
+            await expect(adapter1.runOnce()).rejects.toEqual(new Error("Run once"))
         });
 
     })
@@ -137,70 +116,46 @@ const adapterTest = (
 
         test("Registers result", async () => {
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
-            try {
-                await adapter1.runOnce();
-                const registers = await registerDataAccess.getAll()
-                registersEqual(registers, mocks.mockFinalRegisters)
-            } catch (error: any) {
-                expect(error.message).toBe("Test custom Error")
-            }
+            await adapter1.runOnce();
+            const registers = await registerDataAccess.getAll()
+            registersEqual(registers, mocks.mockFinalRegisters)
         });
 
         test("runOptions:onlyFailedEntities", async () => {
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
-            try {
-                await adapter1.runOnce();
-            } catch (error: any) {
-                expect(error.message).toBe("Test custom Error")
-            }
+            await adapter1.runOnce();
             const adapter2 = adapterFactory.createAdapter(definition.id, adapterDependencies)
-            try {
-                await adapter2.runOnce({ onlyFailedEntities: true });
-                const registers = await registerDataAccess.getAll()
-                const mockRegistersWithRetries = [
-                    ...mocks.mockFinalRegisters,
-                    ...mocks.mockFinalRegisters.filter(reg => reg.statusTag == RegisterStatusTag.failed && reg.entityType == definition.outputType)
-                ]
-                registersEqual(registers, mockRegistersWithRetries)
-            } catch (error: any) {
-                expect(error.message).toBe("Test custom Error")
-            }
+            await adapter2.runOnce({ onlyFailedEntities: true });
+            const registers = await registerDataAccess.getAll()
+            const mockRegistersWithRetries = [
+                ...mocks.mockFinalRegisters,
+                ...mocks.mockFinalRegisters.filter(reg => reg.statusTag == RegisterStatusTag.failed && reg.entityType == definition.outputType)
+            ]
+            registersEqual(registers, mockRegistersWithRetries)
         })
 
         test("runOptions:inputEntities", async () => {
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
-            try {
-                await adapter1.runOnce({ inputEntities: mocks.inputEntities })
-                const registers = await registerDataAccess.getAll()
-                registersEqual(registers, mocks.mockFinalRegisters)
-            } catch (error: any) {
-                expect(error.message).toBe("Test custom Error")
-            }
+            await adapter1.runOnce({ inputEntities: mocks.inputEntities })
+            const registers = await registerDataAccess.getAll()
+            registersEqual(registers, mocks.mockFinalRegisters)
         })
 
         test("Not pending registers", async () => {
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
-            try {
-                await adapter1.runOnce()
-                const registers = await registerDataAccess.getAll()
-                registers.forEach(register => {
-                    expect(register.statusTag).not.toBe(RegisterStatusTag.pending)
-                })
-            } catch (error: any) {
-                expect(error.message).toBe("Test custom Error")
-            }
+            await adapter1.runOnce()
+            const registers = await registerDataAccess.getAll()
+            registers.forEach(register => {
+                expect(register.statusTag).not.toBe(RegisterStatusTag.pending)
+            })
         })
 
         test("Relative and Absolute ids", async () => {
             const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
-            try {
-                await adapter1.runOnce()
-                const registers = await registerDataAccess.getAll()
-                for (const register of registers) {
-                    await testSources(register);
-                }
-            } catch (error: any) {
-                expect(error.message).toBe("Test custom Error")
+            await adapter1.runOnce()
+            const registers = await registerDataAccess.getAll()
+            for (const register of registers) {
+                await testSources(register);
             }
         })
     })

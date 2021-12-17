@@ -3,12 +3,12 @@ import { VolatileRegisterDataAccess } from "../../src/dataAccess/volatile";
 import { AdapterFactory } from "../../src/interactors/adapters/factory";
 import { SyncContext } from "../../src/interactors/registers/types";
 import { StepFactory } from "../../src/interactors/steps/factory";
-import { StepDefinition, StepStatus } from "../../src/interactors/steps/types";
-import { case3Definition } from "../adapters/localAdapterTranformerMocks/case3Mocks";
-import { localStepDefinition, localStepMocks } from "./localStepMocks";
+import { StepDefinition, StepRunOptions, StepStatus } from "../../src/interactors/steps/types";
+import { case1Definition } from "../adapters/localAdapterExtractorMocks/case1Mocks";
+import { stepMocksSuites } from "./mocks";
 
 let presenter = new EventEmitter()
-let adapterDefinitions = [case3Definition];
+let adapterDefinitions = [case1Definition];
 let registerDataAccess = new VolatileRegisterDataAccess();
 let adapterFactory = new AdapterFactory(adapterDefinitions)
 let adapterDependencies = {
@@ -19,7 +19,10 @@ let adapterDependencies = {
 const syncContext: SyncContext = {
     flowId: "testFlow",
 }
-const stepDefinitions = [localStepDefinition]
+let stepDefinitions: StepDefinition[] = [];
+stepMocksSuites.forEach(suite => {
+    stepDefinitions.push(suite.definition)
+})
 const stepFactory = new StepFactory(stepDefinitions)
 const stepDependencies = {
     stepPresenter: presenter,
@@ -38,7 +41,7 @@ const stepTest = (
         mockFinalStatus: StepStatus,
     }
 ) => {
-    describe(definition.definitionType + " status test", () => {
+    describe(definition.definitionType + " - " + definition.id + " status test", () => {
 
         beforeEach(() => {
             presenter.removeAllListeners("stepStatus")
@@ -63,39 +66,35 @@ const stepTest = (
         test("Presenter calls", async () => {
             presenter.on("stepStatus", stepPresenterCallback)
             const step1 = stepFactory.createStep(definition.id, stepDependencies)
-            try {
-                await step1.runOnce();
-                expect(stepPresenterCallback.mock.calls.length).toBe(3)
-                statusEqual(stepPresenterCallback.mock.results[0].value, mocks.mockInitialStatus)
-                statusEqual(stepPresenterCallback.mock.results[2].value, mocks.mockFinalStatus)
-            } catch (error: any) {
-                expect(error.message).toBe("Test custom Error")
-            }
+            await step1.runOnce();
+            expect(stepPresenterCallback.mock.calls.length).toBe(3)
+            statusEqual(stepPresenterCallback.mock.results[0].value, mocks.mockInitialStatus)
+            statusEqual(stepPresenterCallback.mock.results[2].value, mocks.mockFinalStatus)
+
         })
 
-        // test("Final status: runOptions", async () => {
-        //     const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
-        //     const runOptions = { onlyFailedEntities: true, inputEntities: mocks.inputEntities }
-        //     await adapter1.runOnce(runOptions);
-        //     const stepStatus = await adapter1.getStatus()
-        //     expect(stepStatus.runOptions).toEqual(runOptions)
-        // })
+        test("Final status: runOptions", async () => {
+            const step1 = stepFactory.createStep(definition.id, stepDependencies)
+            const runOptions: StepRunOptions = { inputEntities: [] }
+            await step1.runOnce(runOptions);
+            const stepStatus = await step1.getStatus()
+            expect(stepStatus.runOptions).toEqual(runOptions)
+        })
 
-        // test("Final presenter: runOptions", (done) => {
-        //     const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
-        //     const runOptions = { onlyFailedEntities: true, inputEntities: mocks.inputEntities }
-        //     adapterPresenter.on("stepStatus", (stepStatus) => {
-        //         expect(stepStatus.runOptions).toEqual(runOptions)
-        //         done()
-        //     })
-        //     adapter1.runOnce({ onlyFailedEntities: true, inputEntities: mocks.inputEntities })
-        // })
+        test("Presenter calls: runOptions", async () => {
+            presenter.on("stepStatus", stepPresenterCallback)
+            const step1 = stepFactory.createStep(definition.id, stepDependencies)
+            const runOptions: StepRunOptions = { inputEntities: [] }
+            await step1.runOnce(runOptions);
+            expect(stepPresenterCallback.mock.results[0].value.runOptions).toBe(null)
+            expect(stepPresenterCallback.mock.results[2].value.runOptions).toEqual(runOptions)
+        })
 
-        // test("Run once exception", async () => {
-        //     const adapter1 = adapterFactory.createAdapter(definition.id, adapterDependencies)
-        //     adapter1.runOnce()
-        //     await expect(adapter1.runOnce()).rejects.toEqual(new Error("Run once"))
-        // });
+        test("Run once exception", async () => {
+            const step1 = stepFactory.createStep(definition.id, stepDependencies)
+            step1.runOnce()
+            await expect(step1.runOnce()).rejects.toEqual(new Error("Run once"))
+        });
 
     })
 
@@ -112,4 +111,6 @@ const statusEqual = (stepStatus: StepStatus, mockStatus: StepStatus) => {
     expect(stepStatus).toEqual(mockStatus)
 }
 
-stepTest(localStepDefinition, localStepMocks)
+stepMocksSuites.forEach(suite => {
+    stepTest(suite.definition, suite.mocks)
+})

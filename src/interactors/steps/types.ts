@@ -1,5 +1,5 @@
-import { AdapterRunOptions } from "../adapters/types";
-import { SyncContext } from "../registers/types";
+import { AdapterRunOptions, InputEntity } from "../adapters/types";
+import { Entity, SyncContext } from "../registers/types";
 
 export interface Step<sd extends StepDefinition> {
     runOnce(stepRunOptions?: StepRunOptions): Promise<StepStatusTag> //start, if registers -> filter input by ids, if skip -> compare hash to skip
@@ -7,7 +7,7 @@ export interface Step<sd extends StepDefinition> {
 }
 
 export type StepRunOptions = {
-    adapterRunOptions?: AdapterRunOptions,
+    inputEntities?: InputEntity<Entity>[],
 }
 
 export interface StepDefinition {

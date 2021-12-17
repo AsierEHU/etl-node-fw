@@ -1,18 +1,18 @@
-import { LocalStepDefinition } from "../../src/interactors/steps/definitions/localStep"
-import { StepStatus, StepStatusSummary, StepStatusTag } from "../../src/interactors/steps/types"
+import { LocalStepDefinition } from "../../../src/interactors/steps/definitions/localStep"
+import { StepStatus, StepStatusSummary, StepStatusTag } from "../../../src/interactors/steps/types"
 
-export const localStepDefinition: LocalStepDefinition = {
-    id: "testLocalStep",
-    adapterDefinitionId: "case3Transformer",
-    retartTries: 3,
+export const case1Definition: LocalStepDefinition = {
+    id: "case1testLocalStep",
+    adapterDefinitionId: "case1Extractor",
+    retartTries: 0,
     definitionType: "LocalStepDefinition",
     isFailedStatus: function (statusSummary: StepStatusSummary): boolean {
-        return statusSummary.rows_failed > 0
+        return false
     }
 }
 
 const mockInitialStatus: StepStatus = {
-    definitionId: "testLocalStep",
+    definitionId: "case1testLocalStep",
     definitionType: "LocalStepDefinition",
     id: "testStep",
     runOptions: null,
@@ -26,7 +26,7 @@ const mockInitialStatus: StepStatus = {
 }
 
 const mockFinalStatus: StepStatus = {
-    definitionId: "testLocalStep",
+    definitionId: "case1testLocalStep",
     definitionType: "LocalStepDefinition",
     id: "testStep",
     statusTag: StepStatusTag.success,
@@ -40,12 +40,12 @@ const mockFinalStatus: StepStatus = {
         stepId: "testStep",
     },
     statusSummary: {
-        output_rows: 0,
-        rows_success: 0,
-        rows_failed: 0,
-        rows_invalid: 0,
-        rows_skipped: 0,
+        output_rows: 7,
+        rows_success: 3,
+        rows_failed: 2,
+        rows_invalid: 1,
+        rows_skipped: 1,
     },
 }
 
-export const localStepMocks = { mockInitialStatus, mockFinalStatus }
+export const case1Mocks = { mockInitialStatus, mockFinalStatus }

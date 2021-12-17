@@ -1,6 +1,6 @@
 import EventEmitter from "events";
 import { AdapterFactory } from "../../adapters/factory";
-import { AdapterDefinition, AdapterDependencies, AdapterRunOptions, AdapterStatus, AdapterStatusSummary, AdapterStatusTag } from "../../adapters/types";
+import { Adapter, AdapterDefinition, AdapterDependencies, AdapterRunOptions, AdapterStatus, AdapterStatusSummary, AdapterStatusTag } from "../../adapters/types";
 import { SyncContext } from "../../registers/types";
 import { Step, StepStatus, StepStatusTag, StepRunOptions, StepDefinition, StepStatusSummary } from "../types"
 import { v4 as uuidv4 } from 'uuid';
@@ -53,7 +53,8 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
         this.stepStatus.runOptions = cloneDeep(runOptions) || null;
         await this.presentStatus()
 
-        await this.tryRunAdapter(this.stepStatus.runOptions?.adapterRunOptions);
+        const adapterRunOptions = this.buildAdapterOptions(runOptions)
+        await this.tryRunAdapter(adapterRunOptions);
 
         this.stepStatus.timeFinished = new Date();
         await this.presentStatus()
@@ -119,9 +120,17 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
         if (adapterStatusSummary && adapterRunOptions?.onlyFailedEntities) {
             actualSummary.rows_success += adapterStatusSummary.rows_success
             actualSummary.rows_failed = adapterStatusSummary.rows_failed
+        } else if (adapterStatusSummary) {
+            actualSummary = adapterStatusSummary
         }
 
         return actualSummary
+    }
+
+    private buildAdapterOptions(stepOptions?: StepRunOptions): AdapterRunOptions {
+        return {
+            inputEntities: stepOptions?.inputEntities
+        }
     }
 
     private canRetry(): boolean {
