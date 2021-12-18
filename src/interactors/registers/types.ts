@@ -27,3 +27,26 @@ export type SyncContext = {
 }
 
 export type Entity = object
+
+export interface RegisterDataAccess {//For a specific syncContext
+    save: (register: Register<Entity>) => Promise<void>
+    saveAll: (registers: Register<Entity>[]) => Promise<void>
+    get: (id: string) => Promise<Register<Entity> | null>
+    getAll: (filter?: RegisterDataFilter, registersIds?: string[]) => Promise<Register<Entity>[]>
+}
+
+export type RegisterDataFilter = {
+    flowId?: string,
+    stepId?: string,
+    apdaterId?: string,
+    registerType?: string,
+    registerStatus?: RegisterStatusTag
+}
+
+export type EntityWithMeta<e extends Entity> = {
+    entity: e | null,
+    meta: any,
+}
+export interface EntityFetcher {//For a specific syncContext
+    getEntities: (filter?: RegisterDataFilter) => Promise<EntityWithMeta<Entity>[]>
+}

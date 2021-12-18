@@ -1,4 +1,4 @@
-import { Entity, Register, RegisterStatusTag, SyncContext } from "../registers/types"
+import { Entity, EntityWithMeta, SyncContext } from "../registers/types"
 
 export interface AdapterDefinition {
     readonly id: string
@@ -18,11 +18,6 @@ export type AdapterRunOptions = { //filters, skips...
 }
 
 export type InputEntity<e extends Entity> = EntityWithMeta<e> | null | e
-
-export type EntityWithMeta<e extends Entity> = {
-    entity: e | null,
-    meta: any,
-}
 
 export type AdapterStatus = {
     id: string
@@ -58,20 +53,4 @@ export type AdapterStatusSummary = { //Audit
 export interface AdapterDependencies<ad extends AdapterDefinition> {
     adapterDefinition: ad
     syncContext?: SyncContext
-}
-
-export interface RegisterDataAccess {//For a specific syncContext
-    save: (register: Register<Entity>) => Promise<void>
-    saveAll: (registers: Register<Entity>[]) => Promise<void>
-    get: (id: string) => Promise<Register<Entity> | null>
-    getAll: (filter?: RegisterDataFilter, registersIds?: string[]) => Promise<Register<Entity>[]>
-}
-
-
-export type RegisterDataFilter = {
-    flowId?: string,
-    stepId?: string,
-    apdaterId?: string,
-    registerType?: string,
-    registerStatus?: RegisterStatusTag
 }

@@ -1,4 +1,4 @@
-import { RegisterDataAccess, RegisterDataFilter } from "../interactors/adapters/types";
+import { RegisterDataAccess, RegisterDataFilter } from "../interactors/registers/types";
 import { Entity, Register } from "../interactors/registers/types";
 
 export class VolatileRegisterDataAccess implements RegisterDataAccess {

@@ -1,10 +1,10 @@
 import EventEmitter from "events";
-import { Entity, Register, SyncContext, RegisterStatusTag } from "../../registers/types";
-import { Adapter, AdapterStatus, AdapterDefinition, EntityWithMeta, AdapterRunOptions, AdapterStatusSummary, AdapterStatusTag, RegisterDataAccess } from "../types"
+import { Entity, Register, SyncContext, RegisterStatusTag, EntityWithMeta, RegisterDataAccess } from "../../registers/types";
+import { Adapter, AdapterStatus, AdapterDefinition, AdapterRunOptions, AdapterStatusSummary, AdapterStatusTag } from "../types"
 import { v4 as uuidv4 } from 'uuid';
 import { EntityInitValues, MyAdapterDependencies } from "./types";
-import { AdvancedRegisterFetcher, getWithMetaFormat } from "./utils";
 import { cloneDeep } from 'lodash'
+import { AdvancedRegisterFetcher, getWithMetaFormat } from "../../registers/utils";
 
 
 

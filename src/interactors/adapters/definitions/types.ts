@@ -1,6 +1,6 @@
 import EventEmitter from "events"
-import { Entity } from "../../registers/types"
-import { AdapterDefinition, AdapterDependencies, EntityWithMeta, RegisterDataAccess, RegisterDataFilter } from "../types"
+import { Entity, RegisterDataAccess } from "../../registers/types"
+import { AdapterDefinition, AdapterDependencies } from "../types"
 
 
 export interface MyAdapterDependencies<ad extends AdapterDefinition> extends AdapterDependencies<ad> {
@@ -34,8 +34,4 @@ export type EntityInitValues<e extends Entity> = {
     meta: any,
     sourceAbsoluteId: any,
     sourceRelativeId: any,
-}
-
-export interface EntityFetcher {//For a specific syncContext
-    getEntities: (filter?: RegisterDataFilter) => Promise<EntityWithMeta<Entity>[]>
 }

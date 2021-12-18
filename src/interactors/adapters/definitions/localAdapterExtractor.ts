@@ -2,8 +2,9 @@
 import { Entity, Register, RegisterStatusTag } from "../../registers/types";
 import { AdapterDefinition, InputEntity } from "../types"
 import { FixedEntity, ToFixEntity, ValidationResult, ValidationStatusTag } from "./types";
-import { getValidationResultWithMeta, getWithMetaFormat, validationTagToRegisterTag } from "./utils";
+import { getValidationResultWithMeta, validationTagToRegisterTag } from "./utils";
 import { LocalAdapter } from "./localAdapter";
+import { getWithMetaFormat } from "../../registers/utils";
 
 
 /**
