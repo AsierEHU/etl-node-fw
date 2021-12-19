@@ -1,5 +1,5 @@
 
-import { Entity, EntityFetcher, Register, RegisterDataFilter, RegisterStatusTag } from "../../registers/types";
+import { Entity, EntityFetcher, Register, RegisterDataFilter, RegisterStatusTag, SyncContext } from "../../registers/types";
 import { AdapterDefinition } from "../types"
 import { getValidationResultWithMeta, validationTagToRegisterTag } from "./utils";
 import { LocalAdapter } from "./localAdapter";
@@ -17,14 +17,14 @@ export class LocalAdapterFlex<ad extends LocalAdapterFlexDefinition<Entity>> ext
         super(dependencies)
     }
 
-    protected async getRegisters(): Promise<Register<Entity>[]> {
+    protected async getRegisters(syncContext: SyncContext): Promise<Register<Entity>[]> {
         const entityFetcher = new ContextEntityFetcher(
-            { flowId: this.adapterStatus.syncContext.flowId },
+            { flowId: syncContext.flowId },
             this.registerDataAccess
         )
         const inputEntities = await this.adapterDefinition.entitiesGet(entityFetcher);
         const inputEntitiesWithMeta = getWithMetaFormat(inputEntities)
-        const registers = await this.initRegisters(inputEntitiesWithMeta);
+        const registers = await this.initRegisters(inputEntitiesWithMeta, syncContext);
         this.calculateSourceId(registers, entityFetcher.getHistory())
         return registers;
     }
@@ -45,7 +45,6 @@ export class LocalAdapterFlex<ad extends LocalAdapterFlexDefinition<Entity>> ext
         await this.validateRegisters(inputRegisters);
         const outputRegisters = inputRegisters;
         await this.registerDataAccess.saveAll(outputRegisters)
-        return outputRegisters
     }
 
     private async validateRegisters(inputRegisters: Register<Entity>[]) {

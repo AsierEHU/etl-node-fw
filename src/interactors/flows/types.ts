@@ -21,7 +21,7 @@ export type FlowStatus = {
 export type FlowMeta = string | object | null
 
 export interface Flow<fd extends FlowDefinition> {
-    runOnce(flowRunOptions?: FlowRunOptions): Promise<FlowStatusTag> //start a flow from the beginning
+    run(flowRunOptions?: FlowRunOptions): Promise<FlowStatusTag> //start a flow from the beginning
     continue(): Promise<void> //continue flow from the last success or partial success step.
     getStatus(): Promise<FlowStatus>
 }

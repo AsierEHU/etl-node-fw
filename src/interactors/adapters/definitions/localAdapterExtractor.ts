@@ -1,5 +1,5 @@
 
-import { Entity, Register, RegisterStatusTag } from "../../registers/types";
+import { Entity, Register, RegisterStatusTag, SyncContext } from "../../registers/types";
 import { AdapterDefinition, InputEntity } from "../types"
 import { FixedEntity, ToFixEntity, ValidationResult, ValidationStatusTag } from "./types";
 import { getValidationResultWithMeta, validationTagToRegisterTag } from "./utils";
@@ -18,10 +18,10 @@ export class LocalAdapterExtractor<ad extends LocalAdapterExtractorDefinition<En
         super(dependencies)
     }
 
-    protected async getRegisters(): Promise<Register<Entity>[]> {
+    protected async getRegisters(syncContext: SyncContext): Promise<Register<Entity>[]> {
         const inputEntities = await this.adapterDefinition.entitiesGet();
         const inputEntitiesWithMeta = getWithMetaFormat(inputEntities)
-        const registers = await this.initRegisters(inputEntitiesWithMeta);
+        const registers = await this.initRegisters(inputEntitiesWithMeta, syncContext);
         return registers;
     }
 
@@ -30,7 +30,6 @@ export class LocalAdapterExtractor<ad extends LocalAdapterExtractorDefinition<En
         await this.fixRegisters(inputRegisters);
         const outputRegisters = inputRegisters;
         await this.registerDataAccess.saveAll(outputRegisters)
-        return outputRegisters
     }
 
     private async validateRegisters(inputRegisters: Register<Entity>[]) {

@@ -1,6 +1,6 @@
 import EventEmitter from "events";
 import { AdapterFactory } from "../../adapters/factory";
-import { Adapter, AdapterDefinition, AdapterDependencies, AdapterRunOptions, AdapterStatus, AdapterStatusSummary, AdapterStatusTag } from "../../adapters/types";
+import { AdapterDefinition, AdapterDependencies, AdapterRunnerRunOptions, AdapterRunOptions, AdapterStatus, AdapterStatusTag } from "../../adapters/types";
 import { SyncContext } from "../../registers/types";
 import { Step, StepStatus, StepStatusTag, StepRunOptions, StepDefinition, StepStatusSummary } from "../types"
 import { v4 as uuidv4 } from 'uuid';
@@ -39,11 +39,11 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
             statusSummary: null
         }
         this.adapterDependencies = dependencies.adapterDependencies;
-        this.adapterDependencies.syncContext = this.stepStatus.syncContext;
+        // this.adapterDependencies.syncContext = this.stepStatus.syncContext;
         this.presentStatus()
     }
 
-    async runOnce(runOptions?: StepRunOptions) {
+    async run(runOptions?: StepRunOptions) {
 
         if (this.stepStatus.statusTag != StepStatusTag.pending)
             throw new Error("Run once")
@@ -62,17 +62,16 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
         return this.stepStatus.statusTag;
     }
 
-    private async tryRunAdapter(adapterRunOptions?: AdapterRunOptions, tryNumber?: number) {
+    private async tryRunAdapter(adapterRunOptions?: AdapterRunnerRunOptions, tryNumber?: number) {
         this.stepStatus.tryNumber = tryNumber || 1;
 
         try {
-            const adapter = this.adapterFactory.createAdapter(this.stepDefinition.adapterDefinitionId, this.adapterDependencies)
-            const adapterStatusTag = await adapter.runOnce(adapterRunOptions)
-            if (adapterStatusTag == AdapterStatusTag.failed && this.canRetry()) {
+            const adapter = this.adapterFactory.createAdapterRunner(this.stepDefinition.adapterDefinitionId, this.adapterDependencies)
+            const adapterStatus = await adapter.run(adapterRunOptions)
+            if (adapterStatus.statusTag == AdapterStatusTag.failed && this.canRetry()) {
                 await this.retryRunAdapter(adapterRunOptions)
             }
             else {
-                const adapterStatus = await adapter.getStatus()
                 this.stepStatus.statusSummary = this.getSummary(adapterStatus)
                 if (this.stepStatus.statusSummary.rows_failed > 0 && this.canRetry()) {
                     await this.retryRunAdapter(adapterRunOptions)
@@ -97,7 +96,7 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
         }
     }
 
-    private async retryRunAdapter(adapterRunOptions?: AdapterRunOptions) {
+    private async retryRunAdapter(adapterRunOptions?: AdapterRunnerRunOptions) {
         const restartAdapterRunOptions = { ...adapterRunOptions, onlyFailedEntities: true }
         await this.tryRunAdapter(restartAdapterRunOptions, this.stepStatus.tryNumber + 1);
     }
@@ -127,9 +126,10 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
         return actualSummary
     }
 
-    private buildAdapterOptions(stepOptions?: StepRunOptions): AdapterRunOptions {
+    private buildAdapterOptions(stepOptions?: StepRunOptions): AdapterRunnerRunOptions {
         return {
-            inputEntities: stepOptions?.inputEntities
+            inputEntities: stepOptions?.inputEntities,
+            syncContext: this.stepStatus.syncContext
         }
     }
 

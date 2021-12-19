@@ -2,7 +2,7 @@ import { AdapterRunOptions, InputEntity } from "../adapters/types";
 import { Entity, SyncContext } from "../registers/types";
 
 export interface Step<sd extends StepDefinition> {
-    runOnce(stepRunOptions?: StepRunOptions): Promise<StepStatusTag> //start, if registers -> filter input by ids, if skip -> compare hash to skip
+    run(stepRunOptions?: StepRunOptions): Promise<StepStatusTag> //start, if registers -> filter input by ids, if skip -> compare hash to skip
     getStatus(): Promise<StepStatus>
 }
 

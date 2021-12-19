@@ -1,6 +1,4 @@
-import { Entity, EntityWithMeta, RegisterStatusTag } from "../../registers/types";
-import { isEntityWithMeta } from "../../registers/utils"
-import { InputEntity } from "../types";
+import { RegisterStatusTag } from "../../registers/types";
 import { ValidationResult, ValidationStatusTag } from "./types";
 
 export const getValidationResultWithMeta = (validation: ValidationResult | ValidationStatusTag): ValidationResult => {

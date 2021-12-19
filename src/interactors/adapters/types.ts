@@ -8,14 +8,28 @@ export interface AdapterDefinition {
 }
 
 export interface Adapter<AdapterDefinition> {
-    runOnce(runOptions?: AdapterRunOptions): Promise<AdapterStatusTag> //start, if registers -> filter input by ids, if skip -> compare hash to skip
-    getStatus(): Promise<AdapterStatus>
+    adapterDefinition: AdapterDefinition
+    run(runOptions?: AdapterRunOptions): Promise<void> //start, if registers -> filter input by ids, if skip -> compare hash to skip
 }
 
 export type AdapterRunOptions = { //filters, skips...
+    // getEntitiesOptions?: any
+    useInputEntities?: boolean
+    onlyFailedEntities?: boolean
+    syncContext: SyncContext
+}
+
+export interface AdapterRunner {
+    adapter: Adapter<AdapterDefinition>
+    run(runOptions?: AdapterRunnerRunOptions): Promise<AdapterStatus> //start, if registers -> filter input by ids, if skip -> compare hash to skip
+}
+
+export type AdapterRunnerRunOptions = {
     inputEntities?: InputEntity<Entity>[],
+    syncContext?: SyncContext,
     onlyFailedEntities?: boolean
 }
+
 
 export type InputEntity<e extends Entity> = EntityWithMeta<e> | null | e
 

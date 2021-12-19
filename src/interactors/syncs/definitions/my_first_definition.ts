@@ -54,7 +54,7 @@
 
 //     async startNewFlow(syncOptions: SyncOptions, mockData?: [{ stepDefinitionId: any; mockData: any }]): Promise<string>{
 //         const newFlow = await this.flowBuilder.buildFlowByDefinition(syncOptions.flowdefinitionId,{});
-//         newFlow.runOnce(syncOptions.flowDefinitionOptions, mockData);
+//         newFlow.run(syncOptions.flowDefinitionOptions, mockData);
 //         return (await newFlow.getData()).id;
 //     }
     
@@ -71,7 +71,7 @@
 //         const flowDefinitionOptions = await oldFlow.getDefinitionOptions()
 //         const {correlationId, definitionId} = await oldFlow.getData()
 //         const newFlow = await this.flowBuilder.buildFlowByDefinition(definitionId, {correlationId: correlationId || flowId})
-//         newFlow.runOnce(flowDefinitionOptions)
+//         newFlow.run(flowDefinitionOptions)
 //     }
     
 // }

@@ -58,7 +58,7 @@ const stepTest = (
 
         test("Final status", async () => {
             const step1 = stepFactory.createStep(definition.id, stepDependencies)
-            await step1.runOnce();
+            await step1.run();
             const stepStatus = await step1.getStatus()
             statusEqual(stepStatus, mocks.mockFinalStatus)
         })
@@ -66,7 +66,7 @@ const stepTest = (
         test("Presenter calls", async () => {
             presenter.on("stepStatus", stepPresenterCallback)
             const step1 = stepFactory.createStep(definition.id, stepDependencies)
-            await step1.runOnce();
+            await step1.run();
             expect(stepPresenterCallback.mock.calls.length).toBe(3)
             statusEqual(stepPresenterCallback.mock.results[0].value, mocks.mockInitialStatus)
             statusEqual(stepPresenterCallback.mock.results[2].value, mocks.mockFinalStatus)
@@ -76,7 +76,7 @@ const stepTest = (
         test("Final status: runOptions", async () => {
             const step1 = stepFactory.createStep(definition.id, stepDependencies)
             const runOptions: StepRunOptions = { inputEntities: [] }
-            await step1.runOnce(runOptions);
+            await step1.run(runOptions);
             const stepStatus = await step1.getStatus()
             expect(stepStatus.runOptions).toEqual(runOptions)
         })
@@ -85,15 +85,15 @@ const stepTest = (
             presenter.on("stepStatus", stepPresenterCallback)
             const step1 = stepFactory.createStep(definition.id, stepDependencies)
             const runOptions: StepRunOptions = { inputEntities: [] }
-            await step1.runOnce(runOptions);
+            await step1.run(runOptions);
             expect(stepPresenterCallback.mock.results[0].value.runOptions).toBe(null)
             expect(stepPresenterCallback.mock.results[2].value.runOptions).toEqual(runOptions)
         })
 
         test("Run once exception", async () => {
             const step1 = stepFactory.createStep(definition.id, stepDependencies)
-            step1.runOnce()
-            await expect(step1.runOnce()).rejects.toEqual(new Error("Run once"))
+            step1.run()
+            await expect(step1.run()).rejects.toEqual(new Error("Run once"))
         });
 
     })

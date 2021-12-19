@@ -2,7 +2,8 @@ import { LocalAdapterExtractor } from "./definitions/localAdapterExtractor";
 import { LocalAdapterFlex } from "./definitions/localAdapterFlex";
 import { LocalAdapterLoader } from "./definitions/localAdapterLoader";
 import { LocalAdapterTransformer } from "./definitions/localAdapterTransformer";
-import { Adapter, AdapterDefinition } from "./types";
+import { LocalAdapterRunner } from "./runners/localAdapterRunner";
+import { Adapter, AdapterDefinition, AdapterRunner } from "./types";
 
 export class AdapterFactory {
     private readonly adapterDefinitionsMap: { [key: string]: AdapterDefinition }
@@ -16,7 +17,7 @@ export class AdapterFactory {
         }
     }
 
-    public createAdapter(definitionId: string, dependencies: any): Adapter<AdapterDefinition> {
+    public createAdapterDefinition(definitionId: string, dependencies: any): Adapter<AdapterDefinition> {
         const adapterDefinition = this.adapterDefinitionsMap[definitionId];
         if (!adapterDefinition) {
             throw Error("Not adapter match with definition id: " + definitionId)
@@ -41,5 +42,32 @@ export class AdapterFactory {
             throw Error("Not adapter match with definition type: " + adapterDefinition.definitionType)
         }
     }
+
+    public createAdapterRunner(definitionId: string, dependencies: any): AdapterRunner {
+        const adapterDefinition = this.adapterDefinitionsMap[definitionId];
+        if (!adapterDefinition) {
+            throw Error("Not adapter match with definition id: " + definitionId)
+        }
+
+        const adapterDependencies = dependencies;
+        adapterDependencies.adapter = this.createAdapterDefinition(definitionId, dependencies);
+
+        if (adapterDefinition.definitionType == "LocalAdapterLoaderDefinition") {
+            return new LocalAdapterRunner(adapterDependencies);
+        }
+        else if (adapterDefinition.definitionType == "LocalAdapterExtractorDefinition") {
+            return new LocalAdapterRunner(adapterDependencies);
+        }
+        else if (adapterDefinition.definitionType == "LocalAdapterTransformerDefinition") {
+            return new LocalAdapterRunner(adapterDependencies);
+        }
+        else if (adapterDefinition.definitionType == "LocalAdapterFlexDefinition") {
+            return new LocalAdapterRunner(adapterDependencies);
+        }
+        else {
+            throw Error("Not adapter match with definition type: " + adapterDefinition.definitionType)
+        }
+    }
+
 }
 
