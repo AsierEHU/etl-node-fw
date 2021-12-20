@@ -2,7 +2,7 @@ import { EventEmitter } from "stream";
 import { VolatileRegisterDataAccess } from "../../src/dataAccess/volatile";
 import { AdapterFactory } from "../../src/interactors/adapters/factory";
 import { AdapterDefinition, AdapterRunnerRunOptions, AdapterRunOptions, AdapterStatus, InputEntity } from "../../src/interactors/adapters/types";
-import { Entity, Register, SyncContext, RegisterStatusTag } from "../../src/interactors/registers/types";
+import { Register, SyncContext, RegisterStatusTag } from "../../src/interactors/registers/types";
 import { getWithMetaFormat, initRegisters, isByGroupSource, isByRowSource, isOrigin } from "../../src/interactors/registers/utils";
 import { adapterMocksSuites } from "./mocks";
 
@@ -35,10 +35,10 @@ const adapterTest = (
     mocks: {
         mockInitialStatus: AdapterStatus,
         mockFinalStatus: AdapterStatus,
-        mockNewRegisters: Register<Entity>[],
-        mockFinalRegisters: Register<Entity>[],
-        mockInitialRegisters: Register<Entity>[],
-        inputEntities: InputEntity<Entity>[]
+        mockNewRegisters: Register[],
+        mockFinalRegisters: Register[],
+        mockInitialRegisters: Register[],
+        inputEntities: InputEntity<any>[]
     }
 ) => {
     describe(definition.definitionType + " - " + definition.id + " status test", () => {
@@ -139,7 +139,7 @@ const adapterTest = (
     })
 }
 
-const testSources = async (register: Register<Entity>) => {
+const testSources = async (register: Register) => {
     if (isByGroupSource(register)) {
         if (register.id == register.sourceAbsoluteId && register.id == register.sourceRelativeId) {
             throw Error("Imposible case")
@@ -189,7 +189,7 @@ const runOptionsEqual = (runOtions: AdapterRunOptions, mockRunOptions: AdapterRu
     expect(runOtions).toEqual(mockRunOptions)
 }
 
-const registersEqual = (registers: Register<Entity>[], mockFinalRegisters: Register<Entity>[]) => {
+const registersEqual = (registers: Register[], mockFinalRegisters: Register[]) => {
     expect(registers.length).toBe(mockFinalRegisters.length)
     if (registers.length == mockFinalRegisters.length)
         registers.forEach((register, index) => {
@@ -197,7 +197,7 @@ const registersEqual = (registers: Register<Entity>[], mockFinalRegisters: Regis
         })
 }
 
-const registerEqual = (register: Register<Entity>, mockFinalRegister: Register<Entity>) => {
+const registerEqual = (register: Register, mockFinalRegister: Register) => {
     expect(register.id).not.toBeNull()
     expect(register.syncContext.apdaterId).not.toBeNull()
     expect(register.sourceAbsoluteId).not.toBeNull()

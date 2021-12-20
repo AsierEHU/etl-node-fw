@@ -1,4 +1,4 @@
-import { Entity, EntityWithMeta, SyncContext } from "../registers/types"
+import { EntityWithMeta, SyncContext } from "../registers/types"
 
 export interface AdapterDefinition {
     readonly id: string
@@ -25,13 +25,12 @@ export interface AdapterRunner {
 }
 
 export type AdapterRunnerRunOptions = {
-    mockEntities?: InputEntity<Entity>[],
+    mockEntities?: InputEntity<any>[],
     syncContext?: SyncContext,
     onlyFailedEntities?: boolean
 }
 
-
-export type InputEntity<e extends Entity> = EntityWithMeta<e> | null | e
+export type InputEntity<e extends object> = EntityWithMeta | null | e
 
 export type AdapterStatus = {
     id: string

@@ -1,13 +1,13 @@
 import { LocalAdapterExtractorDefinition } from "../../../src/interactors/adapters/definitions/localAdapterExtractor";
 import { ToFixEntity, ValidationStatusTag } from "../../../src/interactors/adapters/definitions/types";
 import { AdapterStatus, AdapterStatusSummary, AdapterStatusTag, InputEntity } from "../../../src/interactors/adapters/types";
-import { Entity, Register } from "../../../src/interactors/registers/types";
+import {  Register } from "../../../src/interactors/registers/types";
 
 type inputClass = {
     field: string,
     y: number,
 }
-const mockInitialRegisters: Register<Entity>[] = []
+const mockInitialRegisters: Register[] = []
 const inputEntities: InputEntity<inputClass>[] = [];
 export const case2Definition: LocalAdapterExtractorDefinition<inputClass> = {
     id: "case2Extractor",
@@ -23,8 +23,8 @@ export const case2Definition: LocalAdapterExtractorDefinition<inputClass> = {
         return null
     },
 }
-const mockNewRegisters: Register<Entity>[] = []
-const mockFinalRegisters: Register<Entity>[] = [
+const mockNewRegisters: Register[] = []
+const mockFinalRegisters: Register[] = [
     ...mockInitialRegisters,
     ...mockNewRegisters
 ]

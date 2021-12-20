@@ -1,5 +1,5 @@
 
-import { Entity, EntityFetcher, Register, RegisterDataFilter, RegisterStatusTag, SyncContext } from "../../registers/types";
+import { EntityFetcher, Register, RegisterDataFilter, RegisterStatusTag, SyncContext } from "../../registers/types";
 import { AdapterDefinition } from "../types"
 import { getValidationResultWithMeta, validationTagToRegisterTag } from "./utils";
 import { LocalAdapter } from "./localAdapter";
@@ -12,13 +12,13 @@ import { ContextEntityFetcher } from "../../../dataAccess/utils";
  * row-by-row
  * unknown input 1 output
  */
-export class LocalAdapterFlex<ad extends LocalAdapterFlexDefinition<Entity>> extends LocalAdapter<ad>{
+export class LocalAdapterFlex<ad extends LocalAdapterFlexDefinition<any>> extends LocalAdapter<ad>{
 
     constructor(dependencies: any) {
         super(dependencies)
     }
 
-    protected async getRegisters(syncContext: SyncContext): Promise<Register<Entity>[]> {
+    protected async getRegisters(syncContext: SyncContext): Promise<Register[]> {
         const entityFetcher = new ContextEntityFetcher(
             { flowId: syncContext.flowId },
             this.registerDataAccess
@@ -30,7 +30,7 @@ export class LocalAdapterFlex<ad extends LocalAdapterFlexDefinition<Entity>> ext
         return registers;
     }
 
-    private calculateSourceId(registers: Register<Entity>[], history: RegisterDataFilter[]) {
+    private calculateSourceId(registers: Register[], history: RegisterDataFilter[]) {
         const sourceId = history.reduce((id, curr) => {
             return id + "-" + curr.registerType + "_" + curr.registerStatus
         }, "00000000")
@@ -42,12 +42,12 @@ export class LocalAdapterFlex<ad extends LocalAdapterFlexDefinition<Entity>> ext
             }
     }
 
-    async processRegisters(outputRegisters: Register<Entity>[]) {
+    async processRegisters(outputRegisters: Register[]) {
         await this.validateRegisters(outputRegisters);
         await this.registerDataAccess.saveAll(outputRegisters)
     }
 
-    private async validateRegisters(outputRegisters: Register<Entity>[]) {
+    private async validateRegisters(outputRegisters: Register[]) {
         for (const register of outputRegisters) {
             try {
                 const validation = await this.adapterDefinition.entityValidate(register.entity);
@@ -62,7 +62,7 @@ export class LocalAdapterFlex<ad extends LocalAdapterFlexDefinition<Entity>> ext
     }
 }
 
-export abstract class LocalAdapterFlexDefinition<output extends Entity> implements AdapterDefinition {
+export abstract class LocalAdapterFlexDefinition<output extends object> implements AdapterDefinition {
     abstract readonly id: string;
     abstract readonly outputType: string
     abstract readonly definitionType: string;

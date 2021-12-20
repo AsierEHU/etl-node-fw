@@ -1,5 +1,5 @@
 import { uniqBy } from "lodash"
-import { EntityFetcher, SyncContext, RegisterDataAccess, RegisterDataFilter, Register, Entity } from "../interactors/registers/types"
+import { EntityFetcher, SyncContext, RegisterDataAccess, RegisterDataFilter, Register } from "../interactors/registers/types"
 
 export class ContextEntityFetcher implements EntityFetcher {
 
@@ -33,14 +33,14 @@ export class AdvancedRegisterFetcher {
         this.registerDataAccess = registerDataAccess
     }
 
-    async getRelativeRegisters(baseRegisters: Register<Entity>[]): Promise<Register<Entity>[]> {
+    async getRelativeRegisters(baseRegisters: Register[]): Promise<Register[]> {
         const uniqueBaseRegisters = uniqBy(baseRegisters, 'sourceRelativeId')
         const targetRegistersIds = uniqueBaseRegisters.map(baseRegister => baseRegister.sourceRelativeId) as string[]
         const targetRegisters = await this.registerDataAccess.getAll(undefined, targetRegistersIds)
         return targetRegisters
     }
 
-    async getAbsoluteRegisters(baseRegisters: Register<Entity>[]): Promise<Register<Entity>[]> {
+    async getAbsoluteRegisters(baseRegisters: Register[]): Promise<Register[]> {
         const uniqueBaseRegisters = uniqBy(baseRegisters, 'sourceAbsoluteId')
         const targetRegistersIds = uniqueBaseRegisters.map(baseRegister => baseRegister.sourceAbsoluteId) as string[]
         const targetRegisters = await this.registerDataAccess.getAll(undefined, targetRegistersIds)

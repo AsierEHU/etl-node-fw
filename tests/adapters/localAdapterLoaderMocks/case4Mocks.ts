@@ -1,7 +1,7 @@
 import { LocalAdapterLoaderDefinition } from "../../../src/interactors/adapters/definitions/localAdapterLoader";
 import { ValidationResult, ValidationStatusTag } from "../../../src/interactors/adapters/definitions/types";
 import { AdapterStatus, AdapterStatusSummary, AdapterStatusTag, InputEntity } from "../../../src/interactors/adapters/types";
-import { Entity, Register, RegisterStatusTag } from "../../../src/interactors/registers/types";
+import {  Register, RegisterStatusTag } from "../../../src/interactors/registers/types";
 import { case3Mocks } from "../localAdapterTranformerMocks/case3Mocks";
 
 type outputClass = {
@@ -15,7 +15,7 @@ type resultClass = {
     success: boolean,
 }
 
-const mockInitialRegisters: Register<Entity>[] = case3Mocks.mockFinalRegisters
+const mockInitialRegisters: Register[] = case3Mocks.mockFinalRegisters
 const inputEntities: InputEntity<outputClass>[] = [
     {
         text: "Raw Object text",
@@ -52,7 +52,7 @@ export const case4Definition: LocalAdapterLoaderDefinition<outputClass, resultCl
         }
     }
 }
-const mockNewRegisters: Register<Entity>[] = [
+const mockNewRegisters: Register[] = [
     {
         id: "ebd1c577-a6aa-40b1-bdee-52f3ee0ea643",
         entityType: "resultClass",
@@ -88,7 +88,7 @@ const mockNewRegisters: Register<Entity>[] = [
         },
     },
 ]
-const mockFinalRegisters: Register<Entity>[] = [
+const mockFinalRegisters: Register[] = [
     ...mockInitialRegisters,
     ...mockNewRegisters
 ]

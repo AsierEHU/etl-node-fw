@@ -1,6 +1,6 @@
 import { LocalAdapterTransformerDefinition } from "../../../src/interactors/adapters/definitions/localAdapterTransformer";
 import { AdapterStatus, AdapterStatusSummary, AdapterStatusTag, InputEntity } from "../../../src/interactors/adapters/types";
-import { Entity, Register, RegisterStatusTag } from "../../../src/interactors/registers/types";
+import {  Register, RegisterStatusTag } from "../../../src/interactors/registers/types";
 import { case1Mocks } from "../localAdapterExtractorMocks/case1Mocks";
 
 type inputClass = {
@@ -13,7 +13,7 @@ type outputClass = {
         x: number,
     }
 }
-const mockInitialRegisters: Register<Entity>[] = case1Mocks.mockFinalRegisters
+const mockInitialRegisters: Register[] = case1Mocks.mockFinalRegisters
 const inputEntities: InputEntity<inputClass>[] = [
     {
         entity: {
@@ -48,7 +48,7 @@ export const case3Definition: LocalAdapterTransformerDefinition<inputClass, outp
         };
     },
 }
-const mockNewRegisters: Register<Entity>[] = [
+const mockNewRegisters: Register[] = [
     {
         id: "ebd1c577-a6aa-40b1-bdee-52f3ee0ea642",
         entityType: "outputClass",
@@ -105,7 +105,7 @@ const mockNewRegisters: Register<Entity>[] = [
         },
     },
 ]
-const mockFinalRegisters: Register<Entity>[] = [
+const mockFinalRegisters: Register[] = [
     ...mockInitialRegisters,
     ...mockNewRegisters
 ]

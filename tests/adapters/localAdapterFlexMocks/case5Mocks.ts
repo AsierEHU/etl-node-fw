@@ -1,13 +1,13 @@
 import { LocalAdapterFlexDefinition } from "../../../src/interactors/adapters/definitions/localAdapterFlex";
 import { ValidationStatusTag } from "../../../src/interactors/adapters/definitions/types";
 import { AdapterStatus, AdapterStatusSummary, AdapterStatusTag, InputEntity } from "../../../src/interactors/adapters/types";
-import { Entity, EntityFetcher, Register, RegisterDataFilter, RegisterStatusTag } from "../../../src/interactors/registers/types";
+import {  EntityFetcher, Register, RegisterDataFilter, RegisterStatusTag } from "../../../src/interactors/registers/types";
 import { case4Mocks } from "../localAdapterLoaderMocks/case4Mocks";
 
 type result2Class = {
     successTotal: number
 }
-const mockInitialRegisters: Register<Entity>[] = case4Mocks.mockFinalRegisters
+const mockInitialRegisters: Register[] = case4Mocks.mockFinalRegisters
 const inputEntities: InputEntity<result2Class>[] = [
     { successTotal: 1 }
 ];
@@ -29,7 +29,7 @@ export const case5Definition: LocalAdapterFlexDefinition<result2Class> = {
         return ValidationStatusTag.valid
     }
 }
-const mockNewRegisters: Register<Entity>[] = [
+const mockNewRegisters: Register[] = [
     {
         id: "ebd1c577-a6aa-40b1-bdee-52f3ee0ea644",
         entityType: "result2Class",
@@ -48,7 +48,7 @@ const mockNewRegisters: Register<Entity>[] = [
         },
     }
 ]
-const mockFinalRegisters: Register<Entity>[] = [
+const mockFinalRegisters: Register[] = [
     ...mockInitialRegisters,
     ...mockNewRegisters
 ]

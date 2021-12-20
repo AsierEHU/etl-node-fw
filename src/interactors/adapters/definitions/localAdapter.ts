@@ -1,9 +1,9 @@
-import { Entity, Register, SyncContext, RegisterStatusTag, RegisterDataAccess } from "../../registers/types";
+import { Register, SyncContext, RegisterStatusTag, RegisterDataAccess } from "../../registers/types";
 import { Adapter, AdapterDefinition, AdapterRunOptions } from "../types"
 import { MyAdapterDependencies } from "./types";
 import { cloneDeep } from 'lodash'
 import { AdvancedRegisterFetcher } from "../../../dataAccess/utils";
-import { buildRegisterFromOthers, initRegisters } from "../../registers/utils";
+import { buildRegisterFromOthers } from "../../registers/utils";
 
 
 
@@ -30,7 +30,7 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
         await this.processRegisters(registers, runOptions);
     }
 
-    private async getInitialRegisters(runOptions: AdapterRunOptions): Promise<Register<Entity>[]> {
+    private async getInitialRegisters(runOptions: AdapterRunOptions): Promise<Register[]> {
         let registers = [];
 
         if (runOptions?.useMockedEntities) {
@@ -59,8 +59,8 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
         return cloneDeep(registers);
     }
 
-    protected abstract getRegisters(syncContext: SyncContext): Promise<Register<Entity>[]>
+    protected abstract getRegisters(syncContext: SyncContext): Promise<Register[]>
 
-    protected abstract processRegisters(registers: Register<Entity>[], runOptions: AdapterRunOptions): Promise<void>
+    protected abstract processRegisters(registers: Register[], runOptions: AdapterRunOptions): Promise<void>
 
 }

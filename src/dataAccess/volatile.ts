@@ -1,13 +1,13 @@
 import { RegisterDataAccess, RegisterDataFilter } from "../interactors/registers/types";
-import { Entity, Register } from "../interactors/registers/types";
+import {  Register } from "../interactors/registers/types";
 
 export class VolatileRegisterDataAccess implements RegisterDataAccess {
 
     private readonly repo: {
-        [x: string]: Register<Entity>
+        [x: string]: Register
     };
 
-    constructor(registers?: Register<Entity>[]) {
+    constructor(registers?: Register[]) {
         this.repo = {}
         if (registers)
             for (const register of registers) {
@@ -17,7 +17,7 @@ export class VolatileRegisterDataAccess implements RegisterDataAccess {
             }
     }
 
-    async save(register: Register<Entity>) {
+    async save(register: Register) {
         this.repo[register.id] = register
     };
 
@@ -25,7 +25,7 @@ export class VolatileRegisterDataAccess implements RegisterDataAccess {
         return this.repo[id]
     }
 
-    async saveAll(registers: Register<Entity>[]) {
+    async saveAll(registers: Register[]) {
         for (const register of registers) {
             await this.save(register)
         }

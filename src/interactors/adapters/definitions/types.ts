@@ -1,5 +1,5 @@
 import EventEmitter from "events"
-import { Entity, RegisterDataAccess } from "../../registers/types"
+import { RegisterDataAccess } from "../../registers/types"
 import { AdapterDefinition, AdapterDependencies } from "../types"
 
 
@@ -19,12 +19,12 @@ export type ValidationResult = {
     meta: any
 }
 
-export type ToFixEntity<e extends Entity> = {
+export type ToFixEntity<e extends object> = {
     entity: e | null,
     validationMeta: any
 }
 
-export type FixedEntity<e extends Entity> = {
+export type FixedEntity<e extends object> = {
     entity: e,
     meta: any
 }

@@ -1,8 +1,8 @@
 import { uniqBy } from "lodash"
 import { v4 as uuidv4 } from 'uuid';
-import { Entity, EntityFetcher, EntityInitValues, EntityWithMeta, Register, RegisterDataAccess, RegisterDataFilter, RegisterStatusTag, SyncContext } from "./types"
+import { EntityFetcher, EntityInitValues, EntityWithMeta, Register, RegisterDataAccess, RegisterDataFilter, RegisterStatusTag, SyncContext } from "./types"
 
-export const isOrigin = (register: Register<Entity>): boolean => {
+export const isOrigin = (register: Register): boolean => {
     if (isByRowSource(register))
         return register.id == register.sourceAbsoluteId && register.id == register.sourceRelativeId
     else if (isByGroupSource(register))
@@ -11,19 +11,19 @@ export const isOrigin = (register: Register<Entity>): boolean => {
         throw Error("Unknown register origin type")
 }
 
-export function isByRowSource(register: Register<Entity>): boolean {
+export function isByRowSource(register: Register): boolean {
     return register.sourceRelativeId != null && !register.sourceRelativeId.startsWith("00000000")
 }
 
-export function isByGroupSource(register: Register<Entity>): boolean {
+export function isByGroupSource(register: Register): boolean {
     return register.sourceRelativeId != null && register.sourceRelativeId.startsWith("00000000")
 }
 
-export function isEntityWithMeta(entity?: any): entity is EntityWithMeta<Entity> {
+export function isEntityWithMeta(entity?: any): entity is EntityWithMeta {
     return entity?.entity != undefined
 }
 
-export const getWithMetaFormat = (entities: any[]): EntityWithMeta<Entity>[] => {
+export const getWithMetaFormat = (entities: any[]): EntityWithMeta[] => {
     return entities.map(entity => {
         if (isEntityWithMeta(entity)) {
             return entity
@@ -37,7 +37,7 @@ export const getWithMetaFormat = (entities: any[]): EntityWithMeta<Entity>[] => 
     })
 }
 
-export const getWithInitFormat = (entities: any[], entityType: string): EntityInitValues<Entity>[] => {
+export const getWithInitFormat = (entities: any[], entityType: string): EntityInitValues[] => {
     const entitiesWithMeta = getWithMetaFormat(entities);
     return entitiesWithMeta.map(entityWithMeta => {
         return {
@@ -50,11 +50,11 @@ export const getWithInitFormat = (entities: any[], entityType: string): EntityIn
 }
 
 export const initRegisters = (
-    inputEntities: (EntityInitValues<Entity> | EntityWithMeta<Entity> | Entity)[],
+    inputEntities: (EntityInitValues | EntityWithMeta | Object)[],
     syncContext: SyncContext
-): Register<Entity>[] => {
+): Register[] => {
     return inputEntities.map((inputEntity) => {
-        const entity: EntityInitValues<Entity> = inputEntity as EntityInitValues<Entity>
+        const entity: EntityInitValues = inputEntity as EntityInitValues
         const inputEntityId = uuidv4();
         return {
             id: inputEntityId,
@@ -70,7 +70,7 @@ export const initRegisters = (
     })
 }
 
-export const buildRegisterFromOthers = (registers: Register<Entity>[], syncContext: SyncContext, entityType?: string) => {
+export const buildRegisterFromOthers = (registers: Register[], syncContext: SyncContext, entityType?: string) => {
     const entitiesInitialValues = registers.map(reg => {
         return {
             entity: reg.entity,
