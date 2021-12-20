@@ -69,3 +69,16 @@ export const initRegisters = (
         }
     })
 }
+
+export const buildRegisterFromOthers = (registers: Register<Entity>[], syncContext: SyncContext, entityType?: string) => {
+    const entitiesInitialValues = registers.map(reg => {
+        return {
+            entity: reg.entity,
+            meta: reg.meta,
+            sourceAbsoluteId: reg.sourceAbsoluteId,
+            sourceRelativeId: reg.id,
+            entityType
+        }
+    })
+    return initRegisters(entitiesInitialValues, syncContext)
+}

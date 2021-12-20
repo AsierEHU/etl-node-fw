@@ -3,7 +3,7 @@ import { Adapter, AdapterDefinition, AdapterRunOptions } from "../types"
 import { MyAdapterDependencies } from "./types";
 import { cloneDeep } from 'lodash'
 import { AdvancedRegisterFetcher } from "../../../dataAccess/utils";
-import { initRegisters } from "../../registers/utils";
+import { buildRegisterFromOthers, initRegisters } from "../../registers/utils";
 
 
 
@@ -40,16 +40,7 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
                     ...runOptions.syncContext
                 }
             )
-            const inputEntitiesWithMeta = mockedRegisters.map(oir => {
-                return {
-                    entity: oir.entity,
-                    meta: oir.meta,
-                    sourceAbsoluteId: oir.sourceAbsoluteId,
-                    sourceRelativeId: oir.id,
-                    entityType: this.adapterDefinition.outputType
-                }
-            })
-            registers = initRegisters(inputEntitiesWithMeta, runOptions.syncContext)
+            registers = buildRegisterFromOthers(mockedRegisters, runOptions.syncContext, this.adapterDefinition.outputType)
         }
         else if (runOptions?.onlyFailedEntities) {
             const failedRegisters = await this.registerDataAccess.getAll({
@@ -59,16 +50,7 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
             })
             const arg = new AdvancedRegisterFetcher(this.registerDataAccess);
             const oldInputRegisters = await arg.getRelativeRegisters(failedRegisters)
-            const inputEntitiesWithMeta = oldInputRegisters.map(oir => {
-                return {
-                    entity: oir.entity,
-                    meta: oir.meta,
-                    sourceAbsoluteId: oir.sourceAbsoluteId,
-                    sourceRelativeId: oir.id,
-                    entityType: this.adapterDefinition.outputType
-                }
-            })
-            registers = initRegisters(inputEntitiesWithMeta, runOptions.syncContext)
+            registers = buildRegisterFromOthers(oldInputRegisters, runOptions.syncContext, this.adapterDefinition.outputType)
         }
         else {
             registers = await this.getRegisters(runOptions.syncContext)
