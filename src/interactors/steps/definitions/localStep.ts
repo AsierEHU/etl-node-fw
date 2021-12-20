@@ -128,7 +128,7 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
 
     private buildAdapterOptions(stepOptions?: StepRunOptions): AdapterRunnerRunOptions {
         return {
-            inputEntities: stepOptions?.inputEntities,
+            mockEntities: stepOptions?.inputEntities,
             syncContext: this.stepStatus.syncContext
         }
     }

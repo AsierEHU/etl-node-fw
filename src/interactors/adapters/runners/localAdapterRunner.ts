@@ -1,9 +1,8 @@
 import EventEmitter from "events";
-import { Entity, EntityWithMeta, Register, RegisterDataAccess, RegisterStatusTag, SyncContext } from "../../registers/types";
+import { RegisterDataAccess, RegisterStatusTag, SyncContext } from "../../registers/types";
 import { Adapter, AdapterDefinition, AdapterRunner, AdapterRunnerRunOptions, AdapterRunOptions, AdapterStatus, AdapterStatusSummary, AdapterStatusTag } from "../types";
 import { v4 as uuidv4 } from 'uuid';
-import { EntityInitValues } from "../definitions/types";
-import { getWithMetaFormat } from "../../registers/utils";
+import { getWithMetaFormat, initRegisters } from "../../registers/utils";
 import { cloneDeep } from "lodash";
 
 export class LocalAdapterRunner implements AdapterRunner {
@@ -17,7 +16,7 @@ export class LocalAdapterRunner implements AdapterRunner {
         this.adapterPresenter = dependencies.adapterPresenter;
         this.registerDataAccess = dependencies.registerDataAccess;
     }
-
+    //TODO:Run, run with mockoptions, run with input values
     async run(runOptions?: AdapterRunnerRunOptions) {
         runOptions = cloneDeep(runOptions)
         const adapterStatus = this.buildStatus(runOptions?.syncContext)
@@ -25,12 +24,12 @@ export class LocalAdapterRunner implements AdapterRunner {
             syncContext: adapterStatus.syncContext,
             onlyFailedEntities: runOptions?.onlyFailedEntities
         }
-        if (runOptions?.inputEntities) {
-            const inputEntities = runOptions?.inputEntities || [];
-            const inputEntitiesWithMeta = getWithMetaFormat(inputEntities)
-            const inputRegisters = await this.initRegisters(inputEntitiesWithMeta, adapterStatus.syncContext)
+        if (runOptions?.mockEntities) {
+            const mockEntities = runOptions?.mockEntities || [];
+            const inputEntitiesWithMeta = getWithMetaFormat(mockEntities)
+            const inputRegisters = initRegisters(inputEntitiesWithMeta, adapterStatus.syncContext)
             await this.registerDataAccess.saveAll(inputRegisters)
-            adapterRunOptions.useInputEntities = true;
+            adapterRunOptions.useMockedEntities = true;
         }
 
         adapterStatus.runOptions = adapterRunOptions;
@@ -79,23 +78,5 @@ export class LocalAdapterRunner implements AdapterRunner {
             rows_skipped: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.skipped).length,
         };
         return statusSummary;
-    }
-
-    private async initRegisters(inputEntities: (EntityInitValues<Entity> | EntityWithMeta<Entity>)[], syncContext: SyncContext): Promise<Register<Entity>[]> {
-        return inputEntities.map((inputEntity) => {
-            const entity: EntityInitValues<Entity> = inputEntity as EntityInitValues<Entity>
-            const inputEntityId = uuidv4();
-            return {
-                id: inputEntityId,
-                entityType: "inputMocked",
-                sourceAbsoluteId: entity.sourceAbsoluteId || inputEntityId,
-                sourceRelativeId: entity.sourceRelativeId || inputEntityId,
-                statusTag: RegisterStatusTag.pending,
-                statusMeta: null,
-                entity: entity.entity,
-                meta: entity.meta,
-                syncContext,
-            }
-        })
     }
 }

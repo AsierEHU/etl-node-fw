@@ -14,7 +14,7 @@ export interface Adapter<AdapterDefinition> {
 
 export type AdapterRunOptions = { //filters, skips...
     // getEntitiesOptions?: any
-    useInputEntities?: boolean
+    useMockedEntities?: boolean
     onlyFailedEntities?: boolean
     syncContext: SyncContext
 }
@@ -25,7 +25,7 @@ export interface AdapterRunner {
 }
 
 export type AdapterRunnerRunOptions = {
-    inputEntities?: InputEntity<Entity>[],
+    mockEntities?: InputEntity<Entity>[],
     syncContext?: SyncContext,
     onlyFailedEntities?: boolean
 }

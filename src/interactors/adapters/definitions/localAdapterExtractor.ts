@@ -4,7 +4,7 @@ import { AdapterDefinition, InputEntity } from "../types"
 import { FixedEntity, ToFixEntity, ValidationResult, ValidationStatusTag } from "./types";
 import { getValidationResultWithMeta, validationTagToRegisterTag } from "./utils";
 import { LocalAdapter } from "./localAdapter";
-import { getWithMetaFormat } from "../../registers/utils";
+import { getWithInitFormat, initRegisters } from "../../registers/utils";
 
 
 /**
@@ -20,20 +20,19 @@ export class LocalAdapterExtractor<ad extends LocalAdapterExtractorDefinition<En
 
     protected async getRegisters(syncContext: SyncContext): Promise<Register<Entity>[]> {
         const inputEntities = await this.adapterDefinition.entitiesGet();
-        const inputEntitiesWithMeta = getWithMetaFormat(inputEntities)
-        const registers = await this.initRegisters(inputEntitiesWithMeta, syncContext);
+        const inputEntitiesInitialValues = getWithInitFormat(inputEntities, this.adapterDefinition.outputType)
+        const registers = initRegisters(inputEntitiesInitialValues, syncContext);
         return registers;
     }
 
-    async outputRegisters(inputRegisters: Register<Entity>[]) {
-        await this.validateRegisters(inputRegisters);
-        await this.fixRegisters(inputRegisters);
-        const outputRegisters = inputRegisters;
+    async processRegisters(outputRegisters: Register<Entity>[]) {
+        await this.validateRegisters(outputRegisters);
+        await this.fixRegisters(outputRegisters);
         await this.registerDataAccess.saveAll(outputRegisters)
     }
 
-    private async validateRegisters(inputRegisters: Register<Entity>[]) {
-        for (const register of inputRegisters) {
+    private async validateRegisters(outputRegisters: Register<Entity>[]) {
+        for (const register of outputRegisters) {
             try {
                 const validation = await this.adapterDefinition.entityValidate(register.entity);
                 const validationWithMeta = getValidationResultWithMeta(validation);
@@ -46,8 +45,8 @@ export class LocalAdapterExtractor<ad extends LocalAdapterExtractorDefinition<En
         }
     }
 
-    private async fixRegisters(inputRegisters: Register<Entity>[]) {
-        const toFixRegisters = inputRegisters.filter(register => register.statusTag == RegisterStatusTag.invalid);
+    private async fixRegisters(outputRegisters: Register<Entity>[]) {
+        const toFixRegisters = outputRegisters.filter(register => register.statusTag == RegisterStatusTag.invalid);
         for (const toFixRegister of toFixRegisters) {
             try {
                 const toFixEntity: ToFixEntity<Entity> = {

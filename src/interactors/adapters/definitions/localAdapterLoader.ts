@@ -27,7 +27,7 @@ export class LocalAdapterLoader<ad extends LocalAdapterLoaderDefinition<Entity, 
         return inputRegisters
     }
 
-    async outputRegisters(inputRegisters: Register<Entity>[], runOptions: AdapterRunOptions) {
+    async processRegisters(inputRegisters: Register<Entity>[], runOptions: AdapterRunOptions) {
         const outputRegisters = [];
         for (const inputRegister of inputRegisters) {
             const outputRegister = await this.loadRegister(inputRegister, runOptions)

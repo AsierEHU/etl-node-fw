@@ -1,5 +1,6 @@
 import { uniqBy } from "lodash"
-import { Entity, EntityFetcher, EntityWithMeta, Register, RegisterDataAccess, RegisterDataFilter, SyncContext } from "./types"
+import { v4 as uuidv4 } from 'uuid';
+import { Entity, EntityFetcher, EntityInitValues, EntityWithMeta, Register, RegisterDataAccess, RegisterDataFilter, RegisterStatusTag, SyncContext } from "./types"
 
 export const isOrigin = (register: Register<Entity>): boolean => {
     if (isByRowSource(register))
@@ -18,54 +19,6 @@ export function isByGroupSource(register: Register<Entity>): boolean {
     return register.sourceRelativeId != null && register.sourceRelativeId.startsWith("00000000")
 }
 
-
-export class ContextEntityFetcher implements EntityFetcher {
-
-    private readonly syncContext: SyncContext
-    private readonly registerDataAccess: RegisterDataAccess
-    private readonly fetchHistory: RegisterDataFilter[]
-
-    constructor(syncContext: SyncContext, registerDataAccess: RegisterDataAccess) {
-        this.syncContext = syncContext
-        this.registerDataAccess = registerDataAccess
-        this.fetchHistory = []
-    }
-
-    async getEntities(filter?: RegisterDataFilter) {
-        filter = { ...filter, ...this.syncContext }
-        this.fetchHistory.push(filter)
-        const registers = await this.registerDataAccess.getAll(filter)
-        return registers.map(register => { return { entity: register.entity, meta: register.meta } })
-    }
-
-    getHistory(): RegisterDataFilter[] {
-        return this.fetchHistory;
-    }
-
-}
-export class AdvancedRegisterFetcher {
-
-    private readonly registerDataAccess: RegisterDataAccess
-
-    constructor(registerDataAccess: RegisterDataAccess) {
-        this.registerDataAccess = registerDataAccess
-    }
-
-    async getRelativeRegisters(baseRegisters: Register<Entity>[]): Promise<Register<Entity>[]> {
-        const uniqueBaseRegisters = uniqBy(baseRegisters, 'sourceRelativeId')
-        const targetRegistersIds = uniqueBaseRegisters.map(baseRegister => baseRegister.sourceRelativeId) as string[]
-        const targetRegisters = await this.registerDataAccess.getAll(undefined, targetRegistersIds)
-        return targetRegisters
-    }
-
-    async getAbsoluteRegisters(baseRegisters: Register<Entity>[]): Promise<Register<Entity>[]> {
-        const uniqueBaseRegisters = uniqBy(baseRegisters, 'sourceAbsoluteId')
-        const targetRegistersIds = uniqueBaseRegisters.map(baseRegister => baseRegister.sourceAbsoluteId) as string[]
-        const targetRegisters = await this.registerDataAccess.getAll(undefined, targetRegistersIds)
-        return targetRegisters
-    }
-}
-
 export function isEntityWithMeta(entity?: any): entity is EntityWithMeta<Entity> {
     return entity?.entity != undefined
 }
@@ -80,6 +33,39 @@ export const getWithMetaFormat = (entities: any[]): EntityWithMeta<Entity>[] => 
                 entity,
                 meta: null
             }
+        }
+    })
+}
+
+export const getWithInitFormat = (entities: any[], entityType: string): EntityInitValues<Entity>[] => {
+    const entitiesWithMeta = getWithMetaFormat(entities);
+    return entitiesWithMeta.map(entityWithMeta => {
+        return {
+            ...entityWithMeta,
+            entityType,
+            sourceAbsoluteId: null,
+            sourceRelativeId: null
+        }
+    })
+}
+
+export const initRegisters = (
+    inputEntities: (EntityInitValues<Entity> | EntityWithMeta<Entity> | Entity)[],
+    syncContext: SyncContext
+): Register<Entity>[] => {
+    return inputEntities.map((inputEntity) => {
+        const entity: EntityInitValues<Entity> = inputEntity as EntityInitValues<Entity>
+        const inputEntityId = uuidv4();
+        return {
+            id: inputEntityId,
+            entityType: entity.entityType || "inputMocked",
+            sourceAbsoluteId: entity.sourceAbsoluteId || inputEntityId,
+            sourceRelativeId: entity.sourceRelativeId || inputEntityId,
+            statusTag: entity.entityType ? RegisterStatusTag.pending : RegisterStatusTag.success,
+            statusMeta: null,
+            entity: entity.entity,
+            meta: entity.meta,
+            syncContext,
         }
     })
 }

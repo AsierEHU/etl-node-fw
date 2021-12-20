@@ -4,7 +4,8 @@ import { AdapterDefinition } from "../types"
 import { getValidationResultWithMeta, validationTagToRegisterTag } from "./utils";
 import { LocalAdapter } from "./localAdapter";
 import { ValidationResult, ValidationStatusTag } from "./types";
-import { ContextEntityFetcher, getWithMetaFormat } from "../../registers/utils";
+import { getWithInitFormat, initRegisters } from "../../registers/utils";
+import { ContextEntityFetcher } from "../../../dataAccess/utils";
 
 /**
  * Local async step, persistance
@@ -23,8 +24,8 @@ export class LocalAdapterFlex<ad extends LocalAdapterFlexDefinition<Entity>> ext
             this.registerDataAccess
         )
         const inputEntities = await this.adapterDefinition.entitiesGet(entityFetcher);
-        const inputEntitiesWithMeta = getWithMetaFormat(inputEntities)
-        const registers = await this.initRegisters(inputEntitiesWithMeta, syncContext);
+        const inputEntitiesInitialValues = getWithInitFormat(inputEntities, this.adapterDefinition.outputType)
+        const registers = initRegisters(inputEntitiesInitialValues, syncContext);
         this.calculateSourceId(registers, entityFetcher.getHistory())
         return registers;
     }
@@ -41,14 +42,13 @@ export class LocalAdapterFlex<ad extends LocalAdapterFlexDefinition<Entity>> ext
             }
     }
 
-    async outputRegisters(inputRegisters: Register<Entity>[]) {
-        await this.validateRegisters(inputRegisters);
-        const outputRegisters = inputRegisters;
+    async processRegisters(outputRegisters: Register<Entity>[]) {
+        await this.validateRegisters(outputRegisters);
         await this.registerDataAccess.saveAll(outputRegisters)
     }
 
-    private async validateRegisters(inputRegisters: Register<Entity>[]) {
-        for (const register of inputRegisters) {
+    private async validateRegisters(outputRegisters: Register<Entity>[]) {
+        for (const register of outputRegisters) {
             try {
                 const validation = await this.adapterDefinition.entityValidate(register.entity);
                 const validationWithMeta = getValidationResultWithMeta(validation);

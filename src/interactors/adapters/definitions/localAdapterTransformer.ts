@@ -24,12 +24,12 @@ export class LocalAdapterTransformer<ad extends LocalAdapterTransformerDefinitio
         return inputRegisters
     }
 
-    async outputRegisters(inputRegisters: Register<Entity>[], runOptions: AdapterRunOptions) {
-        const outputRegisters = await this.processRegisters(inputRegisters, runOptions);
+    async processRegisters(inputRegisters: Register<Entity>[], runOptions: AdapterRunOptions) {
+        const outputRegisters = await this.transformRegisters(inputRegisters, runOptions);
         await this.registerDataAccess.saveAll(outputRegisters)
     }
 
-    private async processRegisters(inputRegisters: Register<Entity>[], runOptions: AdapterRunOptions): Promise<Register<Entity>[]> {
+    private async transformRegisters(inputRegisters: Register<Entity>[], runOptions: AdapterRunOptions): Promise<Register<Entity>[]> {
         const outputRegisters = [];
         for (const inputRegister of inputRegisters) {
             try {

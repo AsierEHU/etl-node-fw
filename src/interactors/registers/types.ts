@@ -50,3 +50,11 @@ export type EntityWithMeta<e extends Entity> = {
 export interface EntityFetcher {//For a specific syncContext
     getEntities: (filter?: RegisterDataFilter) => Promise<EntityWithMeta<Entity>[]>
 }
+
+export type EntityInitValues<e extends Entity> = {
+    entity: e | null,
+    entityType: any,
+    meta: any,
+    sourceAbsoluteId: any,
+    sourceRelativeId: any,
+}

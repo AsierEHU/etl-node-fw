@@ -28,10 +28,3 @@ export type FixedEntity<e extends Entity> = {
     entity: e,
     meta: any
 }
-
-export type EntityInitValues<e extends Entity> = {
-    entity: e | null,
-    meta: any,
-    sourceAbsoluteId: any,
-    sourceRelativeId: any,
-}

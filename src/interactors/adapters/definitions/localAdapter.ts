@@ -1,9 +1,9 @@
-import { Entity, Register, SyncContext, RegisterStatusTag, EntityWithMeta, RegisterDataAccess } from "../../registers/types";
+import { Entity, Register, SyncContext, RegisterStatusTag, RegisterDataAccess } from "../../registers/types";
 import { Adapter, AdapterDefinition, AdapterRunOptions } from "../types"
-import { v4 as uuidv4 } from 'uuid';
-import { EntityInitValues, MyAdapterDependencies } from "./types";
+import { MyAdapterDependencies } from "./types";
 import { cloneDeep } from 'lodash'
-import { AdvancedRegisterFetcher } from "../../registers/utils";
+import { AdvancedRegisterFetcher } from "../../../dataAccess/utils";
+import { initRegisters } from "../../registers/utils";
 
 
 
@@ -26,20 +26,30 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
     }
 
     async run(runOptions: AdapterRunOptions) {
-        const inputRegisters = await this.inputRegisters(runOptions);
-        await this.outputRegisters(inputRegisters, runOptions);
+        const registers = await this.getInitialRegisters(runOptions);
+        await this.processRegisters(registers, runOptions);
     }
 
-    private async inputRegisters(runOptions: AdapterRunOptions): Promise<Register<Entity>[]> {
-        let inputRegisters = [];
+    private async getInitialRegisters(runOptions: AdapterRunOptions): Promise<Register<Entity>[]> {
+        let registers = [];
 
-        if (runOptions?.useInputEntities) {
-            inputRegisters = await this.registerDataAccess.getAll(
+        if (runOptions?.useMockedEntities) {
+            const mockedRegisters = await this.registerDataAccess.getAll(
                 {
                     registerType: "inputMocked",
                     ...runOptions.syncContext
                 }
             )
+            const inputEntitiesWithMeta = mockedRegisters.map(oir => {
+                return {
+                    entity: oir.entity,
+                    meta: oir.meta,
+                    sourceAbsoluteId: oir.sourceAbsoluteId,
+                    sourceRelativeId: oir.id,
+                    entityType: this.adapterDefinition.outputType
+                }
+            })
+            registers = initRegisters(inputEntitiesWithMeta, runOptions.syncContext)
         }
         else if (runOptions?.onlyFailedEntities) {
             const failedRegisters = await this.registerDataAccess.getAll({
@@ -48,45 +58,27 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
                 stepId: runOptions.syncContext.stepId
             })
             const arg = new AdvancedRegisterFetcher(this.registerDataAccess);
-            // const oldInputRegisters = await arg.getRelativeRegisters(failedRegisters)
-            // const inputEntitiesWithMeta = oldInputRegisters.map(oir => {
-            //     return {
-            //         entity: oir.entity,
-            //         meta: oir.meta,
-            //         sourceAbsoluteId: oir.sourceAbsoluteId,
-            //         sourceRelativeId: oir.id
-            //     }
-            // })
-            // inputRegisters = await this.initRegisters(inputEntitiesWithMeta, runOptions.syncContext)
-            inputRegisters = await arg.getRelativeRegisters(failedRegisters)
+            const oldInputRegisters = await arg.getRelativeRegisters(failedRegisters)
+            const inputEntitiesWithMeta = oldInputRegisters.map(oir => {
+                return {
+                    entity: oir.entity,
+                    meta: oir.meta,
+                    sourceAbsoluteId: oir.sourceAbsoluteId,
+                    sourceRelativeId: oir.id,
+                    entityType: this.adapterDefinition.outputType
+                }
+            })
+            registers = initRegisters(inputEntitiesWithMeta, runOptions.syncContext)
         }
         else {
-            inputRegisters = await this.getRegisters(runOptions.syncContext)
+            registers = await this.getRegisters(runOptions.syncContext)
         }
 
-        return cloneDeep(inputRegisters);
-    }
-
-    protected async initRegisters(inputEntities: (EntityInitValues<Entity> | EntityWithMeta<Entity>)[], syncContext: SyncContext): Promise<Register<Entity>[]> {
-        return inputEntities.map((inputEntity) => {
-            const entity: EntityInitValues<Entity> = inputEntity as EntityInitValues<Entity>
-            const inputEntityId = uuidv4();
-            return {
-                id: inputEntityId,
-                entityType: this.adapterDefinition.outputType,
-                sourceAbsoluteId: entity.sourceAbsoluteId || inputEntityId,
-                sourceRelativeId: entity.sourceRelativeId || inputEntityId,
-                statusTag: RegisterStatusTag.pending,
-                statusMeta: null,
-                entity: entity.entity,
-                meta: entity.meta,
-                syncContext,
-            }
-        })
+        return cloneDeep(registers);
     }
 
     protected abstract getRegisters(syncContext: SyncContext): Promise<Register<Entity>[]>
 
-    protected abstract outputRegisters(inputRegisters: Register<Entity>[], runOptions: AdapterRunOptions): Promise<void>
+    protected abstract processRegisters(registers: Register<Entity>[], runOptions: AdapterRunOptions): Promise<void>
 
 }
