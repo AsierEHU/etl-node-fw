@@ -1,5 +1,5 @@
 import { uniqBy } from "lodash"
-import { EntityFetcher, SyncContext, RegisterDataAccess, RegisterDataFilter, Register } from "../interactors/registers/types"
+import { EntityFetcher, SyncContext, RegisterDataAccess, RegisterDataFilter, Register, MetaEntity } from "../interactors/registers/types"
 
 export class ContextEntityFetcher implements EntityFetcher {
 
@@ -17,7 +17,14 @@ export class ContextEntityFetcher implements EntityFetcher {
         filter = { ...filter, ...this.syncContext }
         this.fetchHistory.push(filter)
         const registers = await this.registerDataAccess.getAll(filter)
-        return registers.map(register => { return { entity: register.entity, meta: register.meta } })
+        return registers.map(register => {
+            const metaEntity: MetaEntity = {
+                $entity: register.entity,
+                $meta: register.meta,
+                $id: register.sourceEntityId || undefined,
+            }
+            return metaEntity
+        })
     }
 
     getHistory(): RegisterDataFilter[] {

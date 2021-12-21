@@ -41,13 +41,13 @@ export type RegisterDataFilter = {
     registerStatus?: RegisterStatusTag
 }
 
-export type EntityWithMeta = {
-    entity: object | null,
-    meta?: any,
-    id?: string
+export type MetaEntity = {
+    $entity: object | null,
+    $meta?: any,
+    $id?: string
 }
 export interface EntityFetcher {//For a specific syncContext
-    getEntities: (filter?: RegisterDataFilter) => Promise<EntityWithMeta[]>
+    getEntities: (filter?: RegisterDataFilter) => Promise<MetaEntity[]>
 }
 
 export type RegisterInitValues = {

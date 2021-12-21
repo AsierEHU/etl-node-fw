@@ -16,12 +16,12 @@ type outputClass = {
 const mockInitialRegisters: Register[] = case1Mocks.mockFinalRegisters
 const inputEntities: InputEntity<inputClass>[] = [
     {
-        entity: {
+        $entity: {
             field: "Raw Object text",
             y: 23,
         },
-        meta: "rawMocked to success",
-        id: "userDefinedId1"
+        $meta: "rawMocked to success",
+        $id: "userDefinedId1"
     },
     {
         field: "Raw Object text 2",

@@ -10,12 +10,12 @@ type inputClass = {
 const mockInitialRegisters: Register[] = []
 const inputEntities: InputEntity<inputClass>[] = [
     {
-        entity: {
+        $entity: {
             field: "Raw Object text",
             y: 23,
         },
-        meta: "rawMocked to success",
-        id: "userDefinedId1"
+        $meta: "rawMocked to success",
+        $id: "userDefinedId1"
     },
     null,
     {
@@ -23,18 +23,18 @@ const inputEntities: InputEntity<inputClass>[] = [
         y: 0,
     },
     {
-        entity: {
+        $entity: {
             field: "Raw Object text 3",
             y: -34,
         },
-        meta: "rawMocked to skip"
+        $meta: "rawMocked to skip"
     },
     {
-        entity: {
+        $entity: {
             field: "Raw Object text 3",
             y: 30,
         },
-        meta: "rawMocked to fail"
+        $meta: "rawMocked to fail"
     },
     {
         field: "Raw Object text 4",

@@ -1,4 +1,4 @@
-import { EntityWithMeta, SyncContext } from "../registers/types"
+import { MetaEntity, SyncContext } from "../registers/types"
 
 export interface AdapterDefinition {
     readonly id: string
@@ -30,7 +30,7 @@ export type AdapterRunnerRunOptions = {
     onlyFailedEntities?: boolean
 }
 
-export type InputEntity<e extends object> = EntityWithMeta | null | e
+export type InputEntity<e extends object> = MetaEntity | null | e
 
 export type AdapterStatus = {
     id: string

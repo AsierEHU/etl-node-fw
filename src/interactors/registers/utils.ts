@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { RegisterInitValues, EntityWithMeta, Register, RegisterStatusTag, SyncContext } from "./types"
+import { RegisterInitValues, MetaEntity, Register, RegisterStatusTag, SyncContext } from "./types"
 
 export const isOrigin = (register: Register): boolean => {
     if (isByRowSource(register))
@@ -18,18 +18,18 @@ export function isByGroupSource(register: Register): boolean {
     return register.sourceRelativeId != null && register.sourceRelativeId.startsWith("00000000")
 }
 
-function isEntityWithMeta(entity?: any): entity is EntityWithMeta {
-    return entity?.entity != undefined
+function isEntityWithMeta(entity?: any): entity is MetaEntity {
+    return entity?.$entity != undefined
 }
 
-const getWithMetaFormat = (entities: any[]): EntityWithMeta[] => {
+const getWithMetaFormat = (entities: any[]): MetaEntity[] => {
     return entities.map(entity => {
         if (isEntityWithMeta(entity)) {
             return entity
         }
         else {
             return {
-                entity
+                $entity: entity
             }
         }
     })
@@ -39,10 +39,10 @@ export const getWithInitFormat = (entities: any[], entityType?: string): Registe
     const entitiesWithMeta = getWithMetaFormat(entities);
     return entitiesWithMeta.map(entityWithMeta => {
         return {
-            entity: entityWithMeta.entity,
+            entity: entityWithMeta.$entity,
             entityType,
-            sourceEntityId: entityWithMeta.id,
-            meta: entityWithMeta.meta,
+            sourceEntityId: entityWithMeta.$id,
+            meta: entityWithMeta.$meta,
         }
     })
 }

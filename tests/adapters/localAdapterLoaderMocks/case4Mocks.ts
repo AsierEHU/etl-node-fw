@@ -18,13 +18,13 @@ type resultClass = {
 const mockInitialRegisters: Register[] = case3Mocks.mockFinalRegisters
 const inputEntities: InputEntity<outputClass>[] = [
     {
-        entity: {
+        $entity: {
             text: "Raw Object text",
             others: {
                 x: 23,
             },
         },
-        id: "userDefinedId1"
+        $id: "userDefinedId1"
     },
     {
         text: "Raw Object text 2",
