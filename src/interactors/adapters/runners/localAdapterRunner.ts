@@ -2,7 +2,7 @@ import EventEmitter from "events";
 import { RegisterDataAccess, RegisterStatusTag, SyncContext } from "../../registers/types";
 import { Adapter, AdapterDefinition, AdapterRunner, AdapterRunnerRunOptions, AdapterRunOptions, AdapterStatus, AdapterStatusSummary, AdapterStatusTag } from "../types";
 import { v4 as uuidv4 } from 'uuid';
-import { getWithInitFormat, getWithMetaFormat, initRegisters } from "../../registers/utils";
+import { getWithInitFormat, initRegisters } from "../../registers/utils";
 import { cloneDeep } from "lodash";
 
 export class LocalAdapterRunner implements AdapterRunner {

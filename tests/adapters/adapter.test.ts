@@ -3,7 +3,7 @@ import { VolatileRegisterDataAccess } from "../../src/dataAccess/volatile";
 import { AdapterFactory } from "../../src/interactors/adapters/factory";
 import { AdapterDefinition, AdapterRunnerRunOptions, AdapterRunOptions, AdapterStatus, InputEntity } from "../../src/interactors/adapters/types";
 import { Register, SyncContext, RegisterStatusTag } from "../../src/interactors/registers/types";
-import { getWithInitFormat, getWithMetaFormat, initRegisters, isByGroupSource, isByRowSource, isOrigin } from "../../src/interactors/registers/utils";
+import { getWithInitFormat, initRegisters, isByGroupSource, isByRowSource, isOrigin } from "../../src/interactors/registers/utils";
 import { adapterMocksSuites } from "./mocks";
 
 

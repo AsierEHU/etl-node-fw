@@ -18,11 +18,11 @@ export function isByGroupSource(register: Register): boolean {
     return register.sourceRelativeId != null && register.sourceRelativeId.startsWith("00000000")
 }
 
-export function isEntityWithMeta(entity?: any): entity is EntityWithMeta {
+function isEntityWithMeta(entity?: any): entity is EntityWithMeta {
     return entity?.entity != undefined
 }
 
-export const getWithMetaFormat = (entities: any[]): EntityWithMeta[] => {
+const getWithMetaFormat = (entities: any[]): EntityWithMeta[] => {
     return entities.map(entity => {
         if (isEntityWithMeta(entity)) {
             return entity

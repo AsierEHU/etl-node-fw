@@ -1,11 +1,11 @@
 
-import { EntityWithMeta, Register, RegisterStatusTag, SyncContext } from "../../registers/types";
+import { Register, RegisterStatusTag, SyncContext } from "../../registers/types";
 import { AdapterDefinition, AdapterRunOptions, InputEntity } from "../types"
 import { v4 as uuidv4 } from 'uuid';
 import { LocalAdapter } from "./localAdapter";
 import { getValidationResultWithMeta, validationTagToRegisterTag } from "./utils";
 import { ValidationResult, ValidationStatusTag } from "./types";
-import { getWithMetaFormat } from "../../registers/utils";
+import { getWithInitFormat } from "../../registers/utils";
 
 /**
  * Local async step, persistance
@@ -41,7 +41,7 @@ export class LocalAdapterLoader<ad extends LocalAdapterLoaderDefinition<any, any
         try {
             const inputEntity = inputRegister.entity;
             const outputEntity = await this.adapterDefinition.entityLoad(inputEntity);
-            const [outputEntityWithMeta] = getWithMetaFormat([outputEntity])
+            const [outputEntityWithMeta] = getWithInitFormat([outputEntity])
             const register: Register = {
                 id: uuidv4(),
                 entityType: this.adapterDefinition.outputType,
