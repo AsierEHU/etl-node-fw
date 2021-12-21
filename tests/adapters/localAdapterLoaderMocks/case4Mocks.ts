@@ -1,7 +1,7 @@
 import { LocalAdapterLoaderDefinition } from "../../../src/interactors/adapters/definitions/localAdapterLoader";
 import { ValidationResult, ValidationStatusTag } from "../../../src/interactors/adapters/definitions/types";
 import { AdapterStatus, AdapterStatusSummary, AdapterStatusTag, InputEntity } from "../../../src/interactors/adapters/types";
-import {  Register, RegisterStatusTag } from "../../../src/interactors/registers/types";
+import { Register, RegisterStatusTag } from "../../../src/interactors/registers/types";
 import { case3Mocks } from "../localAdapterTranformerMocks/case3Mocks";
 
 type outputClass = {
@@ -18,10 +18,13 @@ type resultClass = {
 const mockInitialRegisters: Register[] = case3Mocks.mockFinalRegisters
 const inputEntities: InputEntity<outputClass>[] = [
     {
-        text: "Raw Object text",
-        others: {
-            x: 23,
+        entity: {
+            text: "Raw Object text",
+            others: {
+                x: 23,
+            },
         },
+        id: "userDefinedId1"
     },
     {
         text: "Raw Object text 2",
@@ -58,6 +61,7 @@ const mockNewRegisters: Register[] = [
         entityType: "resultClass",
         sourceAbsoluteId: "fb7bc93a-17c1-467c-951d-58bf119c1967",
         sourceRelativeId: "fb7bc93a-17c1-467c-951d-58bf119c1967",
+        sourceEntityId: "userDefinedId1",
         statusTag: RegisterStatusTag.success,
         statusMeta: null,
         entity: {
@@ -75,6 +79,7 @@ const mockNewRegisters: Register[] = [
         entityType: "resultClass",
         sourceAbsoluteId: "b056be4c-595e-419d-aa2f-c6607cca738b",
         sourceRelativeId: "b056be4c-595e-419d-aa2f-c6607cca738b",
+        sourceEntityId: null,
         statusTag: RegisterStatusTag.invalid,
         statusMeta: null,
         entity: {

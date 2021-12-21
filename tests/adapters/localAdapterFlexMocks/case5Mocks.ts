@@ -1,7 +1,7 @@
 import { LocalAdapterFlexDefinition } from "../../../src/interactors/adapters/definitions/localAdapterFlex";
 import { ValidationStatusTag } from "../../../src/interactors/adapters/definitions/types";
 import { AdapterStatus, AdapterStatusSummary, AdapterStatusTag, InputEntity } from "../../../src/interactors/adapters/types";
-import {  EntityFetcher, Register, RegisterDataFilter, RegisterStatusTag } from "../../../src/interactors/registers/types";
+import { EntityFetcher, Register, RegisterDataFilter, RegisterStatusTag } from "../../../src/interactors/registers/types";
 import { case4Mocks } from "../localAdapterLoaderMocks/case4Mocks";
 
 type result2Class = {
@@ -35,6 +35,7 @@ const mockNewRegisters: Register[] = [
         entityType: "result2Class",
         sourceAbsoluteId: "fb7bc93a-17c1-467c-951d-58bf119c1967",
         sourceRelativeId: "fb7bc93a-17c1-467c-951d-58bf119c1967",
+        sourceEntityId: null,
         statusTag: RegisterStatusTag.success,
         statusMeta: null,
         entity: {

@@ -1,7 +1,7 @@
 import { LocalAdapterExtractorDefinition } from "../../../src/interactors/adapters/definitions/localAdapterExtractor";
 import { ToFixEntity, ValidationStatusTag } from "../../../src/interactors/adapters/definitions/types";
 import { AdapterStatus, AdapterStatusSummary, AdapterStatusTag, InputEntity } from "../../../src/interactors/adapters/types";
-import {  Register, RegisterStatusTag } from "../../../src/interactors/registers/types";
+import { Register, RegisterStatusTag } from "../../../src/interactors/registers/types";
 
 type inputClass = {
     field: string,
@@ -14,7 +14,8 @@ const inputEntities: InputEntity<inputClass>[] = [
             field: "Raw Object text",
             y: 23,
         },
-        meta: "rawMocked to success"
+        meta: "rawMocked to success",
+        id: "userDefinedId1"
     },
     null,
     {
@@ -117,6 +118,7 @@ const mockNewRegisters: Register[] = [
         entityType: "inputClass",
         sourceAbsoluteId: "fb7bc93a-17c1-467c-951d-58bf119c1967",
         sourceRelativeId: "fb7bc93a-17c1-467c-951d-58bf119c1967",
+        sourceEntityId: "userDefinedId1",
         statusTag: RegisterStatusTag.success,
         statusMeta: null,
         entity: {
@@ -135,6 +137,7 @@ const mockNewRegisters: Register[] = [
         entityType: "inputClass",
         sourceAbsoluteId: "4e804c38-a540-4929-bc0d-0f9c51a1c203",
         sourceRelativeId: "4e804c38-a540-4929-bc0d-0f9c51a1c203",
+        sourceEntityId: null,
         statusTag: RegisterStatusTag.invalid,
         statusMeta: {
             type: "null object",
@@ -154,6 +157,7 @@ const mockNewRegisters: Register[] = [
         entityType: "inputClass",
         sourceAbsoluteId: "b056be4c-595e-419d-aa2f-c6607cca738b",
         sourceRelativeId: "b056be4c-595e-419d-aa2f-c6607cca738b",
+        sourceEntityId: null,
         statusTag: RegisterStatusTag.success,
         statusMeta: { note: "Fixed changing to 1" },
         entity: {
@@ -172,6 +176,7 @@ const mockNewRegisters: Register[] = [
         entityType: "inputClass",
         sourceAbsoluteId: "8d07acc6-1765-4862-8bb9-9ee1e9809e64",
         sourceRelativeId: "8d07acc6-1765-4862-8bb9-9ee1e9809e64",
+        sourceEntityId: null,
         statusTag: RegisterStatusTag.skipped,
         statusMeta: null,
         entity: {
@@ -190,6 +195,7 @@ const mockNewRegisters: Register[] = [
         entityType: "inputClass",
         sourceAbsoluteId: "b349def1-3c4e-4ddf-8378-2a3b3bd1c173",
         sourceRelativeId: "b349def1-3c4e-4ddf-8378-2a3b3bd1c173",
+        sourceEntityId: null,
         statusTag: RegisterStatusTag.success,
         statusMeta: null,
         entity: {
@@ -208,6 +214,7 @@ const mockNewRegisters: Register[] = [
         entityType: "inputClass",
         sourceAbsoluteId: "df4hsdf-564e-4dgh-8458-2hgfff5633dss",
         sourceRelativeId: "df4hsdf-564e-4dgh-8458-2hgfff5633dss",
+        sourceEntityId: null,
         statusTag: RegisterStatusTag.failed,
         statusMeta: "-1 exception",
         entity: {
@@ -226,6 +233,7 @@ const mockNewRegisters: Register[] = [
         entityType: "inputClass",
         sourceAbsoluteId: "df4hsdf-564e-4dgh-8458-2hgfff5633ds4",
         sourceRelativeId: "df4hsdf-564e-4dgh-8458-2hgfff5633ds4",
+        sourceEntityId: null,
         statusTag: RegisterStatusTag.failed,
         statusMeta: "Exception Fixing",
         entity: {

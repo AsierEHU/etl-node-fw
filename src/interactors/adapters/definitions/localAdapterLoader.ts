@@ -47,10 +47,11 @@ export class LocalAdapterLoader<ad extends LocalAdapterLoaderDefinition<any, any
                 entityType: this.adapterDefinition.outputType,
                 sourceAbsoluteId: inputRegister.sourceRelativeId,
                 sourceRelativeId: inputRegister.id,
+                sourceEntityId: inputRegister.sourceEntityId,
                 statusTag: RegisterStatusTag.pending,
                 statusMeta: null,
                 entity: outputEntityWithMeta.entity,
-                meta: outputEntityWithMeta.meta,
+                meta: outputEntityWithMeta.meta || null,
                 syncContext: runOptions.syncContext
             }
             return register
@@ -60,6 +61,7 @@ export class LocalAdapterLoader<ad extends LocalAdapterLoaderDefinition<any, any
                 entityType: this.adapterDefinition.outputType,
                 sourceAbsoluteId: inputRegister.sourceRelativeId,
                 sourceRelativeId: inputRegister.id,
+                sourceEntityId: inputRegister.sourceEntityId,
                 statusTag: RegisterStatusTag.failed,
                 statusMeta: error.message,
                 entity: null,

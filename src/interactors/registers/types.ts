@@ -3,6 +3,7 @@ export type Register = {
     entityType: string
     sourceRelativeId: string | null //datalineage
     sourceAbsoluteId: string | null //datalineage
+    sourceEntityId: string | null //datalineage
     statusTag: RegisterStatusTag  //managing bad data
     statusMeta: RegisterMeta
     entity: object | null, //register itself
@@ -42,16 +43,18 @@ export type RegisterDataFilter = {
 
 export type EntityWithMeta = {
     entity: object | null,
-    meta: any,
+    meta?: any,
+    id?: string
 }
 export interface EntityFetcher {//For a specific syncContext
     getEntities: (filter?: RegisterDataFilter) => Promise<EntityWithMeta[]>
 }
 
-export type EntityInitValues = {
+export type RegisterInitValues = {
     entity: object | null,
-    entityType: any,
-    meta: any,
-    sourceAbsoluteId: any,
-    sourceRelativeId: any,
+    entityType?: string,
+    meta?: any,
+    sourceAbsoluteId?: string,
+    sourceRelativeId?: string,
+    sourceEntityId?: string,
 }

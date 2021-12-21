@@ -1,6 +1,6 @@
 import { LocalAdapterTransformerDefinition } from "../../../src/interactors/adapters/definitions/localAdapterTransformer";
 import { AdapterStatus, AdapterStatusSummary, AdapterStatusTag, InputEntity } from "../../../src/interactors/adapters/types";
-import {  Register, RegisterStatusTag } from "../../../src/interactors/registers/types";
+import { Register, RegisterStatusTag } from "../../../src/interactors/registers/types";
 import { case1Mocks } from "../localAdapterExtractorMocks/case1Mocks";
 
 type inputClass = {
@@ -21,6 +21,7 @@ const inputEntities: InputEntity<inputClass>[] = [
             y: 23,
         },
         meta: "rawMocked to success",
+        id: "userDefinedId1"
     },
     {
         field: "Raw Object text 2",
@@ -54,6 +55,7 @@ const mockNewRegisters: Register[] = [
         entityType: "outputClass",
         sourceAbsoluteId: "fb7bc93a-17c1-467c-951d-58bf119c1967",
         sourceRelativeId: "fb7bc93a-17c1-467c-951d-58bf119c1967",
+        sourceEntityId: "userDefinedId1",
         statusTag: RegisterStatusTag.success,
         statusMeta: null,
         entity: {
@@ -74,6 +76,7 @@ const mockNewRegisters: Register[] = [
         entityType: "outputClass",
         sourceAbsoluteId: "b056be4c-595e-419d-aa2f-c6607cca738b",
         sourceRelativeId: "b056be4c-595e-419d-aa2f-c6607cca738b",
+        sourceEntityId: null,
         statusTag: RegisterStatusTag.success,
         statusMeta: null,
         entity: {
@@ -94,6 +97,7 @@ const mockNewRegisters: Register[] = [
         entityType: "outputClass",
         sourceAbsoluteId: "b349def1-3c4e-4ddf-8378-2a3b3bd1c173",
         sourceRelativeId: "b349def1-3c4e-4ddf-8378-2a3b3bd1c173",
+        sourceEntityId: null,
         statusTag: RegisterStatusTag.failed,
         statusMeta: "Y 30 error!!",
         entity: null,

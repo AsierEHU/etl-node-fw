@@ -1,6 +1,5 @@
-import { uniqBy } from "lodash"
 import { v4 as uuidv4 } from 'uuid';
-import { EntityFetcher, EntityInitValues, EntityWithMeta, Register, RegisterDataAccess, RegisterDataFilter, RegisterStatusTag, SyncContext } from "./types"
+import { RegisterInitValues, EntityWithMeta, Register, RegisterStatusTag, SyncContext } from "./types"
 
 export const isOrigin = (register: Register): boolean => {
     if (isByRowSource(register))
@@ -30,41 +29,39 @@ export const getWithMetaFormat = (entities: any[]): EntityWithMeta[] => {
         }
         else {
             return {
-                entity,
-                meta: null
+                entity
             }
         }
     })
 }
 
-export const getWithInitFormat = (entities: any[], entityType: string): EntityInitValues[] => {
+export const getWithInitFormat = (entities: any[], entityType?: string): RegisterInitValues[] => {
     const entitiesWithMeta = getWithMetaFormat(entities);
     return entitiesWithMeta.map(entityWithMeta => {
         return {
-            ...entityWithMeta,
+            entity: entityWithMeta.entity,
             entityType,
-            sourceAbsoluteId: null,
-            sourceRelativeId: null
+            sourceEntityId: entityWithMeta.id,
+            meta: entityWithMeta.meta,
         }
     })
 }
 
 export const initRegisters = (
-    inputEntities: (EntityInitValues | EntityWithMeta | Object)[],
-    syncContext: SyncContext
+    inputEntities: RegisterInitValues[], syncContext: SyncContext
 ): Register[] => {
-    return inputEntities.map((inputEntity) => {
-        const entity: EntityInitValues = inputEntity as EntityInitValues
+    return inputEntities.map((entity) => {
         const inputEntityId = uuidv4();
         return {
             id: inputEntityId,
             entityType: entity.entityType || "inputMocked",
             sourceAbsoluteId: entity.sourceAbsoluteId || inputEntityId,
             sourceRelativeId: entity.sourceRelativeId || inputEntityId,
+            sourceEntityId: entity.sourceEntityId || null,
             statusTag: entity.entityType ? RegisterStatusTag.pending : RegisterStatusTag.success,
             statusMeta: null,
             entity: entity.entity,
-            meta: entity.meta,
+            meta: entity.meta || null,
             syncContext,
         }
     })
@@ -72,13 +69,15 @@ export const initRegisters = (
 
 export const buildRegisterFromOthers = (registers: Register[], syncContext: SyncContext, entityType?: string) => {
     const entitiesInitialValues = registers.map(reg => {
-        return {
+        const initialValue: RegisterInitValues = {
             entity: reg.entity,
             meta: reg.meta,
-            sourceAbsoluteId: reg.sourceAbsoluteId,
+            sourceAbsoluteId: reg.sourceAbsoluteId || undefined,
             sourceRelativeId: reg.id,
+            sourceEntityId: reg.sourceEntityId || undefined,
             entityType
         }
+        return initialValue
     })
     return initRegisters(entitiesInitialValues, syncContext)
 }

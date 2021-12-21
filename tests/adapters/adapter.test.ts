@@ -3,7 +3,7 @@ import { VolatileRegisterDataAccess } from "../../src/dataAccess/volatile";
 import { AdapterFactory } from "../../src/interactors/adapters/factory";
 import { AdapterDefinition, AdapterRunnerRunOptions, AdapterRunOptions, AdapterStatus, InputEntity } from "../../src/interactors/adapters/types";
 import { Register, SyncContext, RegisterStatusTag } from "../../src/interactors/registers/types";
-import { getWithMetaFormat, initRegisters, isByGroupSource, isByRowSource, isOrigin } from "../../src/interactors/registers/utils";
+import { getWithInitFormat, getWithMetaFormat, initRegisters, isByGroupSource, isByRowSource, isOrigin } from "../../src/interactors/registers/utils";
 import { adapterMocksSuites } from "./mocks";
 
 
@@ -114,7 +114,7 @@ const adapterTest = (
             const adapter1 = adapterFactory.createAdapterRunner(definition.id, adapterDependencies)
             await adapter1.run({ ...defaultRunOptions, mockEntities: mocks.inputEntities })
             const registers = await registerDataAccess.getAll()
-            const entitiesWithMeta = getWithMetaFormat(mocks.inputEntities)
+            const entitiesWithMeta = getWithInitFormat(mocks.inputEntities)
             const registersWithMocks = [...mocks.mockInitialRegisters, ...initRegisters(entitiesWithMeta, syncContext), ...mocks.mockNewRegisters]
             registersEqual(registers, registersWithMocks)
         })

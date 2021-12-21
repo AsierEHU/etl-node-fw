@@ -1,6 +1,6 @@
 
 import { EntityFetcher, Register, RegisterDataFilter, RegisterStatusTag, SyncContext } from "../../registers/types";
-import { AdapterDefinition } from "../types"
+import { AdapterDefinition, InputEntity } from "../types"
 import { getValidationResultWithMeta, validationTagToRegisterTag } from "./utils";
 import { LocalAdapter } from "./localAdapter";
 import { ValidationResult, ValidationStatusTag } from "./types";
@@ -66,7 +66,7 @@ export abstract class LocalAdapterFlexDefinition<output extends object> implemen
     abstract readonly id: string;
     abstract readonly outputType: string
     abstract readonly definitionType: string;
-    abstract readonly entitiesGet: (entityFetcher: EntityFetcher) => Promise<output[]>
+    abstract readonly entitiesGet: (entityFetcher: EntityFetcher) => Promise<InputEntity<output>[]>
     abstract readonly entityValidate: (outputEntity: output | null) => Promise<ValidationResult | ValidationStatusTag> //data quality, error handling (error prevention), managin Bad Data-> triage or CleanUp
 }
 
