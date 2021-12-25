@@ -2,7 +2,7 @@ import { cloneDeep } from "lodash";
 import { AdapterFactory } from "../../adapters/factory";
 import { AdapterDefinition, AdapterDependencies, AdapterRunnerRunOptions, AdapterStatusTag } from "../../adapters/types";
 import { RegisterStatusSummary } from "../../registers/types";
-import { Step, StepRunOptions, StepDefinition, StepStatusSummary } from "../types"
+import { Step, StepDefinition, StepStatusSummary } from "../types"
 import { MyStepDependencies } from "./types";
 
 /**
@@ -20,9 +20,8 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
         this.adapterDependencies = dependencies.adapterDependencies;
     }
 
-    async run(runOptions: StepRunOptions) {
+    async run(runOptions: AdapterRunnerRunOptions) {
         runOptions = cloneDeep(runOptions)
-        const adapterRunOptions = this.buildAdapterOptions(runOptions)
         const stepStatusSummary: StepStatusSummary = {
             registerStatusSummary: {
                 output_rows: 0,
@@ -36,7 +35,7 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
             timeFinished: null,
             isFailedStep: false,
         }
-        await this.tryRunAdapter(stepStatusSummary, adapterRunOptions);
+        await this.tryRunAdapter(stepStatusSummary, runOptions);
         stepStatusSummary.timeFinished = new Date();
         return cloneDeep(stepStatusSummary)
     }
@@ -89,13 +88,6 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
             stepStatusSummary.rows_invalid = adapterStatusSummary.rows_invalid
             stepStatusSummary.rows_skipped = adapterStatusSummary.rows_skipped
             stepStatusSummary.output_rows = adapterStatusSummary.output_rows
-        }
-    }
-
-    private buildAdapterOptions(stepOptions?: StepRunOptions): AdapterRunnerRunOptions {
-        return {
-            mockEntities: stepOptions?.mockEntities,
-            syncContext: stepOptions?.syncContext
         }
     }
 

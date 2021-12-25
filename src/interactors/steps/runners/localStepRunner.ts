@@ -1,8 +1,9 @@
 import EventEmitter from "events";
-import { RegisterDataAccess, RegisterStatusTag, SyncContext } from "../../registers/types";
-import { Step, StepStatus, StepStatusTag, StepDefinition, StepRunner, StepRunnerRunOptions, StepStatusSummary, StepRunOptions } from "../types"
+import { SyncContext } from "../../registers/types";
+import { Step, StepStatus, StepStatusTag, StepDefinition, StepRunner } from "../types"
 import { v4 as uuidv4 } from 'uuid';
 import { cloneDeep } from "lodash";
+import { AdapterRunnerRunOptions } from "../../adapters/types";
 
 /**
  * Local async step, persistance
@@ -17,22 +18,17 @@ export class LocalStepRunner implements StepRunner {
         this.step = dependencies.step;
     }
 
-    async run(runOptions?: StepRunnerRunOptions) {
+    async run(runOptions?: AdapterRunnerRunOptions) {
         runOptions = cloneDeep(runOptions)
         const stepStatus = this.buildStatus(runOptions?.syncContext)
-        const stepRunOptions: StepRunOptions = {
-            syncContext: stepStatus.syncContext,
-            mockEntities: runOptions?.mockEntities
-        }
-
-        stepStatus.runOptions = stepRunOptions
+        runOptions = { ...runOptions, syncContext: { ...runOptions?.syncContext, stepId: stepStatus.id } }
         this.stepPresenter.emit("stepStatus", cloneDeep(stepStatus))
 
         stepStatus.statusTag = StepStatusTag.active
         this.stepPresenter.emit("stepStatus", cloneDeep(stepStatus))
 
         try {
-            const stepSummary = await this.step.run(stepRunOptions)
+            const stepSummary = await this.step.run(runOptions)
             stepStatus.statusSummary = stepSummary
             if (stepSummary.isFailedStep) {
                 stepStatus.statusTag = StepStatusTag.failed
@@ -57,7 +53,6 @@ export class LocalStepRunner implements StepRunner {
             definitionType: stepDefinition.definitionType,
             statusTag: StepStatusTag.pending,
             statusMeta: null,
-            runOptions: null,
             syncContext: { ...syncContext, stepId: id },
             statusSummary: {
                 registerStatusSummary: {

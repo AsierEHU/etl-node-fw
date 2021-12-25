@@ -1,14 +1,9 @@
-import { InputEntity } from "../adapters/types";
+import { AdapterRunnerRunOptions, InputEntity } from "../adapters/types";
 import { RegisterStatusSummary, SyncContext } from "../registers/types";
 
 export interface Step<sd extends StepDefinition> {
     stepDefinition: sd
-    run(stepRunOptions: StepRunOptions): Promise<StepStatusSummary> //start, if registers -> filter input by ids, if skip -> compare hash to skip
-}
-
-export type StepRunOptions = {
-    mockEntities?: InputEntity<any>[],
-    syncContext: SyncContext
+    run(runOptions: AdapterRunnerRunOptions): Promise<StepStatusSummary> //start, if registers -> filter input by ids, if skip -> compare hash to skip
 }
 
 export interface StepDefinition {
@@ -34,7 +29,6 @@ export type StepStatus = {
     statusTag: StepStatusTag //debugging
     statusMeta: StepMeta
     // exceptionTrace: object, //debugging
-    runOptions: StepRunOptions | null
     syncContext: SyncContext
     statusSummary: StepStatusSummary
 }
@@ -56,10 +50,5 @@ export type StepStatusSummary = { //Audit
 
 export interface StepRunner {
     step: Step<StepDefinition>
-    run(runOptions?: StepRunnerRunOptions): Promise<StepStatus> //start, if registers -> filter input by ids, if skip -> compare hash to skip
-}
-
-export type StepRunnerRunOptions = {
-    mockEntities?: InputEntity<any>[],
-    syncContext?: SyncContext,
+    run(runOptions?: AdapterRunnerRunOptions): Promise<StepStatus> //start, if registers -> filter input by ids, if skip -> compare hash to skip
 }

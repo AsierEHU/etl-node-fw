@@ -16,7 +16,6 @@ const mockInitialStatus: StepStatus = {
     definitionId: "case2testLocalStep",
     definitionType: "LocalStepDefinition",
     id: "testStep",
-    runOptions: null,
     statusSummary: {
         registerStatusSummary: {
             output_rows: 0,
@@ -41,7 +40,6 @@ const mockFinalStatus: StepStatus = {
     id: "testStep",
     statusTag: StepStatusTag.failed,
     statusMeta: null,
-    runOptions: null,
     syncContext: {
         flowId: "testFlow",
         stepId: "testStep",
