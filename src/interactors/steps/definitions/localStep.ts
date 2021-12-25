@@ -22,6 +22,14 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
 
     async run(runOptions: AdapterRunnerRunOptions) {
         runOptions = cloneDeep(runOptions)
+
+        const definitionRunOptions = this.stepDefinition.adapterDefinitionRunOptions
+        if (definitionRunOptions) {
+            runOptions.mockEntities = runOptions.mockEntities || definitionRunOptions.mockEntities
+            runOptions.onlyFailedEntities = runOptions.onlyFailedEntities || definitionRunOptions.onlyFailedEntities
+            runOptions.syncContext = runOptions.syncContext || definitionRunOptions.syncContext
+        }
+
         const stepStatusSummary: StepStatusSummary = {
             registerStatusSummary: {
                 output_rows: 0,
@@ -33,7 +41,7 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
             tryNumber: 0,
             timeStarted: new Date(),
             timeFinished: null,
-            isFailedStep: false,
+            failedStatusSummary: false,
         }
         await this.tryRunAdapter(stepStatusSummary, runOptions);
         stepStatusSummary.timeFinished = new Date();
@@ -62,7 +70,7 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
                 }
                 else {
                     if (this.stepDefinition.isFailedStatus(stepRegisterStatusSummary)) {
-                        stepStatusSummary.isFailedStep = true
+                        stepStatusSummary.failedStatusSummary = true
                     }
                 }
             }
@@ -97,8 +105,8 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
 }
 
 export abstract class LocalStepDefinition implements StepDefinition {
+    abstract readonly adapterDefinitionRunOptions: AdapterRunnerRunOptions | null;
     abstract readonly adapterDefinitionId: string;
-    //adapterDefinitionRunOptions
     abstract readonly definitionType: string;
     abstract readonly id: string
     abstract readonly retartTries: number

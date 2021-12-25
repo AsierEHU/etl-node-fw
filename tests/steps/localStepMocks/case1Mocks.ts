@@ -9,7 +9,8 @@ export const case1Definition: LocalStepDefinition = {
     definitionType: "LocalStepDefinition",
     isFailedStatus: function (statusSummary: RegisterStatusSummary): boolean {
         return false
-    }
+    },
+    adapterDefinitionRunOptions: null
 }
 
 const mockInitialStatus: StepStatus = {
@@ -27,7 +28,7 @@ const mockInitialStatus: StepStatus = {
         tryNumber: 0, //retries
         timeStarted: null,  //debugging
         timeFinished: null,   //debugging
-        isFailedStep: false
+        failedStatusSummary: false
     },
     syncContext: { stepId: "testStep", flowId: "testFlow" },
     statusTag: StepStatusTag.pending,
@@ -51,7 +52,7 @@ const mockFinalStatus: StepStatus = {
         tryNumber: 1, //retries
         timeStarted: null,  //debugging
         timeFinished: null,   //debugging
-        isFailedStep: false
+        failedStatusSummary: false
     },
     syncContext: {
         flowId: "testFlow",

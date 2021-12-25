@@ -9,10 +9,8 @@ export interface Step<sd extends StepDefinition> {
 export interface StepDefinition {
     readonly id: string
     readonly definitionType: string
-    // version:string
     readonly adapterDefinitionId: string
-    // stepClass:string
-    //name or description
+    readonly adapterDefinitionRunOptions: AdapterRunnerRunOptions | null
 }
 
 export enum StepStatusTag {
@@ -45,7 +43,7 @@ export type StepStatusSummary = { //Audit
     tryNumber: number, //retries
     timeStarted: Date | null  //debugging
     timeFinished: Date | null   //debugging
-    isFailedStep: boolean
+    failedStatusSummary: boolean
 }
 
 export interface StepRunner {

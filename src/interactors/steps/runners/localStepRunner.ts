@@ -30,7 +30,7 @@ export class LocalStepRunner implements StepRunner {
         try {
             const stepSummary = await this.step.run(runOptions)
             stepStatus.statusSummary = stepSummary
-            if (stepSummary.isFailedStep) {
+            if (stepSummary.failedStatusSummary) {
                 stepStatus.statusTag = StepStatusTag.failed
             } else {
                 stepStatus.statusTag = StepStatusTag.success
@@ -65,7 +65,7 @@ export class LocalStepRunner implements StepRunner {
                 tryNumber: 0,
                 timeStarted: null,
                 timeFinished: null,
-                isFailedStep: false,
+                failedStatusSummary: false,
             }
         }
         return stepStatus
