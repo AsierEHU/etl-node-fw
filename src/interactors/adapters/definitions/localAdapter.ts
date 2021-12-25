@@ -2,7 +2,7 @@ import { Register, SyncContext, RegisterStatusTag, RegisterDataAccess } from "..
 import { Adapter, AdapterDefinition, AdapterRunOptions } from "../types"
 import { MyAdapterDependencies } from "./types";
 import { cloneDeep } from 'lodash'
-import { AdvancedRegisterFetcher } from "../../../dataAccess/utils";
+import { AdvancedRegisterFetcher } from "../../registers/utilsDB";
 import { buildRegisterFromOthers } from "../../registers/utils";
 
 
@@ -26,6 +26,7 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
     }
 
     async run(runOptions: AdapterRunOptions) {
+        runOptions = cloneDeep(runOptions)
         const registers = await this.getInitialRegisters(runOptions);
         await this.processRegisters(registers, runOptions);
     }

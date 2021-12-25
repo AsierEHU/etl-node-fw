@@ -1,5 +1,5 @@
 import { uniqBy } from "lodash"
-import { EntityFetcher, SyncContext, RegisterDataAccess, RegisterDataFilter, Register, MetaEntity } from "../interactors/registers/types"
+import { EntityFetcher, SyncContext, RegisterDataAccess, RegisterDataFilter, Register, MetaEntity, RegisterStatusTag, RegisterStatusSummary } from "./types"
 
 export class ContextEntityFetcher implements EntityFetcher {
 
@@ -52,5 +52,17 @@ export class AdvancedRegisterFetcher {
         const targetRegistersIds = uniqueBaseRegisters.map(baseRegister => baseRegister.sourceAbsoluteId) as string[]
         const targetRegisters = await this.registerDataAccess.getAll(undefined, targetRegistersIds)
         return targetRegisters
+    }
+
+    async getRegistersSummary(apdaterId: string): Promise<RegisterStatusSummary> {
+        const outputRegisters = await this.registerDataAccess.getAll({ apdaterId })
+        const statusSummary = {
+            output_rows: outputRegisters.length,
+            rows_success: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.success).length,
+            rows_failed: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.failed).length,
+            rows_invalid: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.invalid).length,
+            rows_skipped: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.skipped).length,
+        };
+        return statusSummary;
     }
 }

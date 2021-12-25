@@ -1,7 +1,7 @@
 import { LocalAdapterFlexDefinition } from "../../../src/interactors/adapters/definitions/localAdapterFlex";
 import { ValidationStatusTag } from "../../../src/interactors/adapters/definitions/types";
-import { AdapterStatus, AdapterStatusSummary, AdapterStatusTag, InputEntity } from "../../../src/interactors/adapters/types";
-import { EntityFetcher, Register, RegisterDataFilter, RegisterStatusTag } from "../../../src/interactors/registers/types";
+import { AdapterStatus, AdapterStatusTag, InputEntity } from "../../../src/interactors/adapters/types";
+import { EntityFetcher, Register, RegisterDataFilter, RegisterStatusSummary, RegisterStatusTag } from "../../../src/interactors/registers/types";
 import { case4Mocks } from "../localAdapterLoaderMocks/case4Mocks";
 
 type result2Class = {
@@ -59,12 +59,18 @@ const mockInitialStatus: AdapterStatus = {
     id: "testAdapter",
     outputType: "result2Class",
     runOptions: null,
-    statusSummary: null,
+    statusSummary: {
+        output_rows: 0,
+        rows_failed: 0,
+        rows_invalid: 0,
+        rows_skipped: 0,
+        rows_success: 0,
+    },
     syncContext: { apdaterId: "testAdapter", stepId: "testStep", flowId: "testFlow" },
     statusTag: AdapterStatusTag.pending,
     statusMeta: null
 }
-const mockFinalSummary: AdapterStatusSummary = {
+const mockFinalSummary: RegisterStatusSummary = {
     output_rows: 1,
     rows_failed: 0,
     rows_invalid: 0,

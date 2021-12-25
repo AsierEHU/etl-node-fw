@@ -1,4 +1,4 @@
-import { MetaEntity, SyncContext } from "../registers/types"
+import { MetaEntity, RegisterStatusSummary, SyncContext } from "../registers/types"
 
 export interface AdapterDefinition {
     readonly id: string
@@ -7,9 +7,9 @@ export interface AdapterDefinition {
     //     abstract readonly splitRecords: number
 }
 
-export interface Adapter<AdapterDefinition> {
-    adapterDefinition: AdapterDefinition
-    run(runOptions?: AdapterRunOptions): Promise<void> //start, if registers -> filter input by ids, if skip -> compare hash to skip
+export interface Adapter<ad extends AdapterDefinition> {
+    adapterDefinition: ad
+    run(runOptions: AdapterRunOptions): Promise<void> //start, if registers -> filter input by ids, if skip -> compare hash to skip
 }
 
 export type AdapterRunOptions = { //filters, skips...
@@ -39,7 +39,7 @@ export type AdapterStatus = {
     outputType: string
     statusTag: AdapterStatusTag //debugging
     statusMeta: AdapterMeta
-    statusSummary: AdapterStatusSummary | null,
+    statusSummary: RegisterStatusSummary,
     runOptions: AdapterRunOptions | null
     syncContext: SyncContext
 }
@@ -54,16 +54,6 @@ export enum AdapterStatusTag {
     failed = "failed", //Software error or all records in (failed, invalid)
 }
 
-
-export type AdapterStatusSummary = { //Audit
-    output_rows: number
-    rows_success: number
-    rows_failed: number
-    rows_invalid: number
-    rows_skipped: number
-}
-
 export interface AdapterDependencies<ad extends AdapterDefinition> {
     adapterDefinition: ad
-    syncContext?: SyncContext
 }

@@ -3,8 +3,8 @@ import { VolatileRegisterDataAccess } from "../../src/dataAccess/volatile";
 import { AdapterFactory } from "../../src/interactors/adapters/factory";
 import { SyncContext } from "../../src/interactors/registers/types";
 import { StepFactory } from "../../src/interactors/steps/factory";
-import { StepDefinition, StepRunOptions, StepStatus } from "../../src/interactors/steps/types";
-import { case1Definition } from "../adapters/localAdapterExtractorMocks/case1Mocks";
+import { StepDefinition, StepRunnerRunOptions, StepRunOptions, StepStatus } from "../../src/interactors/steps/types";
+import { case1Definition, case1Mocks } from "../adapters/localAdapterExtractorMocks/case1Mocks";
 import { stepMocksSuites } from "./mocks";
 
 let presenter = new EventEmitter()
@@ -18,6 +18,9 @@ let adapterDependencies = {
 
 const syncContext: SyncContext = {
     flowId: "testFlow",
+}
+let defaultRunOptions: StepRunnerRunOptions = {
+    syncContext
 }
 let stepDefinitions: StepDefinition[] = [];
 stepMocksSuites.forEach(suite => {
@@ -50,54 +53,32 @@ const stepTest = (
             })
         });
 
-        test("Initial status", async () => {
-            const step1 = stepFactory.createStep(definition.id, stepDependencies)
-            const stepStatus = await step1.getStatus();
-            statusEqual(stepStatus, mocks.mockInitialStatus)
-        })
-
-        test("Final status", async () => {
-            const step1 = stepFactory.createStep(definition.id, stepDependencies)
-            await step1.run();
-            const stepStatus = await step1.getStatus()
-            statusEqual(stepStatus, mocks.mockFinalStatus)
-        })
-
         test("Presenter calls", async () => {
             presenter.on("stepStatus", stepPresenterCallback)
-            const step1 = stepFactory.createStep(definition.id, stepDependencies)
-            await step1.run();
+            const step1 = stepFactory.createStepRunner(definition.id, stepDependencies)
+            const finalStepStatus = await step1.run(defaultRunOptions);
+            statusEqual(finalStepStatus, mocks.mockFinalStatus)
             expect(stepPresenterCallback.mock.calls.length).toBe(3)
             statusEqual(stepPresenterCallback.mock.results[0].value, mocks.mockInitialStatus)
             statusEqual(stepPresenterCallback.mock.results[2].value, mocks.mockFinalStatus)
-
-        })
-
-        test("Final status: runOptions", async () => {
-            const step1 = stepFactory.createStep(definition.id, stepDependencies)
-            const runOptions: StepRunOptions = { inputEntities: [] }
-            await step1.run(runOptions);
-            const stepStatus = await step1.getStatus()
-            expect(stepStatus.runOptions).toEqual(runOptions)
         })
 
         test("Presenter calls: runOptions", async () => {
             presenter.on("stepStatus", stepPresenterCallback)
-            const step1 = stepFactory.createStep(definition.id, stepDependencies)
-            const runOptions: StepRunOptions = { inputEntities: [] }
-            await step1.run(runOptions);
-            expect(stepPresenterCallback.mock.results[0].value.runOptions).toBe(null)
-            expect(stepPresenterCallback.mock.results[2].value.runOptions).toEqual(runOptions)
+            const step1 = stepFactory.createStepRunner(definition.id, stepDependencies)
+            const inputRunOptions: StepRunnerRunOptions = { ...defaultRunOptions, mockEntities: case1Mocks.inputEntities }
+            const outputRunOptions: StepRunOptions = { syncContext: defaultRunOptions.syncContext as SyncContext, mockEntities: case1Mocks.inputEntities }
+            const finalStepStatus = await step1.run(inputRunOptions);
+            runOptionsEqual(finalStepStatus.runOptions as StepRunOptions, outputRunOptions)
+            runOptionsEqual(stepPresenterCallback.mock.results[0].value.runOptions, outputRunOptions)
+            runOptionsEqual(stepPresenterCallback.mock.results[2].value.runOptions, outputRunOptions)
         })
-
-        test("Run once exception", async () => {
-            const step1 = stepFactory.createStep(definition.id, stepDependencies)
-            step1.run()
-            await expect(step1.run()).rejects.toEqual(new Error("Run once"))
-        });
-
     })
+}
 
+const runOptionsEqual = (runOtions: StepRunOptions, mockRunOptions: StepRunOptions) => {
+    runOtions.syncContext.stepId = mockRunOptions.syncContext.stepId
+    expect(runOtions).toEqual(mockRunOptions)
 }
 
 const statusEqual = (stepStatus: StepStatus, mockStatus: StepStatus) => {
@@ -106,11 +87,13 @@ const statusEqual = (stepStatus: StepStatus, mockStatus: StepStatus) => {
     expect(stepStatus.id).toEqual(stepStatus.syncContext.stepId)
     stepStatus.id = mockStatus.id
     stepStatus.syncContext.stepId = mockStatus.id
-    stepStatus.timeFinished = mockStatus.timeFinished
-    stepStatus.timeStarted = mockStatus.timeStarted
+    stepStatus.runOptions = mockStatus.runOptions
+    stepStatus.statusSummary.timeFinished = mockStatus.statusSummary.timeFinished
+    stepStatus.statusSummary.timeStarted = mockStatus.statusSummary.timeStarted
     expect(stepStatus).toEqual(mockStatus)
 }
 
 stepMocksSuites.forEach(suite => {
     stepTest(suite.definition, suite.mocks)
 })
+

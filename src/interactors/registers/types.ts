@@ -58,3 +58,11 @@ export type RegisterInitValues = {
     sourceRelativeId?: string,
     sourceEntityId?: string,
 }
+
+export type RegisterStatusSummary = { //Audit
+    output_rows: number
+    rows_success: number
+    rows_failed: number
+    rows_invalid: number
+    rows_skipped: number
+}

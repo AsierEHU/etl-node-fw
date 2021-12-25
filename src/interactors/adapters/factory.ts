@@ -17,7 +17,7 @@ export class AdapterFactory {
         }
     }
 
-    public createAdapterDefinition(definitionId: string, dependencies: any): Adapter<AdapterDefinition> {
+    public createAdapter(definitionId: string, dependencies: any): Adapter<AdapterDefinition> {
         const adapterDefinition = this.adapterDefinitionsMap[definitionId];
         if (!adapterDefinition) {
             throw Error("Not adapter match with definition id: " + definitionId)
@@ -49,20 +49,20 @@ export class AdapterFactory {
             throw Error("Not adapter match with definition id: " + definitionId)
         }
 
-        const adapterDependencies = dependencies;
-        adapterDependencies.adapter = this.createAdapterDefinition(definitionId, dependencies);
+        const adapterRunnerDependencies = dependencies;
+        adapterRunnerDependencies.adapter = this.createAdapter(definitionId, dependencies);
 
         if (adapterDefinition.definitionType == "LocalAdapterLoaderDefinition") {
-            return new LocalAdapterRunner(adapterDependencies);
+            return new LocalAdapterRunner(adapterRunnerDependencies);
         }
         else if (adapterDefinition.definitionType == "LocalAdapterExtractorDefinition") {
-            return new LocalAdapterRunner(adapterDependencies);
+            return new LocalAdapterRunner(adapterRunnerDependencies);
         }
         else if (adapterDefinition.definitionType == "LocalAdapterTransformerDefinition") {
-            return new LocalAdapterRunner(adapterDependencies);
+            return new LocalAdapterRunner(adapterRunnerDependencies);
         }
         else if (adapterDefinition.definitionType == "LocalAdapterFlexDefinition") {
-            return new LocalAdapterRunner(adapterDependencies);
+            return new LocalAdapterRunner(adapterRunnerDependencies);
         }
         else {
             throw Error("Not adapter match with definition type: " + adapterDefinition.definitionType)

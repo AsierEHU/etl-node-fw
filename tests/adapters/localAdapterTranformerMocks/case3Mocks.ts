@@ -1,6 +1,6 @@
 import { LocalAdapterTransformerDefinition } from "../../../src/interactors/adapters/definitions/localAdapterTransformer";
-import { AdapterStatus, AdapterStatusSummary, AdapterStatusTag, InputEntity } from "../../../src/interactors/adapters/types";
-import { Register, RegisterStatusTag } from "../../../src/interactors/registers/types";
+import { AdapterStatus, AdapterStatusTag, InputEntity } from "../../../src/interactors/adapters/types";
+import { Register, RegisterStatusSummary, RegisterStatusTag } from "../../../src/interactors/registers/types";
 import { case1Mocks } from "../localAdapterExtractorMocks/case1Mocks";
 
 type inputClass = {
@@ -119,12 +119,18 @@ const mockInitialStatus: AdapterStatus = {
     id: "testAdapter",
     outputType: "outputClass",
     runOptions: null,
-    statusSummary: null,
+    statusSummary: {
+        output_rows: 0,
+        rows_failed: 0,
+        rows_invalid: 0,
+        rows_skipped: 0,
+        rows_success: 0,
+    },
     syncContext: { apdaterId: "testAdapter", stepId: "testStep", flowId: "testFlow" },
     statusTag: AdapterStatusTag.pending,
     statusMeta: null
 }
-const mockFinalSummary: AdapterStatusSummary = {
+const mockFinalSummary: RegisterStatusSummary = {
     output_rows: 3,
     rows_failed: 1,
     rows_invalid: 0,

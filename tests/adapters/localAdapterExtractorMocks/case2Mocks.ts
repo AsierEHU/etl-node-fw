@@ -1,7 +1,7 @@
 import { LocalAdapterExtractorDefinition } from "../../../src/interactors/adapters/definitions/localAdapterExtractor";
 import { ToFixEntity, ValidationStatusTag } from "../../../src/interactors/adapters/definitions/types";
-import { AdapterStatus, AdapterStatusSummary, AdapterStatusTag, InputEntity } from "../../../src/interactors/adapters/types";
-import {  Register } from "../../../src/interactors/registers/types";
+import { AdapterStatus, AdapterStatusTag, InputEntity } from "../../../src/interactors/adapters/types";
+import { Register } from "../../../src/interactors/registers/types";
 
 type inputClass = {
     field: string,
@@ -34,12 +34,24 @@ const mockInitialStatus: AdapterStatus = {
     id: "testAdapter",
     outputType: "inputClass",
     runOptions: null,
-    statusSummary: null,
+    statusSummary: {
+        output_rows: 0,
+        rows_failed: 0,
+        rows_invalid: 0,
+        rows_skipped: 0,
+        rows_success: 0,
+    },
     statusTag: AdapterStatusTag.pending,
     statusMeta: null,
     syncContext: { apdaterId: "testAdapter", stepId: "testStep", flowId: "testFlow" },
 }
-const mockFinalSummary = null
+const mockFinalSummary = {
+    output_rows: 0,
+    rows_failed: 0,
+    rows_invalid: 0,
+    rows_skipped: 0,
+    rows_success: 0,
+}
 const mockFinalStatus: AdapterStatus = {
     ...mockInitialStatus,
     statusSummary: mockFinalSummary,

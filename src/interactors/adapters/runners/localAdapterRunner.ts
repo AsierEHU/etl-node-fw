@@ -1,9 +1,10 @@
 import EventEmitter from "events";
-import { RegisterDataAccess, RegisterStatusTag, SyncContext } from "../../registers/types";
-import { Adapter, AdapterDefinition, AdapterRunner, AdapterRunnerRunOptions, AdapterRunOptions, AdapterStatus, AdapterStatusSummary, AdapterStatusTag } from "../types";
+import { RegisterDataAccess, SyncContext } from "../../registers/types";
+import { Adapter, AdapterDefinition, AdapterRunner, AdapterRunnerRunOptions, AdapterRunOptions, AdapterStatus, AdapterStatusTag } from "../types";
 import { v4 as uuidv4 } from 'uuid';
 import { getWithInitFormat, initRegisters } from "../../registers/utils";
 import { cloneDeep } from "lodash";
+import { AdvancedRegisterFetcher } from "../../registers/utilsDB";
 
 export class LocalAdapterRunner implements AdapterRunner {
 
@@ -40,7 +41,8 @@ export class LocalAdapterRunner implements AdapterRunner {
 
         try {
             await this.adapter.run(adapterRunOptions)
-            adapterStatus.statusSummary = await this.calculateSummary(adapterStatus.id)
+            const arf = new AdvancedRegisterFetcher(this.registerDataAccess)
+            adapterStatus.statusSummary = await arf.getRegistersSummary(adapterStatus.id)
             adapterStatus.statusTag = AdapterStatusTag.success
         } catch (error: any) {
             adapterStatus.statusTag = AdapterStatusTag.failed
@@ -48,7 +50,7 @@ export class LocalAdapterRunner implements AdapterRunner {
         }
 
         this.adapterPresenter.emit("adapterStatus", cloneDeep(adapterStatus))
-        return adapterStatus;
+        return cloneDeep(adapterStatus);
     }
 
     private buildStatus(syncContext?: SyncContext): AdapterStatus {
@@ -61,22 +63,16 @@ export class LocalAdapterRunner implements AdapterRunner {
             outputType: adapterDefinition.outputType,
             statusTag: AdapterStatusTag.pending,
             statusMeta: null,
-            statusSummary: null,
+            statusSummary: {
+                output_rows: 0,
+                rows_success: 0,
+                rows_failed: 0,
+                rows_invalid: 0,
+                rows_skipped: 0,
+            },
             runOptions: null,
             syncContext: { ...syncContext, apdaterId: id }
         }
         return adapterStatus
-    }
-
-    private async calculateSummary(apdaterId: string): Promise<AdapterStatusSummary> { //TODO: pasar esto al advanced register fetcher
-        const outputRegisters = await this.registerDataAccess.getAll({ apdaterId })
-        const statusSummary = {
-            output_rows: outputRegisters.length,
-            rows_success: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.success).length,
-            rows_failed: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.failed).length,
-            rows_invalid: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.invalid).length,
-            rows_skipped: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.skipped).length,
-        };
-        return statusSummary;
     }
 }

@@ -1,7 +1,7 @@
 import { LocalAdapterLoaderDefinition } from "../../../src/interactors/adapters/definitions/localAdapterLoader";
 import { ValidationResult, ValidationStatusTag } from "../../../src/interactors/adapters/definitions/types";
-import { AdapterStatus, AdapterStatusSummary, AdapterStatusTag, InputEntity } from "../../../src/interactors/adapters/types";
-import { Register, RegisterStatusTag } from "../../../src/interactors/registers/types";
+import { AdapterStatus, AdapterStatusTag, InputEntity } from "../../../src/interactors/adapters/types";
+import { Register, RegisterStatusSummary, RegisterStatusTag } from "../../../src/interactors/registers/types";
 import { case3Mocks } from "../localAdapterTranformerMocks/case3Mocks";
 
 type outputClass = {
@@ -103,12 +103,18 @@ const mockInitialStatus: AdapterStatus = {
     id: "testAdapter",
     outputType: "resultClass",
     runOptions: null,
-    statusSummary: null,
+    statusSummary: {
+        output_rows: 0,
+        rows_failed: 0,
+        rows_invalid: 0,
+        rows_skipped: 0,
+        rows_success: 0,
+    },
     syncContext: { apdaterId: "testAdapter", stepId: "testStep", flowId: "testFlow" },
     statusTag: AdapterStatusTag.pending,
     statusMeta: null
 }
-const mockFinalSummary: AdapterStatusSummary = {
+const mockFinalSummary: RegisterStatusSummary = {
     output_rows: 2,
     rows_failed: 0,
     rows_invalid: 1,

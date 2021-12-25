@@ -1,13 +1,14 @@
-import { AdapterRunOptions, InputEntity } from "../adapters/types";
-import { SyncContext } from "../registers/types";
+import { InputEntity } from "../adapters/types";
+import { RegisterStatusSummary, SyncContext } from "../registers/types";
 
 export interface Step<sd extends StepDefinition> {
-    run(stepRunOptions?: StepRunOptions): Promise<StepStatusTag> //start, if registers -> filter input by ids, if skip -> compare hash to skip
-    getStatus(): Promise<StepStatus>
+    stepDefinition: sd
+    run(stepRunOptions: StepRunOptions): Promise<StepStatusSummary> //start, if registers -> filter input by ids, if skip -> compare hash to skip
 }
 
 export type StepRunOptions = {
-    inputEntities?: InputEntity<any>[],
+    mockEntities?: InputEntity<any>[],
+    syncContext: SyncContext
 }
 
 export interface StepDefinition {
@@ -30,15 +31,12 @@ export type StepStatus = {
     id: string
     definitionId: string
     definitionType: string
-    tryNumber: number //retries
     statusTag: StepStatusTag //debugging
     statusMeta: StepMeta
-    timeStarted: Date | null  //debugging
-    timeFinished: Date | null   //debugging
     // exceptionTrace: object, //debugging
     runOptions: StepRunOptions | null
     syncContext: SyncContext
-    statusSummary: StepStatusSummary | null
+    statusSummary: StepStatusSummary
 }
 
 export type StepMeta = string | object | null
@@ -49,9 +47,19 @@ export interface StepDependencies<sp extends StepDefinition> {
 }
 
 export type StepStatusSummary = { //Audit
-    output_rows: number
-    rows_success: number
-    rows_failed: number
-    rows_invalid: number
-    rows_skipped: number
+    registerStatusSummary: RegisterStatusSummary
+    tryNumber: number, //retries
+    timeStarted: Date | null  //debugging
+    timeFinished: Date | null   //debugging
+    isFailedStep: boolean
+}
+
+export interface StepRunner {
+    step: Step<StepDefinition>
+    run(runOptions?: StepRunnerRunOptions): Promise<StepStatus> //start, if registers -> filter input by ids, if skip -> compare hash to skip
+}
+
+export type StepRunnerRunOptions = {
+    mockEntities?: InputEntity<any>[],
+    syncContext?: SyncContext,
 }

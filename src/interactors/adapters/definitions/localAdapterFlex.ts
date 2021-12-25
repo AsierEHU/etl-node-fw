@@ -5,7 +5,7 @@ import { getValidationResultWithMeta, validationTagToRegisterTag } from "./utils
 import { LocalAdapter } from "./localAdapter";
 import { ValidationResult, ValidationStatusTag } from "./types";
 import { getWithInitFormat, initRegisters } from "../../registers/utils";
-import { ContextEntityFetcher } from "../../../dataAccess/utils";
+import { ContextEntityFetcher } from "../../registers/utilsDB";
 
 /**
  * Local async step, persistance
