@@ -1,4 +1,4 @@
-import { AdapterRunnerRunOptions, InputEntity } from "../adapters/types";
+import { AdapterRunnerRunOptions } from "../adapters/types";
 import { RegisterStatusSummary, SyncContext } from "../registers/types";
 
 export interface Step<sd extends StepDefinition> {

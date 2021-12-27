@@ -1,39 +1,48 @@
-import { StepRunOptions } from "../steps/types"
+import { AdapterRunnerRunOptions } from "../adapters/types"
+import { SyncContext } from "../registers/types"
+
+export interface Flow<fd extends FlowDefinition> {
+    flowDefinition: fd
+    run(flowRunOptions: FlowRunOptions): Promise<FlowStatusSummary> //start a flow from the beginning
+    //continue(): Promise<void> //continue flow from the last success or partial success step.
+}
+
+export interface FlowDefinition {
+    id: string
+    readonly definitionType: string
+}
+
+export type FlowRunOptions = {
+    syncContext?: SyncContext
+    stepsRunOptions?: { stepDefinitionId: string, runOptions: AdapterRunnerRunOptions }[]
+}
+
 
 export enum FlowStatusTag {
     pending = "pending", //pendiente de ejecución
     active = "active", //Ejecutandose
     success = "success", //sin erroes
-    error = "error", //SW error
+    failed = "failed", //SW error
 }
 
 export type FlowStatus = {
     id: string
     definitionId: string
+    definitionType: string
     statusTag: FlowStatusTag  //debugging
     statusMeta: FlowMeta
-    timeStarted: Date,  //debugging
-    timeFinished: Date,  //debugging
-    // exceptionTrace: object, //debugging
-    meta: FlowMeta
+    statusSummary: FlowStatusSummary
 }
 
 export type FlowMeta = string | object | null
 
-export interface Flow<fd extends FlowDefinition> {
-    run(flowRunOptions?: FlowRunOptions): Promise<FlowStatusTag> //start a flow from the beginning
-    continue(): Promise<void> //continue flow from the last success or partial success step.
-    getStatus(): Promise<FlowStatus>
+export type FlowStatusSummary = { //Audit
+    timeStarted: Date | null  //debugging
+    timeFinished: Date | null   //debugging
+    stepFailedId: string | null
 }
 
-export type FlowRunOptions = {
-    stepsRunOptions: { stepDefinitionId: string, stepRunOptions: StepRunOptions }[]
-}
-
-
-export interface FlowDefinition {
-    id: string
-    // name: string
-    // version: string
-    // description: string
+export interface FlowRunner {
+    flow: Flow<FlowDefinition>
+    run(runOptions?: FlowRunOptions): Promise<FlowStatus> //start, if registers -> filter input by ids, if skip -> compare hash to skip
 }
