@@ -12,12 +12,10 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
 
     public readonly stepDefinition: sd;
     private readonly adapterFactory: AdapterFactory;
-    private readonly adapterDependencies: AdapterDependencies<AdapterDefinition>;
 
     constructor(dependencies: MyStepDependencies<sd>) {
         this.stepDefinition = dependencies.stepDefinition;
         this.adapterFactory = dependencies.adapterFactory;
-        this.adapterDependencies = dependencies.adapterDependencies;
     }
 
     async run(runOptions: AdapterRunnerRunOptions) {
@@ -53,7 +51,7 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
         stepStatusSummary.tryNumber++
 
         try {
-            const adapterRunner = this.adapterFactory.createAdapterRunner(this.stepDefinition.adapterDefinitionId, this.adapterDependencies)
+            const adapterRunner = this.adapterFactory.createAdapterRunner(this.stepDefinition.adapterDefinitionId)
             const adapterStatus = await adapterRunner.run(adapterRunOptions)
             const registerStatusSummary = adapterStatus.statusSummary;
             const stepRegisterStatusSummary = stepStatusSummary.registerStatusSummary;

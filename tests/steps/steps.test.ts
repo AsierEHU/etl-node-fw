@@ -2,20 +2,23 @@ import { EventEmitter } from "stream";
 import { VolatileRegisterDataAccess } from "../../src/dataAccess/volatile";
 import { AdapterFactory } from "../../src/interactors/adapters/factory";
 import { AdapterRunnerRunOptions, AdapterRunOptions } from "../../src/interactors/adapters/types";
-import { SyncContext } from "../../src/interactors/registers/types";
+import { RegisterDataAccess, SyncContext } from "../../src/interactors/registers/types";
 import { StepFactory } from "../../src/interactors/steps/factory";
 import { StepDefinition, StepStatus } from "../../src/interactors/steps/types";
 import { case1Definition } from "../adapters/localAdapterExtractorMocks/case1Mocks";
 import { stepMocksSuites } from "./mocks";
 
-let presenter = new EventEmitter()
-let adapterDefinitions = [case1Definition];
-let registerDataAccess = new VolatileRegisterDataAccess();
-let adapterFactory = new AdapterFactory(adapterDefinitions)
-let adapterDependencies = {
-    adapterPresenter: presenter,
-    registerDataAccess
-}
+const adapterDefinitions = [case1Definition];
+let adapterFactory: AdapterFactory
+let adapterPresenterCallback: any
+let registerDataAccess: RegisterDataAccess
+
+const stepDefinitions: StepDefinition[] = [];
+stepMocksSuites.forEach(suite => {
+    stepDefinitions.push(suite.definition)
+})
+let stepFactory: StepFactory
+let stepPresenterCallback: any
 
 const syncContext: SyncContext = {
     flowId: "testFlow",
@@ -23,23 +26,7 @@ const syncContext: SyncContext = {
 let defaultRunOptions: AdapterRunnerRunOptions = {
     syncContext
 }
-let stepDefinitions: StepDefinition[] = [];
-stepMocksSuites.forEach(suite => {
-    stepDefinitions.push(suite.definition)
-})
-const stepFactory = new StepFactory(stepDefinitions)
-const stepDependencies = {
-    stepPresenter: presenter,
-    adapterDependencies,
-    adapterFactory,
-    syncContext
-}
-let stepPresenterCallback = jest.fn(stepStatus => {
-    return stepStatus
-})
-let adapterPresenterCallback = jest.fn(adapterStatus => {
-    return adapterStatus
-})
+
 
 const stepTest = (
     definition: StepDefinition,
@@ -52,18 +39,30 @@ const stepTest = (
     describe(definition.definitionType + " - " + definition.id + " status test", () => {
 
         beforeEach(() => {
-            presenter.removeAllListeners("stepStatus")
+            const presenter = new EventEmitter()
             stepPresenterCallback = jest.fn(stepStatus => {
                 return stepStatus
             })
             adapterPresenterCallback = jest.fn(adapterStatus => {
                 return adapterStatus
             })
+            presenter.on("adapterStatus", adapterPresenterCallback)
+            presenter.on("stepStatus", stepPresenterCallback)
+            registerDataAccess = new VolatileRegisterDataAccess()
+            const adapterDependencies = {
+                adapterPresenter: presenter,
+                registerDataAccess,
+            }
+            adapterFactory = new AdapterFactory(adapterDefinitions, adapterDependencies)
+            const stepDependencies = {
+                stepPresenter: presenter,
+                adapterFactory
+            }
+            stepFactory = new StepFactory(stepDefinitions, stepDependencies)
         });
 
         test("Presenter calls", async () => {
-            presenter.on("stepStatus", stepPresenterCallback)
-            const step1 = stepFactory.createStepRunner(definition.id, stepDependencies)
+            const step1 = stepFactory.createStepRunner(definition.id)
             const finalStepStatus = await step1.run(defaultRunOptions);
             statusEqual(finalStepStatus, mocks.mockFinalStatus)
             expect(stepPresenterCallback.mock.calls.length).toBe(3)
@@ -72,8 +71,7 @@ const stepTest = (
         })
 
         test("Adapter run options", async () => {
-            presenter.on("adapterStatus", adapterPresenterCallback)
-            const step1 = stepFactory.createStepRunner(definition.id, stepDependencies)
+            const step1 = stepFactory.createStepRunner(definition.id)
             await step1.run(defaultRunOptions);
             runOptionsEqual(adapterPresenterCallback.mock.results[2].value.runOptions, mocks.mockAdapterRunOptions)
         })
