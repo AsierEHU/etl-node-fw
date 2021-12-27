@@ -2,20 +2,24 @@ import { AdapterRunOptions } from "../../../src/interactors/adapters/types"
 import { RegisterStatusSummary } from "../../../src/interactors/registers/types"
 import { LocalStepDefinition } from "../../../src/interactors/steps/definitions/localStep"
 import { StepStatus, StepStatusTag } from "../../../src/interactors/steps/types"
+import { case1Mocks } from "../../adapters/localAdapterExtractorMocks/case1Mocks"
 
-export const case1Definition: LocalStepDefinition = {
-    id: "case1testLocalStep",
+export const case3Definition: LocalStepDefinition = {
+    id: "case3testLocalStep",
     adapterDefinitionId: "case1Extractor",
-    retartTries: 0,
+    retartTries: 1,
     definitionType: "LocalStepDefinition",
     isFailedStatus: function (statusSummary: RegisterStatusSummary): boolean {
         return false
     },
-    adapterDefinitionRunOptions: null
+    adapterDefinitionRunOptions: {
+        mockEntities: case1Mocks.inputEntities,
+        onlyFailedEntities: false
+    }
 }
 
 const mockInitialStatus: StepStatus = {
-    definitionId: "case1testLocalStep",
+    definitionId: "case3testLocalStep",
     definitionType: "LocalStepDefinition",
     id: "testStep",
     statusSummary: {
@@ -37,11 +41,15 @@ const mockInitialStatus: StepStatus = {
 }
 
 const mockFinalStatus: StepStatus = {
-    definitionId: "case1testLocalStep",
+    definitionId: "case3testLocalStep",
     definitionType: "LocalStepDefinition",
     id: "testStep",
     statusTag: StepStatusTag.success,
     statusMeta: null,
+    syncContext: {
+        flowId: "testFlow",
+        stepId: "testStep",
+    },
     statusSummary: {
         registerStatusSummary: {
             output_rows: 7,
@@ -50,15 +58,11 @@ const mockFinalStatus: StepStatus = {
             rows_invalid: 1,
             rows_skipped: 1,
         },
-        tryNumber: 1, //retries
+        tryNumber: 2, //retries
         timeStarted: null,  //debugging
         timeFinished: null,   //debugging
         failedByDefinition: false
-    },
-    syncContext: {
-        flowId: "testFlow",
-        stepId: "testStep",
-    },
+    }
 }
 
 const mockAdapterRunOptions: AdapterRunOptions = {
@@ -66,7 +70,9 @@ const mockAdapterRunOptions: AdapterRunOptions = {
         flowId: "testFlow",
         stepId: "testStep",
         adapterId: "testAdapter",
-    }
+    },
+    useMockedEntities: true,
+    onlyFailedEntities: false
 }
 
-export const case1Mocks = { mockInitialStatus, mockFinalStatus, mockAdapterRunOptions }
+export const case3Mocks = { mockInitialStatus, mockFinalStatus, mockAdapterRunOptions }

@@ -43,7 +43,7 @@ export type StepStatusSummary = { //Audit
     tryNumber: number, //retries
     timeStarted: Date | null  //debugging
     timeFinished: Date | null   //debugging
-    failedStatusSummary: boolean
+    failedByDefinition: boolean
 }
 
 export interface StepRunner {

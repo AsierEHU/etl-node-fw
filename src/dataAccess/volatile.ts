@@ -43,8 +43,8 @@ export class VolatileRegisterDataAccess implements RegisterDataAccess {
 
         let repoRegisters = Object.values(this.repo);
 
-        if (filter?.apdaterId)
-            repoRegisters = repoRegisters.filter(repoRegister => repoRegister.syncContext.apdaterId == filter.apdaterId)
+        if (filter?.adapterId)
+            repoRegisters = repoRegisters.filter(repoRegister => repoRegister.syncContext.adapterId == filter.adapterId)
         if (filter?.stepId)
             repoRegisters = repoRegisters.filter(repoRegister => repoRegister.syncContext.stepId == filter.stepId)
         if (filter?.flowId)

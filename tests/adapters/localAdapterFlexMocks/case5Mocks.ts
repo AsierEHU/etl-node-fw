@@ -45,7 +45,7 @@ const mockNewRegisters: Register[] = [
         syncContext: {
             flowId: "testFlow",
             stepId: "testStep",
-            apdaterId: "testAdapter",
+            adapterId: "testAdapter",
         },
     }
 ]
@@ -66,7 +66,7 @@ const mockInitialStatus: AdapterStatus = {
         rows_skipped: 0,
         rows_success: 0,
     },
-    syncContext: { apdaterId: "testAdapter", stepId: "testStep", flowId: "testFlow" },
+    syncContext: { adapterId: "testAdapter", stepId: "testStep", flowId: "testFlow" },
     statusTag: AdapterStatusTag.pending,
     statusMeta: null
 }

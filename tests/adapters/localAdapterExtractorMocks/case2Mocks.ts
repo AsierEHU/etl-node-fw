@@ -43,7 +43,7 @@ const mockInitialStatus: AdapterStatus = {
     },
     statusTag: AdapterStatusTag.pending,
     statusMeta: null,
-    syncContext: { apdaterId: "testAdapter", stepId: "testStep", flowId: "testFlow" },
+    syncContext: { adapterId: "testAdapter", stepId: "testStep", flowId: "testFlow" },
 }
 const mockFinalSummary = {
     output_rows: 0,

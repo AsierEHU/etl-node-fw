@@ -33,17 +33,7 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
 
     private async getInitialRegisters(runOptions: AdapterRunOptions): Promise<Register[]> {
         let registers = [];
-
-        if (runOptions?.useMockedEntities) {
-            const mockedRegisters = await this.registerDataAccess.getAll(
-                {
-                    registerType: "inputMocked",
-                    ...runOptions.syncContext
-                }
-            )
-            registers = buildRegisterFromOthers(mockedRegisters, runOptions.syncContext, this.adapterDefinition.outputType)
-        }
-        else if (runOptions?.onlyFailedEntities) {
+        if (runOptions?.onlyFailedEntities) {
             const failedRegisters = await this.registerDataAccess.getAll({
                 registerType: this.adapterDefinition.outputType,
                 registerStatus: RegisterStatusTag.failed,
@@ -52,6 +42,15 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
             const arg = new AdvancedRegisterFetcher(this.registerDataAccess);
             const oldInputRegisters = await arg.getRelativeRegisters(failedRegisters)
             registers = buildRegisterFromOthers(oldInputRegisters, runOptions.syncContext, this.adapterDefinition.outputType)
+        }
+        else if (runOptions?.useMockedEntities) {
+            const mockedRegisters = await this.registerDataAccess.getAll(
+                {
+                    registerType: "$inputMocked",
+                    stepId: runOptions.syncContext.stepId
+                }
+            )
+            registers = buildRegisterFromOthers(mockedRegisters, runOptions.syncContext, this.adapterDefinition.outputType)
         }
         else {
             registers = await this.getRegisters(runOptions.syncContext)

@@ -54,8 +54,8 @@ export class AdvancedRegisterFetcher {
         return targetRegisters
     }
 
-    async getRegistersSummary(apdaterId: string): Promise<RegisterStatusSummary> {
-        const outputRegisters = await this.registerDataAccess.getAll({ apdaterId })
+    async getRegistersSummary(adapterId: string): Promise<RegisterStatusSummary> {
+        const outputRegisters = await this.registerDataAccess.getAll({ adapterId })
         const statusSummary = {
             output_rows: outputRegisters.length,
             rows_success: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.success).length,

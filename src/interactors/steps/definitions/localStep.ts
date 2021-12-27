@@ -41,7 +41,7 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
             tryNumber: 0,
             timeStarted: new Date(),
             timeFinished: null,
-            failedStatusSummary: false,
+            failedByDefinition: false,
         }
         await this.tryRunAdapter(stepStatusSummary, runOptions);
         stepStatusSummary.timeFinished = new Date();
@@ -70,7 +70,7 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
                 }
                 else {
                     if (this.stepDefinition.isFailedStatus(stepRegisterStatusSummary)) {
-                        stepStatusSummary.failedStatusSummary = true
+                        stepStatusSummary.failedByDefinition = true
                     }
                 }
             }

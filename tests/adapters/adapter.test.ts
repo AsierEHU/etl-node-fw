@@ -68,8 +68,8 @@ const adapterTest = (
         test("Presenter calls: runOptions", async () => {
             adapterPresenter.on("adapterStatus", adapterPresenterCallback)
             const adapter1 = adapterFactory.createAdapterRunner(definition.id, adapterDependencies)
-            const inputRunOptions: AdapterRunnerRunOptions = { ...defaultRunOptions, onlyFailedEntities: true, mockEntities: mocks.inputEntities }
-            const outputRunOptions: AdapterRunOptions = { syncContext: defaultRunOptions.syncContext as SyncContext, onlyFailedEntities: true, useMockedEntities: true }
+            const inputRunOptions: AdapterRunnerRunOptions = { ...defaultRunOptions, onlyFailedEntities: false, mockEntities: mocks.inputEntities }
+            const outputRunOptions: AdapterRunOptions = { syncContext: defaultRunOptions.syncContext as SyncContext, onlyFailedEntities: false, useMockedEntities: true }
             const finalAdapterStatus = await adapter1.run(inputRunOptions);
             runOptionsEqual(finalAdapterStatus.runOptions as AdapterRunOptions, outputRunOptions)
             runOptionsEqual(adapterPresenterCallback.mock.results[0].value.runOptions, outputRunOptions)
@@ -176,16 +176,16 @@ const testSources = async (register: Register) => {
 
 const statusEqual = (adapterStatus: AdapterStatus, mockStatus: AdapterStatus) => {
     expect(adapterStatus.id).not.toBeNull()
-    expect(adapterStatus.syncContext.apdaterId).not.toBeNull()
-    expect(adapterStatus.id).toEqual(adapterStatus.syncContext.apdaterId)
+    expect(adapterStatus.syncContext.adapterId).not.toBeNull()
+    expect(adapterStatus.id).toEqual(adapterStatus.syncContext.adapterId)
     adapterStatus.id = mockStatus.id
-    adapterStatus.syncContext.apdaterId = mockStatus.syncContext.apdaterId
+    adapterStatus.syncContext.adapterId = mockStatus.syncContext.adapterId
     adapterStatus.runOptions = mockStatus.runOptions
     expect(adapterStatus).toEqual(mockStatus)
 }
 
 const runOptionsEqual = (runOtions: AdapterRunOptions, mockRunOptions: AdapterRunOptions) => {
-    runOtions.syncContext.apdaterId = mockRunOptions.syncContext.apdaterId
+    runOtions.syncContext.adapterId = mockRunOptions.syncContext.adapterId
     expect(runOtions).toEqual(mockRunOptions)
 }
 
@@ -199,13 +199,13 @@ const registersEqual = (registers: Register[], mockFinalRegisters: Register[]) =
 
 const registerEqual = (register: Register, mockFinalRegister: Register) => {
     expect(register.id).not.toBeNull()
-    expect(register.syncContext.apdaterId).not.toBeNull()
+    expect(register.syncContext.adapterId).not.toBeNull()
     expect(register.sourceAbsoluteId).not.toBeNull()
     expect(register.sourceRelativeId).not.toBeNull()
     register.id = mockFinalRegister.id
     register.sourceAbsoluteId = mockFinalRegister.sourceAbsoluteId
     register.sourceRelativeId = mockFinalRegister.sourceRelativeId
-    register.syncContext.apdaterId = mockFinalRegister.syncContext.apdaterId
+    register.syncContext.adapterId = mockFinalRegister.syncContext.adapterId
     expect(register).toEqual(mockFinalRegister)
 }
 

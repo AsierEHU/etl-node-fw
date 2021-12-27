@@ -1,3 +1,4 @@
+import { AdapterRunOptions } from "../../../src/interactors/adapters/types"
 import { RegisterStatusSummary } from "../../../src/interactors/registers/types"
 import { LocalStepDefinition } from "../../../src/interactors/steps/definitions/localStep"
 import { StepStatus, StepStatusTag } from "../../../src/interactors/steps/types"
@@ -28,7 +29,7 @@ const mockInitialStatus: StepStatus = {
         tryNumber: 0, //retries
         timeStarted: null,  //debugging
         timeFinished: null,   //debugging
-        failedStatusSummary: false
+        failedByDefinition: false
     },
     syncContext: { stepId: "testStep", flowId: "testFlow" },
     statusTag: StepStatusTag.pending,
@@ -56,8 +57,16 @@ const mockFinalStatus: StepStatus = {
         tryNumber: 4, //retries
         timeStarted: null,  //debugging
         timeFinished: null,   //debugging
-        failedStatusSummary: true
+        failedByDefinition: true
     }
 }
 
-export const case2Mocks = { mockInitialStatus, mockFinalStatus }
+const mockAdapterRunOptions: AdapterRunOptions = {
+    syncContext: {
+        flowId: "testFlow",
+        stepId: "testStep",
+        adapterId: "testAdapter",
+    }
+}
+
+export const case2Mocks = { mockInitialStatus, mockFinalStatus, mockAdapterRunOptions }

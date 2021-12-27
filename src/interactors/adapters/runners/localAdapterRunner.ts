@@ -25,10 +25,10 @@ export class LocalAdapterRunner implements AdapterRunner {
             syncContext: adapterStatus.syncContext,
             onlyFailedEntities: runOptions?.onlyFailedEntities
         }
-        if (runOptions?.mockEntities) {
+        if (runOptions?.mockEntities && !adapterRunOptions.onlyFailedEntities) {
             const mockEntities = runOptions?.mockEntities || [];
             const inputEntitiesWithMeta = getWithInitFormat(mockEntities)
-            const inputRegisters = initRegisters(inputEntitiesWithMeta, adapterStatus.syncContext)
+            const inputRegisters = initRegisters(inputEntitiesWithMeta, { ...runOptions.syncContext })
             await this.registerDataAccess.saveAll(inputRegisters)
             adapterRunOptions.useMockedEntities = true;
         }
@@ -71,7 +71,7 @@ export class LocalAdapterRunner implements AdapterRunner {
                 rows_skipped: 0,
             },
             runOptions: null,
-            syncContext: { ...syncContext, apdaterId: id }
+            syncContext: { ...syncContext, adapterId: id }
         }
         return adapterStatus
     }

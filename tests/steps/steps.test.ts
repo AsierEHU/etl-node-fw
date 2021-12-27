@@ -1,11 +1,11 @@
 import { EventEmitter } from "stream";
 import { VolatileRegisterDataAccess } from "../../src/dataAccess/volatile";
 import { AdapterFactory } from "../../src/interactors/adapters/factory";
-import { AdapterRunnerRunOptions } from "../../src/interactors/adapters/types";
+import { AdapterRunnerRunOptions, AdapterRunOptions } from "../../src/interactors/adapters/types";
 import { SyncContext } from "../../src/interactors/registers/types";
 import { StepFactory } from "../../src/interactors/steps/factory";
 import { StepDefinition, StepStatus } from "../../src/interactors/steps/types";
-import { case1Definition, case1Mocks } from "../adapters/localAdapterExtractorMocks/case1Mocks";
+import { case1Definition } from "../adapters/localAdapterExtractorMocks/case1Mocks";
 import { stepMocksSuites } from "./mocks";
 
 let presenter = new EventEmitter()
@@ -37,12 +37,16 @@ const stepDependencies = {
 let stepPresenterCallback = jest.fn(stepStatus => {
     return stepStatus
 })
+let adapterPresenterCallback = jest.fn(adapterStatus => {
+    return adapterStatus
+})
 
 const stepTest = (
     definition: StepDefinition,
     mocks: {
         mockInitialStatus: StepStatus,
         mockFinalStatus: StepStatus,
+        mockAdapterRunOptions: AdapterRunOptions
     }
 ) => {
     describe(definition.definitionType + " - " + definition.id + " status test", () => {
@@ -51,6 +55,9 @@ const stepTest = (
             presenter.removeAllListeners("stepStatus")
             stepPresenterCallback = jest.fn(stepStatus => {
                 return stepStatus
+            })
+            adapterPresenterCallback = jest.fn(adapterStatus => {
+                return adapterStatus
             })
         });
 
@@ -62,6 +69,13 @@ const stepTest = (
             expect(stepPresenterCallback.mock.calls.length).toBe(3)
             statusEqual(stepPresenterCallback.mock.results[0].value, mocks.mockInitialStatus)
             statusEqual(stepPresenterCallback.mock.results[2].value, mocks.mockFinalStatus)
+        })
+
+        test("Adapter run options", async () => {
+            presenter.on("adapterStatus", adapterPresenterCallback)
+            const step1 = stepFactory.createStepRunner(definition.id, stepDependencies)
+            await step1.run(defaultRunOptions);
+            runOptionsEqual(adapterPresenterCallback.mock.results[2].value.runOptions, mocks.mockAdapterRunOptions)
         })
 
     })
@@ -76,6 +90,12 @@ const statusEqual = (stepStatus: StepStatus, mockStatus: StepStatus) => {
     stepStatus.statusSummary.timeFinished = mockStatus.statusSummary.timeFinished
     stepStatus.statusSummary.timeStarted = mockStatus.statusSummary.timeStarted
     expect(stepStatus).toEqual(mockStatus)
+}
+
+const runOptionsEqual = (runOtions: AdapterRunOptions, mockRunOptions: AdapterRunOptions) => {
+    runOtions.syncContext.adapterId = mockRunOptions.syncContext.adapterId
+    runOtions.syncContext.stepId = mockRunOptions.syncContext.stepId
+    expect(runOtions).toEqual(mockRunOptions)
 }
 
 stepMocksSuites.forEach(suite => {

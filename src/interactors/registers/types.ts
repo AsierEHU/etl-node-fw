@@ -24,7 +24,7 @@ export enum RegisterStatusTag {
 export type SyncContext = {
     flowId?: string,
     stepId?: string,
-    apdaterId?: string,
+    adapterId?: string,
 }
 export interface RegisterDataAccess {//For a specific syncContext
     save: (register: Register) => Promise<void>
@@ -36,7 +36,7 @@ export interface RegisterDataAccess {//For a specific syncContext
 export type RegisterDataFilter = {
     flowId?: string,
     stepId?: string,
-    apdaterId?: string,
+    adapterId?: string,
     registerType?: string,
     registerStatus?: RegisterStatusTag
 }
