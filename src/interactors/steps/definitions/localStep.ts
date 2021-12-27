@@ -1,10 +1,8 @@
 import { cloneDeep } from "lodash";
 import { AdapterFactory } from "../../adapters/factory";
-import { AdapterDefinition, AdapterDependencies, AdapterRunnerRunOptions, AdapterStatusTag } from "../../adapters/types";
+import { AdapterRunnerRunOptions, AdapterStatusTag } from "../../adapters/types";
 import { RegisterStatusSummary } from "../../registers/types";
 import { Step, StepDefinition, StepStatusSummary } from "../types"
-import { MyStepDependencies } from "./types";
-
 /**
  * Local async step, persistance
  */
@@ -13,7 +11,7 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
     public readonly stepDefinition: sd;
     private readonly adapterFactory: AdapterFactory;
 
-    constructor(dependencies: MyStepDependencies<sd>) {
+    constructor(dependencies: any) {
         this.stepDefinition = dependencies.stepDefinition;
         this.adapterFactory = dependencies.adapterFactory;
     }

@@ -1,6 +1,5 @@
 import { Register, SyncContext, RegisterStatusTag, RegisterDataAccess } from "../../registers/types";
 import { Adapter, AdapterDefinition, AdapterRunOptions } from "../types"
-import { MyAdapterDependencies } from "./types";
 import { cloneDeep } from 'lodash'
 import { AdvancedRegisterFetcher } from "../../registers/utilsDB";
 import { buildRegisterFromOthers } from "../../registers/utils";
@@ -20,7 +19,7 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
     public readonly adapterDefinition: ad;
     protected readonly registerDataAccess: RegisterDataAccess;
 
-    constructor(dependencies: MyAdapterDependencies<ad>) {
+    constructor(dependencies: any) {
         this.adapterDefinition = dependencies.adapterDefinition;
         this.registerDataAccess = dependencies.registerDataAccess;
     }

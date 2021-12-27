@@ -53,7 +53,3 @@ export enum AdapterStatusTag {
     success = "success", //sin erroes
     failed = "failed", //Software error or all records in (failed, invalid)
 }
-
-export interface AdapterDependencies<ad extends AdapterDefinition> {
-    adapterDefinition: ad
-}

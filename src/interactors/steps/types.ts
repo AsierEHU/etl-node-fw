@@ -33,11 +33,6 @@ export type StepStatus = {
 
 export type StepMeta = string | object | null
 
-export interface StepDependencies<sp extends StepDefinition> {
-    stepDefinition: sp
-    syncContext: SyncContext
-}
-
 export type StepStatusSummary = { //Audit
     registerStatusSummary: RegisterStatusSummary
     tryNumber: number, //retries
