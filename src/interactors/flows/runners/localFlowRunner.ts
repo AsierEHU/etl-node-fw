@@ -11,7 +11,7 @@ export class LocalFlowRunner implements FlowRunner {
 
     constructor(dependencies: any) {
         this.flow = dependencies.flow;
-        this.flowPresenter = dependencies.adapterPresenter;
+        this.flowPresenter = dependencies.flowPresenter;
     }
 
     async run(runOptions?: FlowRunOptions) {
@@ -43,7 +43,7 @@ export class LocalFlowRunner implements FlowRunner {
     private buildStatus(syncContext?: SyncContext): FlowStatus {
         const id = uuidv4();
         const flowDefinition = this.flow.flowDefinition;
-        const flowStatus = {
+        const flowStatus: FlowStatus = {
             id,
             definitionId: flowDefinition.id,
             definitionType: flowDefinition.definitionType,
@@ -53,8 +53,9 @@ export class LocalFlowRunner implements FlowRunner {
                 timeStarted: null,
                 timeFinished: null,
                 stepFailedId: null,
+                stepsSuccess: 0,
+                stepsTotal: 0
             },
-            runOptions: null,
             syncContext: { ...syncContext, flowId: id }
         }
         return flowStatus

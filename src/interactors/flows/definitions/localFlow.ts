@@ -1,3 +1,4 @@
+import { AdapterRunnerRunOptions } from "../../adapters/types";
 import { StepFactory } from "../../steps/factory"
 import { StepStatusTag } from "../../steps/types"
 import { Flow, FlowDefinition, FlowRunOptions, FlowStatusSummary } from "../types"
@@ -19,21 +20,28 @@ export class LocalFlow<fd extends LocalFlowDefinition> implements Flow<fd> {
         const flowStatusSummary: FlowStatusSummary = {
             timeStarted: new Date(),
             timeFinished: null,
-            stepFailedId: null
+            stepFailedId: null,
+            stepsSuccess: 0,
+            stepsTotal: this.flowDefinition.stepsDefinitionFlow.length
         }
-        const stepsDefinitionsIds = this.flowDefinition.stepsDefinitionIds
-        for (const stepDefinitionId of stepsDefinitionsIds) {
+        const stepsDefinitionsFlows = this.flowDefinition.stepsDefinitionFlow
+        for (const stepDefinitionFlow of stepsDefinitionsFlows) {
+            const stepDefinitionId = stepDefinitionFlow.id
             const stepRunner = this.stepFactory.createStepRunner(stepDefinitionId)
+
             const stepRunnerInputRunOptions = flowRunOptions.stepsRunOptions?.filter(sro => sro.stepDefinitionId == stepDefinitionId)[0]
             let stepRunnerRunOptions = undefined;
-            if (stepRunnerInputRunOptions) {
-                stepRunnerRunOptions = stepRunnerInputRunOptions.runOptions;
+            if (stepRunnerInputRunOptions || stepDefinitionFlow.runOptions) {
+                stepRunnerRunOptions = { ...stepDefinitionFlow.runOptions, ...stepRunnerInputRunOptions?.runOptions };
             }
+
             try {
                 const stepStatus = await stepRunner.run(stepRunnerRunOptions)
                 if (stepStatus.statusTag == StepStatusTag.failed) {
                     flowStatusSummary.stepFailedId = stepDefinitionId;
                     break;
+                } else {
+                    flowStatusSummary.stepsSuccess++
                 }
             } catch (error) {
                 throw error
@@ -47,5 +55,5 @@ export class LocalFlow<fd extends LocalFlowDefinition> implements Flow<fd> {
 export abstract class LocalFlowDefinition implements FlowDefinition {
     abstract readonly id: string
     abstract readonly definitionType: string;
-    abstract readonly stepsDefinitionIds: string[]
+    abstract readonly stepsDefinitionFlow: { id: string, runOptions?: AdapterRunnerRunOptions }[]
 }

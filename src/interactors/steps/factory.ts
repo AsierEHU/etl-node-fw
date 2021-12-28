@@ -31,7 +31,7 @@ export class StepFactory {
         this.stepDefinitionsMap = {}
         for (const stepDefinition of stepDefinitions) {
             if (this.stepDefinitionsMap[stepDefinition.id])
-                throw new Error(`Adapter with id ${stepDefinition.id} already exist`);
+                throw new Error(`Step with id ${stepDefinition.id} already exist`);
             this.stepDefinitionsMap[stepDefinition.id] = stepDefinition
         }
         this.stepGlobalDependencies = dependencies

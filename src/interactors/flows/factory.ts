@@ -1,45 +1,79 @@
+import { LocalFlow } from "./definitions/localFlow"
+import { LocalFlowRunner } from "./runners/localFlowRunner"
+import { Flow, FlowDefinition, FlowRunner } from "./types"
 
-// class FlowBuilder { 
+const frdt = {
+    ["LocalFlowRunner"]: {
+        class: LocalFlowRunner,
+        dependencies: ["flowPresenter"],
+    }
+}
 
-//     private readonly flowDataAccess: FlowDataAccess
-//     private readonly flowDefinitionsMap:{[key:string]:FlowDefinition<FlowDefinitionOptions>}
+const fddt = {
+    ["LocalFlow"]: {
+        class: LocalFlow,
+        dependencies: ["flowFactory"],
+        runner: frdt["LocalFlowRunner"]
+    },
+}
 
-//     constructor(dependencies:{flowDefinitions:Array<FlowDefinition<FlowDefinitionOptions>>, flowDataAccess: FlowDataAccess}){
-//         this.flowDefinitionsMap = dependencies.flowDefinitions.reduce((map, flowDefinition) => ({ ...map, [flowDefinition.id]: flowDefinition}), {})
-//         this.flowDataAccess = dependencies.flowDataAccess;
-//     }
+const FlowDefinitionTree: { [key: string]: any } = {
+    ["LocalFlowDefinition"]: fddt["LocalFlow"],
+}
 
-//     async getFlowsByStatus(status:string){
+export class FlowFactory {
 
-//     }
+    private readonly flowDefinitionsMap: { [key: string]: FlowDefinition }
+    private readonly flowGlobalDependencies: any
 
-//     async getFlowById(id:string){
-//         const flowData = await this.flowDataAccess.get(id)
-//         return this.buildFlowByDefinition(flowData.definitionId, flowData)
-//     }
+    constructor(flowDefinitions: Array<FlowDefinition>, dependencies: any) {
+        this.flowDefinitionsMap = {}
+        for (const flowDefinition of flowDefinitions) {
+            if (this.flowDefinitionsMap[flowDefinition.id])
+                throw new Error(`Flow with id ${flowDefinition.id} already exist`);
+            this.flowDefinitionsMap[flowDefinition.id] = flowDefinition
+        }
+        this.flowGlobalDependencies = dependencies
+    }
 
-//     async buildFlowByDefinition(definitionId:string, initData: any):Promise<Flow<FlowDefinitionOptions,FlowDefinition<FlowDefinitionOptions>>>{
+    public createFlow(definitionId: string): Flow<FlowDefinition> {
+        const flowDefinition = this.flowDefinitionsMap[definitionId];
+        if (!flowDefinition) {
+            throw Error("Not flow match with definition id: " + definitionId)
+        }
 
-//         const flowDefinition = this.flowDefinitionsMap[definitionId];
+        const flowDependencies = { ...this.flowGlobalDependencies };
+        flowDependencies.flowDefinition = flowDefinition;
 
-//         if(flowDefinition instanceof MyFlowDefinition){
-//             return await this.buildMyFlow(flowDefinition, initData)
-//         }
+        const flowDefinitionType = flowDefinition.definitionType;
+        const flowBuildOptions = FlowDefinitionTree[flowDefinitionType];
 
-//     }
+        if (flowBuildOptions) {
+            return new flowBuildOptions.class(flowDependencies)
+        }
+        else {
+            throw Error("Not flow match with definition type: " + flowDefinition.definitionType)
+        }
+    }
 
-//     private async buildMyFlow( flowDefinition: MyFlowDefinition, initData:any){
+    public createFlowRunner(definitionId: string): FlowRunner {
+        const flowDefinition = this.flowDefinitionsMap[definitionId];
+        if (!flowDefinition) {
+            throw Error("Not flow match with definition id: " + definitionId)
+        }
 
-//         if(!initData.id){
-//             initData.id = "" //Generate unique id
-//         };
+        const flowRunnerDependencies = { ...this.flowGlobalDependencies };
+        flowRunnerDependencies.flow = this.createFlow(definitionId);
 
-//         const flowDependencies = {
-//             flowDataAccess: this.flowDataAccess,
-//             flowDefinition: flowDefinition,
-//             flowData: initData,
-//         }
+        const flowDefinitionType = flowDefinition.definitionType;
+        const flowRunnerBuildOptions = FlowDefinitionTree[flowDefinitionType].runner;
 
-//         return new MyFlow(flowDependencies);
-//     }
-// }
+        if (flowRunnerBuildOptions) {
+            return new flowRunnerBuildOptions.class(flowRunnerDependencies)
+        }
+        else {
+            throw Error("Not flow match with definition type: " + flowDefinition.definitionType)
+        }
+    }
+}
+

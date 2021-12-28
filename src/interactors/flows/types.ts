@@ -32,6 +32,7 @@ export type FlowStatus = {
     statusTag: FlowStatusTag  //debugging
     statusMeta: FlowMeta
     statusSummary: FlowStatusSummary
+    syncContext: SyncContext
 }
 
 export type FlowMeta = string | object | null
@@ -39,6 +40,8 @@ export type FlowMeta = string | object | null
 export type FlowStatusSummary = { //Audit
     timeStarted: Date | null  //debugging
     timeFinished: Date | null   //debugging
+    stepsSuccess: number
+    stepsTotal: number
     stepFailedId: string | null
 }
 
