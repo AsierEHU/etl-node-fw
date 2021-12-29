@@ -37,7 +37,7 @@ export class StepFactory {
         this.stepGlobalDependencies = dependencies
     }
 
-    public createStep(definitionId: string): Step<StepDefinition> {
+    private createStep(definitionId: string): Step<StepDefinition> {
         const stepDefinition = this.stepDefinitionsMap[definitionId];
         if (!stepDefinition) {
             throw Error("Not step match with definition id: " + definitionId)

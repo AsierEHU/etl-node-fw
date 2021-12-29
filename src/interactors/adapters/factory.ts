@@ -57,7 +57,7 @@ export class AdapterFactory {
         this.adapterGlobalDependencies = dependencies
     }
 
-    public createAdapter(definitionId: string): Adapter<AdapterDefinition> {
+    private createAdapter(definitionId: string): Adapter<AdapterDefinition> {
         const adapterDefinition = this.adapterDefinitionsMap[definitionId];
         if (!adapterDefinition) {
             throw Error("Not adapter match with definition id: " + definitionId)

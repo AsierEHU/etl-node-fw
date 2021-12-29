@@ -36,7 +36,7 @@ export class FlowFactory {
         this.flowGlobalDependencies = dependencies
     }
 
-    public createFlow(definitionId: string): Flow<FlowDefinition> {
+    private createFlow(definitionId: string): Flow<FlowDefinition> {
         const flowDefinition = this.flowDefinitionsMap[definitionId];
         if (!flowDefinition) {
             throw Error("Not flow match with definition id: " + definitionId)
