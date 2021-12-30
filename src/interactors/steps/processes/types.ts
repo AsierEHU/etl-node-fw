@@ -16,5 +16,5 @@ export interface StepDefinition {
 export type StepStatusSummary = { //Audit
     registerStats: RegisterStats
     tryNumber: number, //retries
-    failedByDefinition: boolean
+    isInvalid: boolean
 }

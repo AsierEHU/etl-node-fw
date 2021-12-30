@@ -28,14 +28,14 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
 
         const stepStatusSummary: StepStatusSummary = {
             registerStats: {
-                output_rows: 0,
-                rows_success: 0,
-                rows_failed: 0,
-                rows_invalid: 0,
-                rows_skipped: 0,
+                registers_total: 0,
+                registers_success: 0,
+                registers_failed: 0,
+                registers_invalid: 0,
+                registers_skipped: 0,
             },
             tryNumber: 0,
-            failedByDefinition: false,
+            isInvalid: false,
         }
         await this.tryRunAdapter(stepStatusSummary, runOptions);
         return cloneDeep(stepStatusSummary)
@@ -57,13 +57,13 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
                 await this.tryRunAdapter(stepStatusSummary, restartAdapterRunOptions);
             }
             else {
-                if (registerStats && registerStats.rows_failed > 0 && this.canRetry(stepStatusSummary.tryNumber)) {
+                if (registerStats && registerStats.registers_failed > 0 && this.canRetry(stepStatusSummary.tryNumber)) {
                     const restartAdapterRunOptions = { ...adapterRunOptions, onlyFailedEntities: true }
                     await this.tryRunAdapter(stepStatusSummary, restartAdapterRunOptions);
                 }
                 else {
-                    if (this.stepDefinition.isFailedStatus(stepRegisterStatusSummary)) {
-                        stepStatusSummary.failedByDefinition = true
+                    if (this.stepDefinition.isInvalid(stepRegisterStatusSummary)) {
+                        stepStatusSummary.isInvalid = true
                     }
                 }
             }
@@ -81,14 +81,14 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
 
     private fillSummary(stepStatusSummary: RegisterStats, adapterStatusSummary: RegisterStats, onlyFailedEntities?: boolean) {
         if (onlyFailedEntities) {
-            stepStatusSummary.rows_success += adapterStatusSummary.rows_success
-            stepStatusSummary.rows_failed = adapterStatusSummary.rows_failed
+            stepStatusSummary.registers_success += adapterStatusSummary.registers_success
+            stepStatusSummary.registers_failed = adapterStatusSummary.registers_failed
         } else {
-            stepStatusSummary.rows_success = adapterStatusSummary.rows_success
-            stepStatusSummary.rows_failed = adapterStatusSummary.rows_failed
-            stepStatusSummary.rows_invalid = adapterStatusSummary.rows_invalid
-            stepStatusSummary.rows_skipped = adapterStatusSummary.rows_skipped
-            stepStatusSummary.output_rows = adapterStatusSummary.output_rows
+            stepStatusSummary.registers_success = adapterStatusSummary.registers_success
+            stepStatusSummary.registers_failed = adapterStatusSummary.registers_failed
+            stepStatusSummary.registers_invalid = adapterStatusSummary.registers_invalid
+            stepStatusSummary.registers_skipped = adapterStatusSummary.registers_skipped
+            stepStatusSummary.registers_total = adapterStatusSummary.registers_total
         }
     }
 
@@ -103,5 +103,5 @@ export abstract class LocalStepDefinition implements StepDefinition {
     abstract readonly definitionType: string;
     abstract readonly id: string
     abstract readonly retartTries: number
-    abstract isFailedStatus(statusSummary: RegisterStats): boolean
+    abstract isInvalid(statusSummary: RegisterStats): boolean
 }

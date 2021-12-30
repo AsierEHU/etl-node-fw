@@ -4,7 +4,7 @@ import { FlowStatus, FlowStatusTag } from "../../../src/interactors/flows/runner
 export const case2Definition: LocalFlowDefinition = {
     id: "case2testLocalFlow",
     definitionType: "LocalFlowDefinition",
-    stepsDefinitionFlow: [{ id: "case1testLocalStep" }, { id: "case2testLocalStep" }, { id: "case3testLocalStep" }]
+    stepsDefinitionFlow: [{ id: "case1testLocalStep" }, { id: "case2testLocalStep", successMandatory: true }, { id: "case3testLocalStep" }]
 }
 
 const mockInitialStatus: FlowStatus = {
@@ -26,13 +26,15 @@ const mockFinalStatus: FlowStatus = {
     timeStarted: null,
     timeFinished: null,
     statusSummary: {
-        stepFailedId: "case2testLocalStep",
         stepsSuccess: 1,
-        stepsTotal: 3
+        stepsTotal: 3,
+        stepsFailed: 0,
+        stepsInvalid: 1,
+        stepsPending: 1
     },
     syncContext: { flowId: "testFlow" },
     statusTag: FlowStatusTag.failed,
-    statusMeta: null,
+    statusMeta: "Flow finished with pending steps",
 }
 
 export const case2Mocks = { mockInitialStatus, mockFinalStatus }

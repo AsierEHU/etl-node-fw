@@ -49,6 +49,7 @@ export class LocalAdapterRunner implements AdapterRunner {
         } catch (error: any) {
             adapterStatus.statusTag = AdapterStatusTag.failed
             adapterStatus.statusMeta = error.message
+            this.adapterPresenter.emit("adapterError", { error, statusId: adapterStatus.id })
         }
 
         adapterStatus.timeFinished = new Date()

@@ -112,11 +112,11 @@ const mockInitialStatus: AdapterStatus = {
     timeFinished: null
 }
 const mockFinalSummary: RegisterStats = {
-    output_rows: 2,
-    rows_failed: 0,
-    rows_invalid: 1,
-    rows_skipped: 0,
-    rows_success: 1,
+    registers_total: 2,
+    registers_failed: 0,
+    registers_invalid: 1,
+    registers_skipped: 0,
+    registers_success: 1,
 }
 const mockFinalStatus: AdapterStatus = {
     ...mockInitialStatus,

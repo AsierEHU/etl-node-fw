@@ -18,7 +18,9 @@ export type FlowRunOptions = {
 }
 
 export type FlowStatusSummary = { //Audit
-    stepsSuccess: number
-    stepsTotal: number
-    stepFailedId: string | null
+    stepsSuccess: number,
+    stepsTotal: number,
+    stepsFailed: number,
+    stepsInvalid: number,
+    stepsPending: number,
 }

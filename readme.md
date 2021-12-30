@@ -21,7 +21,7 @@ Tools for:
 
 - **Factories**: Create new runners by definition.
 - **ETL Runners**: Expose process status and metrics. Perform pre and post Adapter running tasks.
-- **ETL process**: Tranform a definition into a result. Return summaraized results (metrics, status).
+- **ETL process**: Tranform a definition into a result. Return summaraized results (monitoring).
 
 ## ETL Framework elements
 

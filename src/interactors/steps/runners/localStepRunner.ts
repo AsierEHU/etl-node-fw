@@ -32,14 +32,15 @@ export class LocalStepRunner implements StepRunner {
         try {
             const stepSummary = await this.step.run(runOptions)
             stepStatus.statusSummary = stepSummary
-            if (stepSummary.failedByDefinition) {
-                stepStatus.statusTag = StepStatusTag.failed
+            if (stepSummary.isInvalid) {
+                stepStatus.statusTag = StepStatusTag.invalid
             } else {
                 stepStatus.statusTag = StepStatusTag.success
             }
         } catch (error: any) {
             stepStatus.statusTag = StepStatusTag.failed
             stepStatus.statusMeta = error.message
+            this.stepPresenter.emit("stepError", { error, statusId: stepStatus.id })
         }
 
         stepStatus.timeFinished = new Date()

@@ -60,9 +60,9 @@ export type RegisterInitValues = {
 }
 
 export type RegisterStats = { //Audit
-    output_rows: number
-    rows_success: number
-    rows_failed: number
-    rows_invalid: number
-    rows_skipped: number
+    registers_total: number
+    registers_success: number
+    registers_failed: number
+    registers_invalid: number
+    registers_skipped: number
 }

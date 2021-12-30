@@ -18,9 +18,11 @@ export class LocalFlow<fd extends LocalFlowDefinition> implements Flow<fd> {
 
     async run(flowRunOptions: FlowRunOptions): Promise<FlowStatusSummary> {
         const flowStatusSummary: FlowStatusSummary = {
-            stepFailedId: null,
             stepsSuccess: 0,
-            stepsTotal: this.flowDefinition.stepsDefinitionFlow.length
+            stepsTotal: this.flowDefinition.stepsDefinitionFlow.length,
+            stepsFailed: 0,
+            stepsInvalid: 0,
+            stepsPending: this.flowDefinition.stepsDefinitionFlow.length,
         }
         const stepsDefinitionsFlows = this.flowDefinition.stepsDefinitionFlow
         for (const stepDefinitionFlow of stepsDefinitionsFlows) {
@@ -35,12 +37,21 @@ export class LocalFlow<fd extends LocalFlowDefinition> implements Flow<fd> {
 
             try {
                 const stepStatus = await stepRunner.run(stepRunnerRunOptions)
-                if (stepStatus.statusTag == StepStatusTag.failed) {
-                    flowStatusSummary.stepFailedId = stepDefinitionId;
-                    break;
-                } else {
-                    flowStatusSummary.stepsSuccess++
+                flowStatusSummary.stepsPending--
+                switch (stepStatus.statusTag) {
+                    case StepStatusTag.failed:
+                        flowStatusSummary.stepsFailed++;
+                        break;
+                    case StepStatusTag.success:
+                        flowStatusSummary.stepsSuccess++;
+                        break;
+                    case StepStatusTag.invalid:
+                        flowStatusSummary.stepsInvalid++;
+                        break;
                 }
+                if (stepDefinitionFlow.successMandatory && stepStatus.statusTag != StepStatusTag.success)
+                    break;
+
             } catch (error) {
                 throw error
             }
@@ -53,5 +64,5 @@ export class LocalFlow<fd extends LocalFlowDefinition> implements Flow<fd> {
 export abstract class LocalFlowDefinition implements FlowDefinition {
     abstract readonly id: string
     abstract readonly definitionType: string;
-    abstract readonly stepsDefinitionFlow: { id: string, runOptions?: AdapterRunnerRunOptions }[]
+    abstract readonly stepsDefinitionFlow: { id: string, runOptions?: AdapterRunnerRunOptions, successMandatory?: boolean }[]
 }

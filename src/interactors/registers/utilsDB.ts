@@ -57,11 +57,11 @@ export class AdvancedRegisterFetcher {
     async getRegistersSummary(adapterId: string): Promise<RegisterStats> {
         const outputRegisters = await this.registerDataAccess.getAll({ adapterId })
         const statusSummary = {
-            output_rows: outputRegisters.length,
-            rows_success: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.success).length,
-            rows_failed: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.failed).length,
-            rows_invalid: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.invalid).length,
-            rows_skipped: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.skipped).length,
+            registers_total: outputRegisters.length,
+            registers_success: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.success).length,
+            registers_failed: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.failed).length,
+            registers_invalid: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.invalid).length,
+            registers_skipped: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.skipped).length,
         };
         return statusSummary;
     }

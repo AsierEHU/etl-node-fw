@@ -9,7 +9,7 @@ export const case3Definition: LocalStepDefinition = {
     adapterDefinitionId: "case1Extractor",
     retartTries: 1,
     definitionType: "LocalStepDefinition",
-    isFailedStatus: function (statusSummary: RegisterStats): boolean {
+    isInvalid: function (statusSummary: RegisterStats): boolean {
         return false
     },
     adapterDefinitionRunOptions: {
@@ -44,14 +44,14 @@ const mockFinalStatus: StepStatus = {
     timeFinished: null,   //debugging
     statusSummary: {
         registerStats: {
-            output_rows: 7,
-            rows_success: 3,
-            rows_failed: 2,
-            rows_invalid: 1,
-            rows_skipped: 1,
+            registers_total: 7,
+            registers_success: 3,
+            registers_failed: 2,
+            registers_invalid: 1,
+            registers_skipped: 1,
         },
         tryNumber: 2, //retries
-        failedByDefinition: false
+        isInvalid: false
     }
 }
 

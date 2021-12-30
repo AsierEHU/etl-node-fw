@@ -7,6 +7,7 @@ export enum StepStatusTag {
     pending = "pending", //pendiente de ejecución
     active = "active", //Ejecutandose
     success = "success", //sin erroes
+    invalid = "invalid", // invalid business result
     failed = "failed", //Software error or all records in (failed, invalid)
 }
 
@@ -16,7 +17,6 @@ export type StepStatus = {
     definitionType: string
     statusTag: StepStatusTag //debugging
     statusMeta: StepMeta
-    // exceptionTrace: object, //debugging
     syncContext: SyncContext
     timeStarted: Date | null  //debugging
     timeFinished: Date | null   //debugging
