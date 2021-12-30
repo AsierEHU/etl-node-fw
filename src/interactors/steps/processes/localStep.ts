@@ -1,8 +1,8 @@
 import { cloneDeep } from "lodash";
 import { AdapterFactory } from "../../adapters/factory";
-import { AdapterRunnerRunOptions, AdapterStatusTag } from "../../adapters/types";
+import { AdapterRunnerRunOptions, AdapterStatusTag } from "../../adapters/runners/types";
 import { RegisterStatusSummary } from "../../registers/types";
-import { Step, StepDefinition, StepStatusSummary } from "../types"
+import { Step, StepStatusSummary, StepDefinition } from "./types";
 /**
  * Local async step, persistance
  */

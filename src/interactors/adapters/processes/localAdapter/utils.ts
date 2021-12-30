@@ -1,4 +1,4 @@
-import { RegisterStatusTag } from "../../registers/types";
+import { RegisterStatusTag } from "../../../registers/types";
 import { ValidationResult, ValidationStatusTag } from "./types";
 
 export const getValidationResultWithMeta = (validation: ValidationResult | ValidationStatusTag): ValidationResult => {

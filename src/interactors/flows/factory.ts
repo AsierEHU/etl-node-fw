@@ -1,6 +1,8 @@
-import { LocalFlow } from "./definitions/localFlow"
+import { LocalFlow } from "./processes/localFlow"
+import { Flow, FlowDefinition } from "./processes/types"
 import { LocalFlowRunner } from "./runners/localFlowRunner"
-import { Flow, FlowDefinition, FlowRunner } from "./types"
+import { FlowRunner } from "./runners/types"
+
 
 const frdt = {
     ["LocalFlowRunner"]: {

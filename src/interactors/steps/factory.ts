@@ -1,7 +1,7 @@
-import { LocalStep } from "./definitions/localStep";
-import { LocalStepRunner } from "./runners/localStepRunner";
-import { Step, StepDefinition, StepRunner } from "./types"
-
+import { LocalStep } from "./processes/localStep"
+import { StepDefinition, Step } from "./processes/types"
+import { LocalStepRunner } from "./runners/localStepRunner"
+import { StepRunner } from "./runners/types"
 
 const srdt = {
     ["LocalStepRunner"]: {

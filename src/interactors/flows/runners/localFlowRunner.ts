@@ -1,8 +1,9 @@
-import EventEmitter from "events";
-import { cloneDeep } from "lodash";
-import { SyncContext } from "../../registers/types";
-import { Flow, FlowDefinition, FlowRunner, FlowRunOptions, FlowStatus, FlowStatusTag } from "../types";
+import EventEmitter from 'events';
+import { cloneDeep } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
+import { SyncContext } from '../../registers/types';
+import { Flow, FlowDefinition, FlowRunOptions } from '../processes/types';
+import { FlowRunner, FlowStatusTag, FlowStatus } from './types';
 
 export class LocalFlowRunner implements FlowRunner {
 

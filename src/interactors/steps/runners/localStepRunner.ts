@@ -1,9 +1,10 @@
-import EventEmitter from "events";
-import { SyncContext } from "../../registers/types";
-import { Step, StepStatus, StepStatusTag, StepDefinition, StepRunner } from "../types"
+import EventEmitter from 'events';
+import { cloneDeep } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
-import { cloneDeep } from "lodash";
-import { AdapterRunnerRunOptions } from "../../adapters/types";
+import { AdapterRunnerRunOptions } from '../../adapters/runners/types';
+import { SyncContext } from '../../registers/types';
+import { Step, StepDefinition } from '../processes/types';
+import { StepRunner, StepStatusTag, StepStatus } from './types';
 
 /**
  * Local async step, persistance

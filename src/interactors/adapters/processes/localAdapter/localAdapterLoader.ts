@@ -1,11 +1,10 @@
-
-import { Register, RegisterStatusTag, SyncContext } from "../../registers/types";
-import { AdapterDefinition, AdapterRunOptions, InputEntity } from "../types"
-import { v4 as uuidv4 } from 'uuid';
+import { SyncContext, Register, RegisterStatusTag } from "../../../registers/types";
+import { getWithInitFormat } from "../../../registers/utils";
+import { AdapterRunOptions, AdapterDefinition } from "../types";
 import { LocalAdapter } from "./localAdapter";
+import { InputEntity, ValidationResult, ValidationStatusTag } from "./types";
 import { getValidationResultWithMeta, validationTagToRegisterTag } from "./utils";
-import { ValidationResult, ValidationStatusTag } from "./types";
-import { getWithInitFormat } from "../../registers/utils";
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Local async step, persistance

@@ -1,7 +1,7 @@
-import { AdapterRunOptions } from "../../../src/interactors/adapters/types"
+import { AdapterRunOptions } from "../../../src/interactors/adapters/processes/types"
 import { RegisterStatusSummary } from "../../../src/interactors/registers/types"
-import { LocalStepDefinition } from "../../../src/interactors/steps/definitions/localStep"
-import { StepStatus, StepStatusTag } from "../../../src/interactors/steps/types"
+import { LocalStepDefinition } from "../../../src/interactors/steps/processes/localStep"
+import { StepStatus, StepStatusTag } from "../../../src/interactors/steps/runners/types"
 
 export const case2Definition: LocalStepDefinition = {
     id: "case2testLocalStep",

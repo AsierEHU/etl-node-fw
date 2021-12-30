@@ -1,10 +1,11 @@
-import EventEmitter from "events";
-import { RegisterDataAccess, SyncContext } from "../../registers/types";
-import { Adapter, AdapterDefinition, AdapterRunner, AdapterRunnerRunOptions, AdapterRunOptions, AdapterStatus, AdapterStatusTag } from "../types";
+import EventEmitter from 'events';
+import { cloneDeep } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
-import { getWithInitFormat, initRegisters } from "../../registers/utils";
-import { cloneDeep } from "lodash";
-import { AdvancedRegisterFetcher } from "../../registers/utilsDB";
+import { RegisterDataAccess, SyncContext } from '../../registers/types';
+import { getWithInitFormat, initRegisters } from '../../registers/utils';
+import { AdvancedRegisterFetcher } from '../../registers/utilsDB';
+import { Adapter, AdapterDefinition, AdapterRunOptions } from '../processes/types';
+import { AdapterRunner, AdapterRunnerRunOptions, AdapterStatusTag, AdapterStatus } from './types';
 
 export class LocalAdapterRunner implements AdapterRunner {
 

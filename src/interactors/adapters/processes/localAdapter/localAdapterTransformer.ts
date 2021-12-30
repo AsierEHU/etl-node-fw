@@ -1,8 +1,7 @@
-import { Register, RegisterStatusTag, SyncContext } from "../../registers/types";
-import { AdapterDefinition, AdapterRunOptions } from "../types"
-import { v4 as uuidv4 } from 'uuid';
+import { SyncContext, Register, RegisterStatusTag } from "../../../registers/types";
+import { AdapterRunOptions, AdapterDefinition } from "../types";
 import { LocalAdapter } from "./localAdapter";
-
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Local async step, persistance

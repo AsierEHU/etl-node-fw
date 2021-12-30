@@ -1,11 +1,10 @@
-
-import { EntityFetcher, Register, RegisterDataFilter, RegisterStatusTag, SyncContext } from "../../registers/types";
-import { AdapterDefinition, InputEntity } from "../types"
-import { getValidationResultWithMeta, validationTagToRegisterTag } from "./utils";
+import { SyncContext, Register, RegisterDataFilter, RegisterStatusTag, EntityFetcher } from "../../../registers/types";
+import { getWithInitFormat, initRegisters } from "../../../registers/utils";
+import { ContextEntityFetcher } from "../../../registers/utilsDB";
+import { AdapterDefinition } from "../types";
 import { LocalAdapter } from "./localAdapter";
-import { ValidationResult, ValidationStatusTag } from "./types";
-import { getWithInitFormat, initRegisters } from "../../registers/utils";
-import { ContextEntityFetcher } from "../../registers/utilsDB";
+import { InputEntity, ValidationResult, ValidationStatusTag } from "./types";
+import { getValidationResultWithMeta, validationTagToRegisterTag } from "./utils";
 
 /**
  * Local async step, persistance

@@ -1,10 +1,8 @@
-import { Register, SyncContext, RegisterStatusTag, RegisterDataAccess } from "../../registers/types";
-import { Adapter, AdapterDefinition, AdapterRunOptions } from "../types"
-import { cloneDeep } from 'lodash'
-import { AdvancedRegisterFetcher } from "../../registers/utilsDB";
-import { buildRegisterFromOthers } from "../../registers/utils";
-
-
+import { cloneDeep } from "lodash";
+import { RegisterDataAccess, Register, RegisterStatusTag, SyncContext } from "../../../registers/types";
+import { buildRegisterFromOthers } from "../../../registers/utils";
+import { AdvancedRegisterFetcher } from "../../../registers/utilsDB";
+import { AdapterDefinition, Adapter, AdapterRunOptions } from "../types";
 
 
 /**

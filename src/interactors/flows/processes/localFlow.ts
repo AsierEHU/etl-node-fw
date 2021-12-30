@@ -1,7 +1,7 @@
-import { AdapterRunnerRunOptions } from "../../adapters/types";
+import { AdapterRunnerRunOptions } from "../../adapters/runners/types";
 import { StepFactory } from "../../steps/factory"
-import { StepStatusTag } from "../../steps/types"
-import { Flow, FlowDefinition, FlowRunOptions, FlowStatusSummary } from "../types"
+import { StepStatusTag } from "../../steps/runners/types"
+import { Flow, FlowDefinition, FlowRunOptions, FlowStatusSummary } from "./types"
 
 /**
  * Lineal async flow, monolith, persistence

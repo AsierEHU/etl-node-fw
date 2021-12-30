@@ -1,16 +1,17 @@
 import { EventEmitter } from "stream";
 import { VolatileRegisterDataAccess } from "../../src/dataAccess/volatile";
 import { AdapterFactory } from "../../src/interactors/adapters/factory";
-import { AdapterRunnerRunOptions, AdapterRunOptions } from "../../src/interactors/adapters/types";
+import { AdapterRunnerRunOptions } from "../../src/interactors/adapters/runners/types";
 import { RegisterDataAccess, SyncContext } from "../../src/interactors/registers/types";
 import { FlowFactory } from "../../src/interactors/flows/factory";
-import { FlowDefinition, FlowStatus } from "../../src/interactors/flows/types";
+import { FlowDefinition } from "../../src/interactors/flows/processes/types";
 import { case1Definition as adapterCase1Definition } from "../adapters/localAdapterExtractorMocks/case1Mocks";
 import { flowMocksSuites } from "./mocks";
 import { StepFactory } from "../../src/interactors/steps/factory";
 import { case1Definition } from "../steps/localStepMocks/case1Mocks";
 import { case2Definition } from "../steps/localStepMocks/case2Mocks";
 import { case3Definition } from "../steps/localStepMocks/case3Mocks";
+import { FlowStatus } from "../../src/interactors/flows/runners/types";
 
 const adapterDefinitions = [adapterCase1Definition];
 let adapterFactory: AdapterFactory

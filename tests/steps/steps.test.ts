@@ -1,10 +1,12 @@
 import { EventEmitter } from "stream";
 import { VolatileRegisterDataAccess } from "../../src/dataAccess/volatile";
 import { AdapterFactory } from "../../src/interactors/adapters/factory";
-import { AdapterRunnerRunOptions, AdapterRunOptions } from "../../src/interactors/adapters/types";
+import { AdapterRunOptions } from "../../src/interactors/adapters/processes/types";
+import { AdapterRunnerRunOptions } from "../../src/interactors/adapters/runners/types";
 import { RegisterDataAccess, SyncContext } from "../../src/interactors/registers/types";
 import { StepFactory } from "../../src/interactors/steps/factory";
-import { StepDefinition, StepStatus } from "../../src/interactors/steps/types";
+import { StepDefinition } from "../../src/interactors/steps/processes/types";
+import { StepStatus } from "../../src/interactors/steps/runners/types";
 import { case1Definition } from "../adapters/localAdapterExtractorMocks/case1Mocks";
 import { stepMocksSuites } from "./mocks";
 

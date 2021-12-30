@@ -1,9 +1,10 @@
-import { LocalAdapterExtractor } from "./definitions/localAdapterExtractor";
-import { LocalAdapterFlex } from "./definitions/localAdapterFlex";
-import { LocalAdapterLoader } from "./definitions/localAdapterLoader";
-import { LocalAdapterTransformer } from "./definitions/localAdapterTransformer";
-import { LocalAdapterRunner } from "./runners/localAdapterRunner";
-import { Adapter, AdapterDefinition, AdapterRunner } from "./types";
+import { LocalAdapterExtractor } from "./processes/localAdapter/localAdapterExtractor"
+import { LocalAdapterFlex } from "./processes/localAdapter/localAdapterFlex"
+import { LocalAdapterLoader } from "./processes/localAdapter/localAdapterLoader"
+import { LocalAdapterTransformer } from "./processes/localAdapter/localAdapterTransformer"
+import { AdapterDefinition, Adapter } from "./processes/types"
+import { LocalAdapterRunner } from "./runners/localAdapterRunner"
+import { AdapterRunner } from "./runners/types"
 
 
 const ardt = {

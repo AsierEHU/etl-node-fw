@@ -1,23 +1,6 @@
-import { MetaEntity, RegisterStatusSummary, SyncContext } from "../registers/types"
-
-export interface AdapterDefinition {
-    readonly id: string
-    readonly outputType: string
-    readonly definitionType: string
-    //     abstract readonly splitRecords: number
-}
-
-export interface Adapter<ad extends AdapterDefinition> {
-    adapterDefinition: ad
-    run(runOptions: AdapterRunOptions): Promise<void> //start, if registers -> filter input by ids, if skip -> compare hash to skip
-}
-
-export type AdapterRunOptions = { //filters, skips...
-    // getEntitiesOptions?: any
-    useMockedEntities?: boolean
-    onlyFailedEntities?: boolean
-    syncContext: SyncContext
-}
+import { SyncContext, RegisterStatusSummary } from "../../registers/types"
+import { InputEntity } from "../processes/localAdapter/types"
+import { Adapter, AdapterDefinition, AdapterRunOptions } from "../processes/types"
 
 export interface AdapterRunner {
     adapter: Adapter<AdapterDefinition>
@@ -30,7 +13,6 @@ export type AdapterRunnerRunOptions = {
     onlyFailedEntities?: boolean
 }
 
-export type InputEntity<e extends object> = MetaEntity | null | e
 
 export type AdapterStatus = {
     id: string

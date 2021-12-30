@@ -1,8 +1,9 @@
-import { LocalAdapterFlexDefinition } from "../../../src/interactors/adapters/definitions/localAdapterFlex";
-import { ValidationStatusTag } from "../../../src/interactors/adapters/definitions/types";
-import { AdapterStatus, AdapterStatusTag, InputEntity } from "../../../src/interactors/adapters/types";
-import { EntityFetcher, Register, RegisterDataFilter, RegisterStatusSummary, RegisterStatusTag } from "../../../src/interactors/registers/types";
+import { LocalAdapterFlexDefinition } from "../../../src/interactors/adapters/processes/localAdapter/localAdapterFlex";
+import { InputEntity, ValidationStatusTag } from "../../../src/interactors/adapters/processes/localAdapter/types";
+import { AdapterStatus, AdapterStatusTag } from "../../../src/interactors/adapters/runners/types";
+import { Register, EntityFetcher, RegisterDataFilter, RegisterStatusTag, RegisterStatusSummary } from "../../../src/interactors/registers/types";
 import { case4Mocks } from "../localAdapterLoaderMocks/case4Mocks";
+
 
 type result2Class = {
     successTotal: number

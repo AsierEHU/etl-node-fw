@@ -1,8 +1,9 @@
-import { LocalAdapterLoaderDefinition } from "../../../src/interactors/adapters/definitions/localAdapterLoader";
-import { ValidationResult, ValidationStatusTag } from "../../../src/interactors/adapters/definitions/types";
-import { AdapterStatus, AdapterStatusTag, InputEntity } from "../../../src/interactors/adapters/types";
-import { Register, RegisterStatusSummary, RegisterStatusTag } from "../../../src/interactors/registers/types";
+import { LocalAdapterLoaderDefinition } from "../../../src/interactors/adapters/processes/localAdapter/localAdapterLoader";
+import { InputEntity, ValidationResult, ValidationStatusTag } from "../../../src/interactors/adapters/processes/localAdapter/types";
+import { AdapterStatus, AdapterStatusTag } from "../../../src/interactors/adapters/runners/types";
+import { Register, RegisterStatusTag, RegisterStatusSummary } from "../../../src/interactors/registers/types";
 import { case3Mocks } from "../localAdapterTranformerMocks/case3Mocks";
+
 
 type outputClass = {
     text: string,

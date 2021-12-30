@@ -1,6 +1,5 @@
-import { AdapterRunOptions } from "../../../src/interactors/adapters/types"
-import { LocalFlowDefinition } from "../../../src/interactors/flows/definitions/localFlow"
-import { FlowStatus, FlowStatusTag } from "../../../src/interactors/flows/types"
+import { LocalFlowDefinition } from "../../../src/interactors/flows/processes/localFlow"
+import { FlowStatus, FlowStatusTag } from "../../../src/interactors/flows/runners/types"
 
 export const case1Definition: LocalFlowDefinition = {
     id: "case1testLocalFlow",

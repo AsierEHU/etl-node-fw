@@ -1,6 +1,7 @@
-import { LocalAdapterTransformerDefinition } from "../../../src/interactors/adapters/definitions/localAdapterTransformer";
-import { AdapterStatus, AdapterStatusTag, InputEntity } from "../../../src/interactors/adapters/types";
-import { Register, RegisterStatusSummary, RegisterStatusTag } from "../../../src/interactors/registers/types";
+import { LocalAdapterTransformerDefinition } from "../../../src/interactors/adapters/processes/localAdapter/localAdapterTransformer";
+import { InputEntity } from "../../../src/interactors/adapters/processes/localAdapter/types";
+import { AdapterStatus, AdapterStatusTag } from "../../../src/interactors/adapters/runners/types";
+import { Register, RegisterStatusTag, RegisterStatusSummary } from "../../../src/interactors/registers/types";
 import { case1Mocks } from "../localAdapterExtractorMocks/case1Mocks";
 
 type inputClass = {
