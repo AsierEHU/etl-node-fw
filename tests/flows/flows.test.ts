@@ -11,23 +11,24 @@ import { StepFactory } from "../../src/interactors/steps/factory";
 import { case1Definition } from "../steps/localStepMocks/case1Mocks";
 import { case2Definition } from "../steps/localStepMocks/case2Mocks";
 import { case3Definition } from "../steps/localStepMocks/case3Mocks";
-import { FlowStatus } from "../../src/interactors/flows/runners/types";
+import { FlowStatus, FlowStatusTag } from "../../src/interactors/flows/runners/types";
 
 const adapterDefinitions = [adapterCase1Definition];
 let adapterFactory: AdapterFactory
-let adapterPresenterCallback: any
+let adapterStatusCallback: any
 let registerDataAccess: RegisterDataAccess
 
 const stepDefinitions = [case1Definition, case2Definition, case3Definition]
 let stepFactory: StepFactory
-let stepPresenterCallback: any
+let stepStatusCallback: any
 
 const flowDefinitions: FlowDefinition[] = [];
 flowMocksSuites.forEach(suite => {
     flowDefinitions.push(suite.definition)
 })
 let flowFactory: FlowFactory
-let flowPresenterCallback: any
+let flowStatusCallback: any
+let flowErrorCallback: any
 
 const syncContext: SyncContext = {
 }
@@ -47,18 +48,22 @@ const flowTest = (
 
         beforeEach(() => {
             const presenter = new EventEmitter()
-            flowPresenterCallback = jest.fn(flowStatus => {
+            flowStatusCallback = jest.fn(flowStatus => {
                 return flowStatus
             })
-            stepPresenterCallback = jest.fn(stepStatus => {
+            flowErrorCallback = jest.fn(flowError => {
+                return flowError
+            })
+            stepStatusCallback = jest.fn(stepStatus => {
                 return stepStatus
             })
-            adapterPresenterCallback = jest.fn(adapterStatus => {
+            adapterStatusCallback = jest.fn(adapterStatus => {
                 return adapterStatus
             })
-            presenter.on("adapterStatus", adapterPresenterCallback)
-            presenter.on("stepStatus", stepPresenterCallback)
-            presenter.on("flowStatus", flowPresenterCallback)
+            presenter.on("adapterStatus", adapterStatusCallback)
+            presenter.on("stepStatus", stepStatusCallback)
+            presenter.on("flowStatus", flowStatusCallback)
+            presenter.on("flowError", flowErrorCallback)
 
             registerDataAccess = new VolatileRegisterDataAccess()
             const adapterDependencies = {
@@ -84,9 +89,15 @@ const flowTest = (
             const flow1 = flowFactory.createFlowRunner(definition.id)
             const finalFlowStatus = await flow1.run(defaultRunOptions);
             statusEqual(finalFlowStatus, mocks.mockFinalStatus)
-            expect(flowPresenterCallback.mock.calls.length).toBe(3)
-            statusEqual(flowPresenterCallback.mock.results[0].value, mocks.mockInitialStatus)
-            statusEqual(flowPresenterCallback.mock.results[2].value, mocks.mockFinalStatus)
+            expect(flowStatusCallback.mock.calls.length).toBe(3)
+            statusEqual(flowStatusCallback.mock.results[0].value, mocks.mockInitialStatus)
+            statusEqual(flowStatusCallback.mock.results[2].value, mocks.mockFinalStatus)
+            if (finalFlowStatus.statusTag == FlowStatusTag.failed) {
+                expect(flowErrorCallback).toBeCalled()
+            }
+            else {
+                expect(flowErrorCallback).not.toBeCalled()
+            }
         })
 
     })

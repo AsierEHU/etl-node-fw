@@ -6,13 +6,13 @@ import { AdapterRunnerRunOptions } from "../../src/interactors/adapters/runners/
 import { RegisterDataAccess, SyncContext } from "../../src/interactors/registers/types";
 import { StepFactory } from "../../src/interactors/steps/factory";
 import { StepDefinition } from "../../src/interactors/steps/processes/types";
-import { StepStatus } from "../../src/interactors/steps/runners/types";
+import { StepStatus, StepStatusTag } from "../../src/interactors/steps/runners/types";
 import { case1Definition } from "../adapters/localAdapterExtractorMocks/case1Mocks";
 import { stepMocksSuites } from "./mocks";
 
 const adapterDefinitions = [case1Definition];
 let adapterFactory: AdapterFactory
-let adapterPresenterCallback: any
+let adapterStatusCallback: any
 let registerDataAccess: RegisterDataAccess
 
 const stepDefinitions: StepDefinition[] = [];
@@ -20,7 +20,8 @@ stepMocksSuites.forEach(suite => {
     stepDefinitions.push(suite.definition)
 })
 let stepFactory: StepFactory
-let stepPresenterCallback: any
+let stepStatusCallback: any
+let stepErrorCallback: any
 
 const syncContext: SyncContext = {
     flowId: "testFlow",
@@ -42,14 +43,18 @@ const stepTest = (
 
         beforeEach(() => {
             const presenter = new EventEmitter()
-            stepPresenterCallback = jest.fn(stepStatus => {
+            stepStatusCallback = jest.fn(stepStatus => {
                 return stepStatus
             })
-            adapterPresenterCallback = jest.fn(adapterStatus => {
+            stepErrorCallback = jest.fn(stepError => {
+                return stepError
+            })
+            adapterStatusCallback = jest.fn(adapterStatus => {
                 return adapterStatus
             })
-            presenter.on("adapterStatus", adapterPresenterCallback)
-            presenter.on("stepStatus", stepPresenterCallback)
+            presenter.on("adapterStatus", adapterStatusCallback)
+            presenter.on("stepStatus", stepStatusCallback)
+            presenter.on("stepError", stepErrorCallback)
             registerDataAccess = new VolatileRegisterDataAccess()
             const adapterDependencies = {
                 adapterPresenter: presenter,
@@ -67,15 +72,21 @@ const stepTest = (
             const step1 = stepFactory.createStepRunner(definition.id)
             const finalStepStatus = await step1.run(defaultRunOptions);
             statusEqual(finalStepStatus, mocks.mockFinalStatus)
-            expect(stepPresenterCallback.mock.calls.length).toBe(3)
-            statusEqual(stepPresenterCallback.mock.results[0].value, mocks.mockInitialStatus)
-            statusEqual(stepPresenterCallback.mock.results[2].value, mocks.mockFinalStatus)
+            expect(stepStatusCallback.mock.calls.length).toBe(3)
+            statusEqual(stepStatusCallback.mock.results[0].value, mocks.mockInitialStatus)
+            statusEqual(stepStatusCallback.mock.results[2].value, mocks.mockFinalStatus)
+            if (finalStepStatus.statusTag == StepStatusTag.failed) {
+                expect(stepErrorCallback).toBeCalled()
+            }
+            else {
+                expect(stepErrorCallback).not.toBeCalled()
+            }
         })
 
         test("Adapter run options", async () => {
             const step1 = stepFactory.createStepRunner(definition.id)
             await step1.run(defaultRunOptions);
-            runOptionsEqual(adapterPresenterCallback.mock.results[2].value.runOptions, mocks.mockAdapterRunOptions)
+            runOptionsEqual(adapterStatusCallback.mock.results[2].value.runOptions, mocks.mockAdapterRunOptions)
         })
 
     })

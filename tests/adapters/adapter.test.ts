@@ -3,7 +3,7 @@ import { VolatileRegisterDataAccess } from "../../src/dataAccess/volatile";
 import { AdapterFactory } from "../../src/interactors/adapters/factory";
 import { InputEntity } from "../../src/interactors/adapters/processes/localAdapter/types";
 import { AdapterDefinition, AdapterRunOptions } from "../../src/interactors/adapters/processes/types";
-import { AdapterRunnerRunOptions, AdapterStatus } from "../../src/interactors/adapters/runners/types";
+import { AdapterRunnerRunOptions, AdapterStatus, AdapterStatusTag } from "../../src/interactors/adapters/runners/types";
 import { RegisterDataAccess, Register, SyncContext, RegisterStatusTag } from "../../src/interactors/registers/types";
 import { getWithInitFormat, initRegisters, isByGroupSource, isOrigin, isByRowSource } from "../../src/interactors/registers/utils";
 import { adapterMocksSuites } from "./mocks";
@@ -14,7 +14,8 @@ adapterMocksSuites.forEach(suite => {
     adapterDefinitions.push(suite.definition)
 })
 let adapterFactory: AdapterFactory
-let adapterPresenterCallback: any
+let adapterStatusCallback: any
+let adapterErrorCallback: any
 let registerDataAccess: RegisterDataAccess
 
 let syncContext = {
@@ -40,10 +41,14 @@ const adapterTest = (
 
         beforeEach(() => {
             const adapterPresenter = new EventEmitter()
-            adapterPresenterCallback = jest.fn(adapterStatus => {
+            adapterStatusCallback = jest.fn(adapterStatus => {
                 return adapterStatus
             })
-            adapterPresenter.on("adapterStatus", adapterPresenterCallback)
+            adapterPresenter.on("adapterStatus", adapterStatusCallback)
+            adapterErrorCallback = jest.fn(adapterError => {
+                return adapterError
+            })
+            adapterPresenter.on("adapterError", adapterErrorCallback)
             registerDataAccess = new VolatileRegisterDataAccess(mocks.mockInitialRegisters)
             const adapterDependencies = {
                 adapterPresenter,
@@ -56,9 +61,15 @@ const adapterTest = (
             const adapter1 = adapterFactory.createAdapterRunner(definition.id)
             const finalAdapterStatus = await adapter1.run(defaultRunOptions);
             statusEqual(finalAdapterStatus, mocks.mockFinalStatus)
-            expect(adapterPresenterCallback.mock.calls.length).toBe(3)
-            statusEqual(adapterPresenterCallback.mock.results[0].value, mocks.mockInitialStatus)
-            statusEqual(adapterPresenterCallback.mock.results[2].value, mocks.mockFinalStatus)
+            expect(adapterStatusCallback.mock.calls.length).toBe(3)
+            statusEqual(adapterStatusCallback.mock.results[0].value, mocks.mockInitialStatus)
+            statusEqual(adapterStatusCallback.mock.results[2].value, mocks.mockFinalStatus)
+            if (finalAdapterStatus.statusTag == AdapterStatusTag.failed) {
+                expect(adapterErrorCallback).toBeCalled()
+            }
+            else {
+                expect(adapterErrorCallback).not.toBeCalled()
+            }
         })
 
         test("Presenter calls: runOptions", async () => {
@@ -67,8 +78,8 @@ const adapterTest = (
             const outputRunOptions: AdapterRunOptions = { syncContext: defaultRunOptions.syncContext as SyncContext, onlyFailedEntities: false, useMockedEntities: true }
             const finalAdapterStatus = await adapter1.run(inputRunOptions);
             runOptionsEqual(finalAdapterStatus.runOptions as AdapterRunOptions, outputRunOptions)
-            runOptionsEqual(adapterPresenterCallback.mock.results[0].value.runOptions, outputRunOptions)
-            runOptionsEqual(adapterPresenterCallback.mock.results[2].value.runOptions, outputRunOptions)
+            runOptionsEqual(adapterStatusCallback.mock.results[0].value.runOptions, outputRunOptions)
+            runOptionsEqual(adapterStatusCallback.mock.results[2].value.runOptions, outputRunOptions)
         })
 
         //test statussummary
@@ -78,10 +89,10 @@ const adapterTest = (
 
         beforeEach(() => {
             const adapterPresenter = new EventEmitter()
-            adapterPresenterCallback = jest.fn(adapterStatus => {
+            adapterStatusCallback = jest.fn(adapterStatus => {
                 return adapterStatus
             })
-            adapterPresenter.on("adapterStatus", adapterPresenterCallback)
+            adapterPresenter.on("adapterStatus", adapterStatusCallback)
             registerDataAccess = new VolatileRegisterDataAccess(mocks.mockInitialRegisters)
             const adapterDependencies = {
                 adapterPresenter,

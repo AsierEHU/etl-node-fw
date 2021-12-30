@@ -29,8 +29,7 @@ export class LocalFlowRunner implements FlowRunner {
             const flowSummary = await this.flow.run(runOptions)
             flowStatus.statusSummary = flowSummary
             if (flowSummary.stepsPending) {
-                flowStatus.statusTag = FlowStatusTag.failed
-                flowStatus.statusMeta = "Flow finished with pending steps"
+                throw new Error("Flow finished with pending steps")
             } else {
                 flowStatus.statusTag = FlowStatusTag.success
             }
