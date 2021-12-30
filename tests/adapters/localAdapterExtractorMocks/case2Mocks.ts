@@ -35,29 +35,21 @@ const mockInitialStatus: AdapterStatus = {
     id: "testAdapter",
     outputType: "inputClass",
     runOptions: null,
-    statusSummary: {
-        output_rows: 0,
-        rows_failed: 0,
-        rows_invalid: 0,
-        rows_skipped: 0,
-        rows_success: 0,
-    },
+    statusSummary: null,
     statusTag: AdapterStatusTag.pending,
     statusMeta: null,
     syncContext: { adapterId: "testAdapter", stepId: "testStep", flowId: "testFlow" },
+    timeStarted: null,
+    timeFinished: null
 }
-const mockFinalSummary = {
-    output_rows: 0,
-    rows_failed: 0,
-    rows_invalid: 0,
-    rows_skipped: 0,
-    rows_success: 0,
-}
+const mockFinalSummary = null
 const mockFinalStatus: AdapterStatus = {
     ...mockInitialStatus,
     statusSummary: mockFinalSummary,
     statusTag: AdapterStatusTag.failed,
-    statusMeta: "Getting entities error"
+    statusMeta: "Getting entities error",
+    timeStarted: null,
+    timeFinished: null
 }
 
 export const case2Mocks = { mockInitialStatus, mockFinalStatus, mockFinalRegisters, inputEntities, mockInitialRegisters, mockNewRegisters }

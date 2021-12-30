@@ -18,8 +18,6 @@ export class LocalFlow<fd extends LocalFlowDefinition> implements Flow<fd> {
 
     async run(flowRunOptions: FlowRunOptions): Promise<FlowStatusSummary> {
         const flowStatusSummary: FlowStatusSummary = {
-            timeStarted: new Date(),
-            timeFinished: null,
             stepFailedId: null,
             stepsSuccess: 0,
             stepsTotal: this.flowDefinition.stepsDefinitionFlow.length
@@ -47,7 +45,7 @@ export class LocalFlow<fd extends LocalFlowDefinition> implements Flow<fd> {
                 throw error
             }
         }
-        flowStatusSummary.timeFinished = new Date()
+
         return flowStatusSummary
     }
 }

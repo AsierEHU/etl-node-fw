@@ -18,12 +18,14 @@ export type StepStatus = {
     statusMeta: StepMeta
     // exceptionTrace: object, //debugging
     syncContext: SyncContext
-    statusSummary: StepStatusSummary
+    timeStarted: Date | null  //debugging
+    timeFinished: Date | null   //debugging
+    statusSummary: StepStatusSummary | null
 }
 
 export type StepMeta = string | object | null
 
 export interface StepRunner {
     step: Step<StepDefinition>
-    run(runOptions?: AdapterRunnerRunOptions): Promise<StepStatus> 
+    run(runOptions?: AdapterRunnerRunOptions): Promise<StepStatus>
 }

@@ -38,6 +38,7 @@ export class LocalAdapterRunner implements AdapterRunner {
         this.adapterPresenter.emit("adapterStatus", cloneDeep(adapterStatus))
 
         adapterStatus.statusTag = AdapterStatusTag.active
+        adapterStatus.timeStarted = new Date()
         this.adapterPresenter.emit("adapterStatus", cloneDeep(adapterStatus))
 
         try {
@@ -50,6 +51,7 @@ export class LocalAdapterRunner implements AdapterRunner {
             adapterStatus.statusMeta = error.message
         }
 
+        adapterStatus.timeFinished = new Date()
         this.adapterPresenter.emit("adapterStatus", cloneDeep(adapterStatus))
         return cloneDeep(adapterStatus);
     }
@@ -57,22 +59,18 @@ export class LocalAdapterRunner implements AdapterRunner {
     private buildStatus(syncContext?: SyncContext): AdapterStatus {
         const id = uuidv4();
         const adapterDefinition = this.adapter.adapterDefinition;
-        const adapterStatus = {
+        const adapterStatus: AdapterStatus = {
             id,
             definitionId: adapterDefinition.id,
             definitionType: adapterDefinition.definitionType,
             outputType: adapterDefinition.outputType,
             statusTag: AdapterStatusTag.pending,
             statusMeta: null,
-            statusSummary: {
-                output_rows: 0,
-                rows_success: 0,
-                rows_failed: 0,
-                rows_invalid: 0,
-                rows_skipped: 0,
-            },
+            statusSummary: null,
             runOptions: null,
-            syncContext: { ...syncContext, adapterId: id }
+            syncContext: { ...syncContext, adapterId: id },
+            timeStarted: null,
+            timeFinished: null
         }
         return adapterStatus
     }

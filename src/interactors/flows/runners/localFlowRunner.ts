@@ -22,6 +22,7 @@ export class LocalFlowRunner implements FlowRunner {
         this.flowPresenter.emit("flowStatus", cloneDeep(flowStatus))
 
         flowStatus.statusTag = FlowStatusTag.active
+        flowStatus.timeStarted = new Date()
         this.flowPresenter.emit("flowStatus", cloneDeep(flowStatus))
 
         try {
@@ -37,6 +38,7 @@ export class LocalFlowRunner implements FlowRunner {
             flowStatus.statusMeta = error.message
         }
 
+        flowStatus.timeFinished = new Date()
         this.flowPresenter.emit("flowStatus", cloneDeep(flowStatus))
         return cloneDeep(flowStatus);
     }
@@ -50,13 +52,9 @@ export class LocalFlowRunner implements FlowRunner {
             definitionType: flowDefinition.definitionType,
             statusTag: FlowStatusTag.pending,
             statusMeta: null,
-            statusSummary: {
-                timeStarted: null,
-                timeFinished: null,
-                stepFailedId: null,
-                stepsSuccess: 0,
-                stepsTotal: 0
-            },
+            timeStarted: null,
+            timeFinished: null,
+            statusSummary: null,
             syncContext: { ...syncContext, flowId: id }
         }
         return flowStatus

@@ -1,7 +1,7 @@
 import { cloneDeep } from "lodash";
 import { AdapterFactory } from "../../adapters/factory";
 import { AdapterRunnerRunOptions, AdapterStatusTag } from "../../adapters/runners/types";
-import { RegisterStatusSummary } from "../../registers/types";
+import { RegisterStats } from "../../registers/types";
 import { Step, StepStatusSummary, StepDefinition } from "./types";
 /**
  * Local async step, persistance
@@ -27,7 +27,7 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
         }
 
         const stepStatusSummary: StepStatusSummary = {
-            registerStatusSummary: {
+            registerStats: {
                 output_rows: 0,
                 rows_success: 0,
                 rows_failed: 0,
@@ -35,12 +35,9 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
                 rows_skipped: 0,
             },
             tryNumber: 0,
-            timeStarted: new Date(),
-            timeFinished: null,
             failedByDefinition: false,
         }
         await this.tryRunAdapter(stepStatusSummary, runOptions);
-        stepStatusSummary.timeFinished = new Date();
         return cloneDeep(stepStatusSummary)
     }
 
@@ -51,16 +48,16 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
         try {
             const adapterRunner = this.adapterFactory.createAdapterRunner(this.stepDefinition.adapterDefinitionId)
             const adapterStatus = await adapterRunner.run(adapterRunOptions)
-            const registerStatusSummary = adapterStatus.statusSummary;
-            const stepRegisterStatusSummary = stepStatusSummary.registerStatusSummary;
-            this.fillSummary(stepRegisterStatusSummary, registerStatusSummary, adapterRunOptions?.onlyFailedEntities)
+            const registerStats = adapterStatus.statusSummary as RegisterStats;
+            const stepRegisterStatusSummary = stepStatusSummary.registerStats;
+            this.fillSummary(stepRegisterStatusSummary, registerStats, adapterRunOptions?.onlyFailedEntities)
 
             if (adapterStatus.statusTag == AdapterStatusTag.failed && this.canRetry(stepStatusSummary.tryNumber)) {
                 const restartAdapterRunOptions = { ...adapterRunOptions, onlyFailedEntities: true }
                 await this.tryRunAdapter(stepStatusSummary, restartAdapterRunOptions);
             }
             else {
-                if (registerStatusSummary && registerStatusSummary.rows_failed > 0 && this.canRetry(stepStatusSummary.tryNumber)) {
+                if (registerStats && registerStats.rows_failed > 0 && this.canRetry(stepStatusSummary.tryNumber)) {
                     const restartAdapterRunOptions = { ...adapterRunOptions, onlyFailedEntities: true }
                     await this.tryRunAdapter(stepStatusSummary, restartAdapterRunOptions);
                 }
@@ -82,7 +79,7 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
     }
 
 
-    private fillSummary(stepStatusSummary: RegisterStatusSummary, adapterStatusSummary: RegisterStatusSummary, onlyFailedEntities?: boolean) {
+    private fillSummary(stepStatusSummary: RegisterStats, adapterStatusSummary: RegisterStats, onlyFailedEntities?: boolean) {
         if (onlyFailedEntities) {
             stepStatusSummary.rows_success += adapterStatusSummary.rows_success
             stepStatusSummary.rows_failed = adapterStatusSummary.rows_failed
@@ -106,5 +103,5 @@ export abstract class LocalStepDefinition implements StepDefinition {
     abstract readonly definitionType: string;
     abstract readonly id: string
     abstract readonly retartTries: number
-    abstract isFailedStatus(statusSummary: RegisterStatusSummary): boolean
+    abstract isFailedStatus(statusSummary: RegisterStats): boolean
 }

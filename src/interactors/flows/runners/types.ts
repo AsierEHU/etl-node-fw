@@ -14,7 +14,9 @@ export type FlowStatus = {
     definitionType: string
     statusTag: FlowStatusTag  //debugging
     statusMeta: FlowMeta
-    statusSummary: FlowStatusSummary
+    timeStarted: Date | null  //debugging
+    timeFinished: Date | null   //debugging
+    statusSummary: FlowStatusSummary | null
     syncContext: SyncContext
 }
 

@@ -181,6 +181,8 @@ const statusEqual = (adapterStatus: AdapterStatus, mockStatus: AdapterStatus) =>
     adapterStatus.id = mockStatus.id
     adapterStatus.syncContext.adapterId = mockStatus.syncContext.adapterId
     adapterStatus.runOptions = mockStatus.runOptions
+    adapterStatus.timeFinished = mockStatus.timeFinished
+    adapterStatus.timeStarted = mockStatus.timeStarted
     expect(adapterStatus).toEqual(mockStatus)
 }
 

@@ -87,8 +87,8 @@ const statusEqual = (stepStatus: StepStatus, mockStatus: StepStatus) => {
     expect(stepStatus.id).toEqual(stepStatus.syncContext.stepId)
     stepStatus.id = mockStatus.id
     stepStatus.syncContext.stepId = mockStatus.id
-    stepStatus.statusSummary.timeFinished = mockStatus.statusSummary.timeFinished
-    stepStatus.statusSummary.timeStarted = mockStatus.statusSummary.timeStarted
+    stepStatus.timeFinished = mockStatus.timeFinished
+    stepStatus.timeStarted = mockStatus.timeStarted
     expect(stepStatus).toEqual(mockStatus)
 }
 

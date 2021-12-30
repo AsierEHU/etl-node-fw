@@ -26,6 +26,7 @@ export class LocalStepRunner implements StepRunner {
         this.stepPresenter.emit("stepStatus", cloneDeep(stepStatus))
 
         stepStatus.statusTag = StepStatusTag.active
+        stepStatus.timeStarted = new Date()
         this.stepPresenter.emit("stepStatus", cloneDeep(stepStatus))
 
         try {
@@ -41,6 +42,7 @@ export class LocalStepRunner implements StepRunner {
             stepStatus.statusMeta = error.message
         }
 
+        stepStatus.timeFinished = new Date()
         this.stepPresenter.emit("stepStatus", cloneDeep(stepStatus))
         return cloneDeep(stepStatus);
     }
@@ -48,26 +50,16 @@ export class LocalStepRunner implements StepRunner {
     private buildStatus(syncContext?: SyncContext): StepStatus {
         const id = uuidv4();
         const stepDefinition = this.step.stepDefinition;
-        const stepStatus = {
+        const stepStatus: StepStatus = {
             id,
             definitionId: stepDefinition.id,
             definitionType: stepDefinition.definitionType,
             statusTag: StepStatusTag.pending,
             statusMeta: null,
             syncContext: { ...syncContext, stepId: id },
-            statusSummary: {
-                registerStatusSummary: {
-                    output_rows: 0,
-                    rows_success: 0,
-                    rows_failed: 0,
-                    rows_invalid: 0,
-                    rows_skipped: 0,
-                },
-                tryNumber: 0,
-                timeStarted: null,
-                timeFinished: null,
-                failedByDefinition: false,
-            }
+            statusSummary: null,
+            timeStarted: null,
+            timeFinished: null
         }
         return stepStatus
     }

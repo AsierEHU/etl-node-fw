@@ -11,25 +11,21 @@ const mockInitialStatus: FlowStatus = {
     definitionId: "case1testLocalFlow",
     definitionType: "LocalFlowDefinition",
     id: "testFlow",
-    statusSummary: {
-        timeStarted: null,
-        timeFinished: null,
-        stepFailedId: null,
-        stepsSuccess: 0,
-        stepsTotal: 0
-    },
+    statusSummary: null,
     syncContext: { flowId: "testFlow" },
     statusTag: FlowStatusTag.pending,
     statusMeta: null,
+    timeStarted: null,
+    timeFinished: null
 }
 
 const mockFinalStatus: FlowStatus = {
     definitionId: "case1testLocalFlow",
     definitionType: "LocalFlowDefinition",
     id: "testFlow",
+    timeStarted: null,
+    timeFinished: null,
     statusSummary: {
-        timeStarted: null,
-        timeFinished: null,
         stepFailedId: null,
         stepsSuccess: 2,
         stepsTotal: 2

@@ -18,8 +18,6 @@ export type FlowRunOptions = {
 }
 
 export type FlowStatusSummary = { //Audit
-    timeStarted: Date | null  //debugging
-    timeFinished: Date | null   //debugging
     stepsSuccess: number
     stepsTotal: number
     stepFailedId: string | null

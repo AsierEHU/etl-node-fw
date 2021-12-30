@@ -98,8 +98,8 @@ const statusEqual = (flowStatus: FlowStatus, mockStatus: FlowStatus) => {
     expect(flowStatus.id).toEqual(flowStatus.syncContext.flowId)
     flowStatus.id = mockStatus.id
     flowStatus.syncContext.flowId = mockStatus.id
-    flowStatus.statusSummary.timeFinished = mockStatus.statusSummary.timeFinished
-    flowStatus.statusSummary.timeStarted = mockStatus.statusSummary.timeStarted
+    flowStatus.timeFinished = mockStatus.timeFinished
+    flowStatus.timeStarted = mockStatus.timeStarted
     expect(flowStatus).toEqual(mockStatus)
 }
 

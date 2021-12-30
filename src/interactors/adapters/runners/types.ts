@@ -1,4 +1,4 @@
-import { SyncContext, RegisterStatusSummary } from "../../registers/types"
+import { SyncContext, RegisterStats } from "../../registers/types"
 import { InputEntity } from "../processes/localAdapter/types"
 import { Adapter, AdapterDefinition, AdapterRunOptions } from "../processes/types"
 
@@ -21,7 +21,9 @@ export type AdapterStatus = {
     outputType: string
     statusTag: AdapterStatusTag //debugging
     statusMeta: AdapterMeta
-    statusSummary: RegisterStatusSummary,
+    timeStarted: Date | null  //debugging
+    timeFinished: Date | null   //debugging
+    statusSummary: RegisterStats | null,
     runOptions: AdapterRunOptions | null
     syncContext: SyncContext
 }

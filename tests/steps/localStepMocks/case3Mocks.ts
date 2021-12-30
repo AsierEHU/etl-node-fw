@@ -1,5 +1,5 @@
 import { AdapterRunOptions } from "../../../src/interactors/adapters/processes/types"
-import { RegisterStatusSummary } from "../../../src/interactors/registers/types"
+import { RegisterStats } from "../../../src/interactors/registers/types"
 import { LocalStepDefinition } from "../../../src/interactors/steps/processes/localStep"
 import { StepStatus, StepStatusTag } from "../../../src/interactors/steps/runners/types"
 import { case1Mocks } from "../../adapters/localAdapterExtractorMocks/case1Mocks"
@@ -9,7 +9,7 @@ export const case3Definition: LocalStepDefinition = {
     adapterDefinitionId: "case1Extractor",
     retartTries: 1,
     definitionType: "LocalStepDefinition",
-    isFailedStatus: function (statusSummary: RegisterStatusSummary): boolean {
+    isFailedStatus: function (statusSummary: RegisterStats): boolean {
         return false
     },
     adapterDefinitionRunOptions: {
@@ -22,22 +22,12 @@ const mockInitialStatus: StepStatus = {
     definitionId: "case3testLocalStep",
     definitionType: "LocalStepDefinition",
     id: "testStep",
-    statusSummary: {
-        registerStatusSummary: {
-            output_rows: 0,
-            rows_success: 0,
-            rows_failed: 0,
-            rows_invalid: 0,
-            rows_skipped: 0,
-        },
-        tryNumber: 0, //retries
-        timeStarted: null,  //debugging
-        timeFinished: null,   //debugging
-        failedByDefinition: false
-    },
+    statusSummary: null,
     syncContext: { stepId: "testStep", flowId: "testFlow" },
     statusTag: StepStatusTag.pending,
     statusMeta: null,
+    timeStarted: null,
+    timeFinished: null
 }
 
 const mockFinalStatus: StepStatus = {
@@ -50,8 +40,10 @@ const mockFinalStatus: StepStatus = {
         flowId: "testFlow",
         stepId: "testStep",
     },
+    timeStarted: null,  //debugging
+    timeFinished: null,   //debugging
     statusSummary: {
-        registerStatusSummary: {
+        registerStats: {
             output_rows: 7,
             rows_success: 3,
             rows_failed: 2,
@@ -59,8 +51,6 @@ const mockFinalStatus: StepStatus = {
             rows_skipped: 1,
         },
         tryNumber: 2, //retries
-        timeStarted: null,  //debugging
-        timeFinished: null,   //debugging
         failedByDefinition: false
     }
 }

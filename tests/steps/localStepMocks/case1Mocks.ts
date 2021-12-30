@@ -1,5 +1,5 @@
 import { AdapterRunOptions } from "../../../src/interactors/adapters/processes/types"
-import { RegisterStatusSummary } from "../../../src/interactors/registers/types"
+import { RegisterStats } from "../../../src/interactors/registers/types"
 import { LocalStepDefinition } from "../../../src/interactors/steps/processes/localStep"
 import { StepStatus, StepStatusTag } from "../../../src/interactors/steps/runners/types"
 
@@ -8,7 +8,7 @@ export const case1Definition: LocalStepDefinition = {
     adapterDefinitionId: "case1Extractor",
     retartTries: 0,
     definitionType: "LocalStepDefinition",
-    isFailedStatus: function (statusSummary: RegisterStatusSummary): boolean {
+    isFailedStatus: function (statusSummary: RegisterStats): boolean {
         return false
     },
     adapterDefinitionRunOptions: null
@@ -18,22 +18,12 @@ const mockInitialStatus: StepStatus = {
     definitionId: "case1testLocalStep",
     definitionType: "LocalStepDefinition",
     id: "testStep",
-    statusSummary: {
-        registerStatusSummary: {
-            output_rows: 0,
-            rows_success: 0,
-            rows_failed: 0,
-            rows_invalid: 0,
-            rows_skipped: 0,
-        },
-        tryNumber: 0, //retries
-        timeStarted: null,  //debugging
-        timeFinished: null,   //debugging
-        failedByDefinition: false
-    },
+    statusSummary: null,
     syncContext: { stepId: "testStep", flowId: "testFlow" },
     statusTag: StepStatusTag.pending,
     statusMeta: null,
+    timeStarted: null,
+    timeFinished: null
 }
 
 const mockFinalStatus: StepStatus = {
@@ -42,8 +32,10 @@ const mockFinalStatus: StepStatus = {
     id: "testStep",
     statusTag: StepStatusTag.success,
     statusMeta: null,
+    timeStarted: null,  //debugging
+    timeFinished: null,   //debugging
     statusSummary: {
-        registerStatusSummary: {
+        registerStats: {
             output_rows: 7,
             rows_success: 3,
             rows_failed: 2,
@@ -51,8 +43,6 @@ const mockFinalStatus: StepStatus = {
             rows_skipped: 1,
         },
         tryNumber: 1, //retries
-        timeStarted: null,  //debugging
-        timeFinished: null,   //debugging
         failedByDefinition: false
     },
     syncContext: {

@@ -59,7 +59,7 @@ export type RegisterInitValues = {
     sourceEntityId?: string,
 }
 
-export type RegisterStatusSummary = { //Audit
+export type RegisterStats = { //Audit
     output_rows: number
     rows_success: number
     rows_failed: number

@@ -1,5 +1,5 @@
 import { AdapterRunnerRunOptions } from "../../adapters/runners/types";
-import { RegisterStatusSummary } from "../../registers/types";
+import { RegisterStats } from "../../registers/types";
 
 export interface Step<sd extends StepDefinition> {
     stepDefinition: sd
@@ -14,9 +14,7 @@ export interface StepDefinition {
 }
 
 export type StepStatusSummary = { //Audit
-    registerStatusSummary: RegisterStatusSummary
+    registerStats: RegisterStats
     tryNumber: number, //retries
-    timeStarted: Date | null  //debugging
-    timeFinished: Date | null   //debugging
     failedByDefinition: boolean
 }
