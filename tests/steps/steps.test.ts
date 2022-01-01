@@ -2,10 +2,9 @@ import { EventEmitter } from "stream";
 import { VolatileRegisterDataAccess } from "../../src/dataAccess/volatile";
 import { AdapterFactory } from "../../src/interactors/adapters/factory";
 import { AdapterRunOptions } from "../../src/interactors/adapters/processes/types";
-import { AdapterRunnerRunOptions } from "../../src/interactors/adapters/runners/types";
 import { RegisterDataAccess, SyncContext } from "../../src/interactors/registers/types";
 import { StepFactory } from "../../src/interactors/steps/factory";
-import { StepDefinition } from "../../src/interactors/steps/processes/types";
+import { StepDefinition, StepRunOptions } from "../../src/interactors/steps/processes/types";
 import { StepStatus, StepStatusTag } from "../../src/interactors/steps/runners/types";
 import { case1Definition } from "../adapters/localAdapterExtractorMocks/case1Mocks";
 import { stepMocksSuites } from "./mocks";
@@ -26,9 +25,7 @@ let stepErrorCallback: any
 const syncContext: SyncContext = {
     flowId: "testFlow",
 }
-let defaultRunOptions: AdapterRunnerRunOptions = {
-    syncContext
-}
+let defaultRunOptions: {}
 
 
 const stepTest = (
@@ -63,6 +60,7 @@ const stepTest = (
             adapterFactory = new AdapterFactory(adapterDefinitions, adapterDependencies)
             const stepDependencies = {
                 stepPresenter: presenter,
+                registerDataAccess: registerDataAccess,
                 adapterFactory
             }
             stepFactory = new StepFactory(stepDefinitions, stepDependencies)
@@ -70,7 +68,7 @@ const stepTest = (
 
         test("Presenter calls", async () => {
             const step1 = stepFactory.createStepRunner(definition.id)
-            const finalStepStatus = await step1.run(defaultRunOptions);
+            const finalStepStatus = await step1.run(syncContext, defaultRunOptions);
             statusEqual(finalStepStatus, mocks.mockFinalStatus)
             expect(stepStatusCallback.mock.calls.length).toBe(3)
             statusEqual(stepStatusCallback.mock.results[0].value, mocks.mockInitialStatus)
@@ -83,10 +81,12 @@ const stepTest = (
             }
         })
 
-        test("Adapter run options", async () => {
+        test("Presenter calls runOptions", async () => {
             const step1 = stepFactory.createStepRunner(definition.id)
-            await step1.run(defaultRunOptions);
-            runOptionsEqual(adapterStatusCallback.mock.results[2].value.runOptions, mocks.mockAdapterRunOptions)
+            const runOptions: StepRunOptions = { ...defaultRunOptions, pushEntities: [] }
+            await step1.run(syncContext, runOptions);
+            const adapterRunOptions: AdapterRunOptions = { ...mocks.mockAdapterRunOptions, usePushedEntities: true }
+            runOptionsEqual(adapterStatusCallback.mock.results[2].value.runOptions, adapterRunOptions)
         })
 
     })
@@ -104,8 +104,6 @@ const statusEqual = (stepStatus: StepStatus, mockStatus: StepStatus) => {
 }
 
 const runOptionsEqual = (runOtions: AdapterRunOptions, mockRunOptions: AdapterRunOptions) => {
-    runOtions.syncContext.adapterId = mockRunOptions.syncContext.adapterId
-    runOtions.syncContext.stepId = mockRunOptions.syncContext.stepId
     expect(runOtions).toEqual(mockRunOptions)
 }
 

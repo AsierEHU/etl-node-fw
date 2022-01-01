@@ -1,4 +1,3 @@
-import { MetaEntity } from "../../../registers/types"
 
 export enum ValidationStatusTag {
     valid = "valid",
@@ -20,5 +19,3 @@ export type FixedEntity<e extends object> = {
     entity: e,
     meta: any
 }
-
-export type InputEntity<e extends object> = MetaEntity | null | e

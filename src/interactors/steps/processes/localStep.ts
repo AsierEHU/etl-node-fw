@@ -1,8 +1,10 @@
 import { cloneDeep } from "lodash";
 import { AdapterFactory } from "../../adapters/factory";
-import { AdapterRunnerRunOptions, AdapterStatusTag } from "../../adapters/runners/types";
-import { RegisterStats } from "../../registers/types";
-import { Step, StepStatusSummary, StepDefinition } from "./types";
+import { AdapterRunOptions } from "../../adapters/processes/types";
+import { AdapterStatusTag } from "../../adapters/runners/types";
+import { RegisterDataAccess, RegisterStats, SyncContext } from "../../registers/types";
+import { getWithInitFormat, initRegisters } from "../../registers/utils";
+import { Step, StepStatusSummary, StepDefinition, StepRunOptions } from "./types";
 /**
  * Local async step, persistance
  */
@@ -10,20 +12,26 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
 
     public readonly stepDefinition: sd;
     private readonly adapterFactory: AdapterFactory;
+    private readonly registerDataAccess: RegisterDataAccess
 
     constructor(dependencies: any) {
         this.stepDefinition = dependencies.stepDefinition;
         this.adapterFactory = dependencies.adapterFactory;
+        this.registerDataAccess = dependencies.registerDataAccess
     }
 
-    async run(runOptions: AdapterRunnerRunOptions) {
+    async run(syncContext: SyncContext, runOptions?: StepRunOptions) {
         runOptions = cloneDeep(runOptions)
+        syncContext = cloneDeep(syncContext)
 
-        const definitionRunOptions = this.stepDefinition.adapterDefinitionRunOptions
-        if (definitionRunOptions) {
-            runOptions.pushEntities = runOptions.pushEntities || definitionRunOptions.pushEntities
-            runOptions.onlyFailedEntities = runOptions.onlyFailedEntities || definitionRunOptions.onlyFailedEntities
-            runOptions.syncContext = runOptions.syncContext || definitionRunOptions.syncContext
+        let adapterRunOptions = this.stepDefinition.adapterRunOptions
+
+        if (runOptions?.pushEntities) {
+            const pushEntities = runOptions?.pushEntities || [];
+            const inputEntitiesWithMeta = getWithInitFormat(pushEntities)
+            const inputRegisters = initRegisters(inputEntitiesWithMeta, { ...syncContext })
+            await this.registerDataAccess.saveAll(inputRegisters)
+            adapterRunOptions = { ...adapterRunOptions, usePushedEntities: true }
         }
 
         const stepStatusSummary: StepStatusSummary = {
@@ -35,42 +43,42 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
                 registers_skipped: 0,
             },
             tryNumber: 0,
-            isInvalid: false,
+            isInvalidRegistersSummary: false,
         }
-        await this.tryRunAdapter(stepStatusSummary, runOptions);
+
+        await this.tryRunAdapter(stepStatusSummary, syncContext, adapterRunOptions || undefined);
+
         return cloneDeep(stepStatusSummary)
     }
 
-    private async tryRunAdapter(stepStatusSummary: StepStatusSummary, adapterRunOptions?: AdapterRunnerRunOptions) {
+    private async tryRunAdapter(stepStatusSummary: StepStatusSummary, syncContext: SyncContext, adapterRunOptions?: AdapterRunOptions) {
 
         stepStatusSummary.tryNumber++
 
         try {
             const adapterRunner = this.adapterFactory.createAdapterRunner(this.stepDefinition.adapterDefinitionId)
-            const adapterStatus = await adapterRunner.run(adapterRunOptions)
+            const adapterStatus = await adapterRunner.run(syncContext, adapterRunOptions)
             const registerStats = adapterStatus.statusSummary as RegisterStats;
             const stepRegisterStatusSummary = stepStatusSummary.registerStats;
             this.fillSummary(stepRegisterStatusSummary, registerStats, adapterRunOptions?.onlyFailedEntities)
 
             if (adapterStatus.statusTag == AdapterStatusTag.failed && this.canRetry(stepStatusSummary.tryNumber)) {
                 const restartAdapterRunOptions = { ...adapterRunOptions, onlyFailedEntities: true }
-                await this.tryRunAdapter(stepStatusSummary, restartAdapterRunOptions);
+                await this.tryRunAdapter(stepStatusSummary, syncContext, restartAdapterRunOptions);
             }
             else {
                 if (registerStats && registerStats.registers_failed > 0 && this.canRetry(stepStatusSummary.tryNumber)) {
-                    const restartAdapterRunOptions = { ...adapterRunOptions, onlyFailedEntities: true }
-                    await this.tryRunAdapter(stepStatusSummary, restartAdapterRunOptions);
+                    const restartAdapterRunOptions = { ...adapterRunOptions, onlyStepFailedEntities: true }
+                    await this.tryRunAdapter(stepStatusSummary, syncContext, restartAdapterRunOptions);
                 }
                 else {
-                    if (this.stepDefinition.isInvalid(stepRegisterStatusSummary)) {
-                        stepStatusSummary.isInvalid = true
-                    }
+                    stepStatusSummary.isInvalidRegistersSummary = this.stepDefinition.isInvalidRegistersSummary(stepRegisterStatusSummary)
                 }
             }
 
         } catch (error: any) {
             if (this.canRetry(stepStatusSummary.tryNumber)) {
-                await this.tryRunAdapter(stepStatusSummary, adapterRunOptions);
+                await this.tryRunAdapter(stepStatusSummary, syncContext, adapterRunOptions);
             }
             else {
                 throw error
@@ -79,8 +87,8 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
     }
 
 
-    private fillSummary(stepStatusSummary: RegisterStats, adapterStatusSummary: RegisterStats, onlyFailedEntities?: boolean) {
-        if (onlyFailedEntities) {
+    private fillSummary(stepStatusSummary: RegisterStats, adapterStatusSummary: RegisterStats, onlyStepFailedEntities?: boolean) {
+        if (onlyStepFailedEntities) {
             stepStatusSummary.registers_success += adapterStatusSummary.registers_success
             stepStatusSummary.registers_failed = adapterStatusSummary.registers_failed
         } else {
@@ -98,10 +106,10 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
 }
 
 export abstract class LocalStepDefinition implements StepDefinition {
-    abstract readonly adapterDefinitionRunOptions: AdapterRunnerRunOptions | null;
+    abstract readonly adapterRunOptions: AdapterRunOptions | null;
     abstract readonly adapterDefinitionId: string;
     abstract readonly definitionType: string;
     abstract readonly id: string
     abstract readonly retartTries: number
-    abstract isInvalid(statusSummary: RegisterStats): boolean
+    abstract isInvalidRegistersSummary(statusSummary: RegisterStats): boolean
 }

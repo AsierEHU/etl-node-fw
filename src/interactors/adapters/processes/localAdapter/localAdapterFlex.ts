@@ -1,9 +1,9 @@
-import { SyncContext, Register, RegisterDataFilter, RegisterStatusTag, EntityFetcher } from "../../../registers/types";
+import { SyncContext, Register, RegisterDataFilter, RegisterStatusTag, EntityFetcher, InputEntity } from "../../../registers/types";
 import { getWithInitFormat, initRegisters } from "../../../registers/utils";
 import { ContextEntityFetcher } from "../../../registers/utilsDB";
 import { AdapterDefinition } from "../types";
 import { LocalAdapter } from "./localAdapter";
-import { InputEntity, ValidationResult, ValidationStatusTag } from "./types";
+import { ValidationResult, ValidationStatusTag } from "./types";
 import { getValidationResultWithMeta, validationTagToRegisterTag } from "./utils";
 
 /**

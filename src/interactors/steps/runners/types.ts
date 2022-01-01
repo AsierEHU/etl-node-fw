@@ -1,6 +1,5 @@
-import { AdapterRunnerRunOptions } from "../../adapters/runners/types"
 import { SyncContext } from "../../registers/types"
-import { StepStatusSummary, Step, StepDefinition } from "../processes/types"
+import { StepStatusSummary, Step, StepDefinition, StepRunOptions } from "../processes/types"
 
 
 export enum StepStatusTag {
@@ -15,11 +14,11 @@ export type StepStatus = {
     id: string
     definitionId: string
     definitionType: string
-    statusTag: StepStatusTag //debugging
+    statusTag: StepStatusTag
     statusMeta: StepMeta
     syncContext: SyncContext
-    timeStarted: Date | null  //debugging
-    timeFinished: Date | null   //debugging
+    timeStarted: Date | null
+    timeFinished: Date | null
     statusSummary: StepStatusSummary | null
 }
 
@@ -27,5 +26,5 @@ export type StepMeta = string | object | null
 
 export interface StepRunner {
     step: Step<StepDefinition>
-    run(runOptions?: AdapterRunnerRunOptions): Promise<StepStatus>
+    run(syncContext: SyncContext, runOptions?: StepRunOptions): Promise<StepStatus>
 }

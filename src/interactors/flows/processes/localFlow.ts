@@ -1,5 +1,9 @@
-import { AdapterRunnerRunOptions } from "../../adapters/runners/types";
+
+import { cloneDeep } from "lodash";
+import { RegisterDataAccess, SyncContext } from "../../registers/types";
+import { getWithInitFormat, initRegisters } from "../../registers/utils";
 import { StepFactory } from "../../steps/factory"
+import { StepRunOptions } from "../../steps/processes/types";
 import { StepStatusTag } from "../../steps/runners/types"
 import { Flow, FlowDefinition, FlowRunOptions, FlowStatusSummary } from "./types"
 
@@ -10,13 +14,25 @@ export class LocalFlow<fd extends LocalFlowDefinition> implements Flow<fd> {
 
     public readonly flowDefinition: fd
     private readonly stepFactory: StepFactory;
+    private readonly registerDataAccess: RegisterDataAccess
 
     constructor(dependencies: any) {
         this.flowDefinition = dependencies.flowDefinition;
         this.stepFactory = dependencies.stepFactory;
+        this.registerDataAccess = dependencies.registerDataAccess;
     }
 
-    async run(flowRunOptions: FlowRunOptions): Promise<FlowStatusSummary> {
+    async run(syncContext: SyncContext, flowRunOptions: FlowRunOptions): Promise<FlowStatusSummary> {
+        flowRunOptions = cloneDeep(flowRunOptions)
+        syncContext = cloneDeep(syncContext)
+
+        if (flowRunOptions?.flowPushConfig) {
+            const pushConfig = flowRunOptions?.flowPushConfig || [];
+            const inputEntitiesWithMeta = getWithInitFormat(pushConfig, "$configPushed")
+            const inputRegisters = initRegisters(inputEntitiesWithMeta, syncContext)
+            await this.registerDataAccess.saveAll(inputRegisters)
+        }
+
         const flowStatusSummary: FlowStatusSummary = {
             stepsSuccess: 0,
             stepsTotal: this.flowDefinition.stepsDefinitionFlow.length,
@@ -29,14 +45,14 @@ export class LocalFlow<fd extends LocalFlowDefinition> implements Flow<fd> {
             const stepDefinitionId = stepDefinitionFlow.id
             const stepRunner = this.stepFactory.createStepRunner(stepDefinitionId)
 
-            const stepRunnerInputRunOptions = flowRunOptions.stepsRunOptions?.filter(sro => sro.stepDefinitionId == stepDefinitionId)[0]
-            let stepRunnerRunOptions = undefined;
-            if (stepRunnerInputRunOptions || stepDefinitionFlow.runOptions) {
-                stepRunnerRunOptions = { ...stepDefinitionFlow.runOptions, ...stepRunnerInputRunOptions?.runOptions };
+            const flowStepRunOptions = flowRunOptions.stepsRunOptions?.filter(sro => sro.stepDefinitionId == stepDefinitionId)[0]
+            let stepRunOptions = undefined;
+            if (flowStepRunOptions || stepDefinitionFlow.runOptions) {
+                stepRunOptions = { ...stepDefinitionFlow.runOptions, ...flowStepRunOptions?.runOptions };
             }
 
             try {
-                const stepStatus = await stepRunner.run(stepRunnerRunOptions)
+                const stepStatus = await stepRunner.run(syncContext, stepRunOptions)
                 flowStatusSummary.stepsPending--
                 switch (stepStatus.statusTag) {
                     case StepStatusTag.failed:
@@ -64,5 +80,5 @@ export class LocalFlow<fd extends LocalFlowDefinition> implements Flow<fd> {
 export abstract class LocalFlowDefinition implements FlowDefinition {
     abstract readonly id: string
     abstract readonly definitionType: string;
-    abstract readonly stepsDefinitionFlow: { id: string, runOptions?: AdapterRunnerRunOptions, successMandatory?: boolean }[]
+    abstract readonly stepsDefinitionFlow: { id: string, runOptions?: StepRunOptions, successMandatory?: boolean }[]
 }

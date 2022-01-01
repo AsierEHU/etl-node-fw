@@ -1,20 +1,25 @@
-import { AdapterRunnerRunOptions } from "../../adapters/runners/types";
-import { RegisterStats } from "../../registers/types";
+
+import { AdapterRunOptions } from "../../adapters/processes/types";
+import { InputEntity, RegisterStats, SyncContext } from "../../registers/types";
 
 export interface Step<sd extends StepDefinition> {
     stepDefinition: sd
-    run(runOptions: AdapterRunnerRunOptions): Promise<StepStatusSummary>
+    run(syncContext: SyncContext, runOptions?: StepRunOptions): Promise<StepStatusSummary>
 }
 
 export interface StepDefinition {
     readonly id: string
     readonly definitionType: string
     readonly adapterDefinitionId: string
-    readonly adapterDefinitionRunOptions: AdapterRunnerRunOptions | null
+    readonly adapterRunOptions: AdapterRunOptions | null
 }
 
-export type StepStatusSummary = { //Audit
+export type StepStatusSummary = {
     registerStats: RegisterStats
-    tryNumber: number, //retries
-    isInvalid: boolean
+    tryNumber: number,
+    isInvalidRegistersSummary: boolean
+}
+
+export type StepRunOptions = {
+    pushEntities?: InputEntity<any>[],
 }

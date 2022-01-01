@@ -2,10 +2,9 @@ import EventEmitter from 'events';
 import { cloneDeep } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import { RegisterDataAccess, SyncContext } from '../../registers/types';
-import { getWithInitFormat, initRegisters } from '../../registers/utils';
 import { AdvancedRegisterFetcher } from '../../registers/utilsDB';
 import { Adapter, AdapterDefinition, AdapterRunOptions } from '../processes/types';
-import { AdapterRunner, AdapterRunnerRunOptions, AdapterStatusTag, AdapterStatus } from './types';
+import { AdapterRunner, AdapterStatusTag, AdapterStatus } from './types';
 
 export class LocalAdapterRunner implements AdapterRunner {
 
@@ -18,23 +17,12 @@ export class LocalAdapterRunner implements AdapterRunner {
         this.adapterPresenter = dependencies.adapterPresenter;
         this.registerDataAccess = dependencies.registerDataAccess;
     }
-    //TODO:Run, run with mockoptions, run with input values
-    async run(runOptions?: AdapterRunnerRunOptions) {
-        runOptions = cloneDeep(runOptions)
-        const adapterStatus = this.buildStatus(runOptions?.syncContext)
-        const adapterRunOptions: AdapterRunOptions = {
-            syncContext: adapterStatus.syncContext,
-            onlyFailedEntities: runOptions?.onlyFailedEntities
-        }
-        if (runOptions?.pushEntities && !adapterRunOptions.onlyFailedEntities) {
-            const pushEntities = runOptions?.pushEntities || [];
-            const inputEntitiesWithMeta = getWithInitFormat(pushEntities)
-            const inputRegisters = initRegisters(inputEntitiesWithMeta, { ...runOptions.syncContext })
-            await this.registerDataAccess.saveAll(inputRegisters)
-            adapterRunOptions.usePushedEntities = true;
-        }
 
-        adapterStatus.runOptions = adapterRunOptions;
+    async run(syncContext: SyncContext, runOptions?: AdapterRunOptions) {
+        runOptions = cloneDeep(runOptions)
+        syncContext = cloneDeep(syncContext)
+        const adapterStatus = this.buildStatus(syncContext)
+        adapterStatus.runOptions = runOptions || null
         this.adapterPresenter.emit("adapterStatus", cloneDeep(adapterStatus))
 
         adapterStatus.statusTag = AdapterStatusTag.active
@@ -42,7 +30,7 @@ export class LocalAdapterRunner implements AdapterRunner {
         this.adapterPresenter.emit("adapterStatus", cloneDeep(adapterStatus))
 
         try {
-            await this.adapter.run(adapterRunOptions)
+            await this.adapter.run(adapterStatus.syncContext, runOptions)
             const arf = new AdvancedRegisterFetcher(this.registerDataAccess)
             adapterStatus.statusSummary = await arf.getRegistersSummary(adapterStatus.id)
             adapterStatus.statusTag = AdapterStatusTag.success
@@ -57,7 +45,7 @@ export class LocalAdapterRunner implements AdapterRunner {
         return cloneDeep(adapterStatus);
     }
 
-    private buildStatus(syncContext?: SyncContext): AdapterStatus {
+    private buildStatus(syncContext: SyncContext): AdapterStatus {
         const id = uuidv4();
         const adapterDefinition = this.adapter.adapterDefinition;
         const adapterStatus: AdapterStatus = {

@@ -1,16 +1,9 @@
 import { SyncContext, RegisterStats } from "../../registers/types"
-import { InputEntity } from "../processes/localAdapter/types"
 import { Adapter, AdapterDefinition, AdapterRunOptions } from "../processes/types"
 
 export interface AdapterRunner {
     adapter: Adapter<AdapterDefinition>
-    run(runOptions?: AdapterRunnerRunOptions): Promise<AdapterStatus>
-}
-
-export type AdapterRunnerRunOptions = {
-    pushEntities?: InputEntity<any>[],
-    syncContext?: SyncContext,
-    onlyFailedEntities?: boolean
+    run(syncContext: SyncContext, runOptions?: AdapterRunOptions): Promise<AdapterStatus>
 }
 
 export type AdapterStatus = {

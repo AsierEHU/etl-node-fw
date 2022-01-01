@@ -14,7 +14,7 @@ const frdt = {
 const fddt = {
     ["LocalFlow"]: {
         class: LocalFlow,
-        dependencies: ["flowFactory"],
+        dependencies: ["flowFactory", "registerDataAccess"],
         runner: frdt["LocalFlowRunner"]
     },
 }

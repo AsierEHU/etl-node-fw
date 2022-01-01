@@ -8,10 +8,10 @@ export const case2Definition: LocalStepDefinition = {
     adapterDefinitionId: "case1Extractor",
     retartTries: 3,
     definitionType: "LocalStepDefinition",
-    isInvalid: function (statusSummary: RegisterStats): boolean {
+    isInvalidRegistersSummary: function (statusSummary: RegisterStats): boolean {
         return true
     },
-    adapterDefinitionRunOptions: null
+    adapterRunOptions: null
 }
 
 const mockInitialStatus: StepStatus = {
@@ -47,16 +47,10 @@ const mockFinalStatus: StepStatus = {
             registers_skipped: 1,
         },
         tryNumber: 4, //retries
-        isInvalid: true
+        isInvalidRegistersSummary: true
     }
 }
 
-const mockAdapterRunOptions: AdapterRunOptions = {
-    syncContext: {
-        flowId: "testFlow",
-        stepId: "testStep",
-        adapterId: "testAdapter",
-    }
-}
+const mockAdapterRunOptions: AdapterRunOptions = {}
 
 export const case2Mocks = { mockInitialStatus, mockFinalStatus, mockAdapterRunOptions }

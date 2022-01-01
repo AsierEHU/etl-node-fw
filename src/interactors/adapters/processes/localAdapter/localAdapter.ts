@@ -22,35 +22,38 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
         this.registerDataAccess = dependencies.registerDataAccess;
     }
 
-    async run(runOptions: AdapterRunOptions) {
+    async run(syncContext: SyncContext, runOptions?: AdapterRunOptions) {
         runOptions = cloneDeep(runOptions)
-        const registers = await this.getInitialRegisters(runOptions);
-        await this.processRegisters(registers, runOptions);
+        syncContext = cloneDeep(syncContext)
+        const registers = await this.getInitialRegisters(syncContext, runOptions);
+        await this.processRegisters(registers, syncContext);
     }
 
-    private async getInitialRegisters(runOptions: AdapterRunOptions): Promise<Register[]> {
+    private async getInitialRegisters(syncContext: SyncContext, runOptions?: AdapterRunOptions): Promise<Register[]> {
         let registers = [];
         if (runOptions?.onlyFailedEntities) {
             const failedRegisters = await this.registerDataAccess.getAll({
                 registerType: this.adapterDefinition.outputType,
                 registerStatus: RegisterStatusTag.failed,
-                stepId: runOptions.syncContext.stepId
+                stepId: syncContext.stepId,
+                flowId: syncContext.flowId
             })
             const arg = new AdvancedRegisterFetcher(this.registerDataAccess);
             const oldInputRegisters = await arg.getRelativeRegisters(failedRegisters)
-            registers = buildRegisterFromOthers(oldInputRegisters, runOptions.syncContext, this.adapterDefinition.outputType)
+            registers = buildRegisterFromOthers(oldInputRegisters, syncContext, this.adapterDefinition.outputType)
         }
         else if (runOptions?.usePushedEntities) {
             const pushedRegisters = await this.registerDataAccess.getAll(
                 {
                     registerType: "$inputPushed",
-                    stepId: runOptions.syncContext.stepId
+                    stepId: syncContext.stepId,
+                    flowId: syncContext.flowId
                 }
             )
-            registers = buildRegisterFromOthers(pushedRegisters, runOptions.syncContext, this.adapterDefinition.outputType)
+            registers = buildRegisterFromOthers(pushedRegisters, syncContext, this.adapterDefinition.outputType)
         }
         else {
-            registers = await this.getRegisters(runOptions.syncContext)
+            registers = await this.getRegisters(syncContext)
         }
 
         return cloneDeep(registers);
@@ -58,6 +61,6 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
 
     protected abstract getRegisters(syncContext: SyncContext): Promise<Register[]>
 
-    protected abstract processRegisters(registers: Register[], runOptions: AdapterRunOptions): Promise<void>
+    protected abstract processRegisters(registers: Register[], syncContext: SyncContext): Promise<void>
 
 }

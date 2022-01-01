@@ -1,10 +1,9 @@
 import { EventEmitter } from "stream";
 import { VolatileRegisterDataAccess } from "../../src/dataAccess/volatile";
 import { AdapterFactory } from "../../src/interactors/adapters/factory";
-import { AdapterRunnerRunOptions } from "../../src/interactors/adapters/runners/types";
 import { RegisterDataAccess, SyncContext } from "../../src/interactors/registers/types";
 import { FlowFactory } from "../../src/interactors/flows/factory";
-import { FlowDefinition } from "../../src/interactors/flows/processes/types";
+import { FlowDefinition, FlowRunOptions } from "../../src/interactors/flows/processes/types";
 import { case1Definition as adapterCase1Definition } from "../adapters/localAdapterExtractorMocks/case1Mocks";
 import { flowMocksSuites } from "./mocks";
 import { StepFactory } from "../../src/interactors/steps/factory";
@@ -12,6 +11,7 @@ import { case1Definition } from "../steps/localStepMocks/case1Mocks";
 import { case2Definition } from "../steps/localStepMocks/case2Mocks";
 import { case3Definition } from "../steps/localStepMocks/case3Mocks";
 import { FlowStatus, FlowStatusTag } from "../../src/interactors/flows/runners/types";
+import { AdapterRunOptions } from "../../src/interactors/adapters/processes/types";
 
 const adapterDefinitions = [adapterCase1Definition];
 let adapterFactory: AdapterFactory
@@ -30,11 +30,7 @@ let flowFactory: FlowFactory
 let flowStatusCallback: any
 let flowErrorCallback: any
 
-const syncContext: SyncContext = {
-}
-let defaultRunOptions: AdapterRunnerRunOptions = {
-    syncContext
-}
+let defaultRunOptions: FlowRunOptions = {}
 
 
 const flowTest = (

@@ -23,12 +23,12 @@ export class LocalAdapterTransformer<ad extends LocalAdapterTransformerDefinitio
         return inputRegisters
     }
 
-    async processRegisters(inputRegisters: Register[], runOptions: AdapterRunOptions) {
-        const outputRegisters = await this.transformRegisters(inputRegisters, runOptions);
+    async processRegisters(inputRegisters: Register[], syncContext: SyncContext) {
+        const outputRegisters = await this.transformRegisters(inputRegisters, syncContext);
         await this.registerDataAccess.saveAll(outputRegisters)
     }
 
-    private async transformRegisters(inputRegisters: Register[], runOptions: AdapterRunOptions): Promise<Register[]> {
+    private async transformRegisters(inputRegisters: Register[], syncContext: SyncContext): Promise<Register[]> {
         const outputRegisters = [];
         for (const inputRegister of inputRegisters) {
             try {
@@ -44,7 +44,7 @@ export class LocalAdapterTransformer<ad extends LocalAdapterTransformerDefinitio
                     statusMeta: null,
                     entity: outputEntity,
                     meta: null,
-                    syncContext: runOptions.syncContext
+                    syncContext
                 }
                 outputRegisters.push(register)
             } catch (error: any) {
@@ -58,7 +58,7 @@ export class LocalAdapterTransformer<ad extends LocalAdapterTransformerDefinitio
                     statusMeta: error.message,
                     entity: null,
                     meta: null,
-                    syncContext: runOptions.syncContext
+                    syncContext
                 }
                 outputRegisters.push(register)
             }

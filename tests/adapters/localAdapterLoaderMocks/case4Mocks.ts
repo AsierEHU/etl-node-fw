@@ -1,7 +1,7 @@
 import { LocalAdapterLoaderDefinition } from "../../../src/interactors/adapters/processes/localAdapter/localAdapterLoader";
-import { InputEntity, ValidationResult, ValidationStatusTag } from "../../../src/interactors/adapters/processes/localAdapter/types";
+import { ValidationResult, ValidationStatusTag } from "../../../src/interactors/adapters/processes/localAdapter/types";
 import { AdapterStatus, AdapterStatusTag } from "../../../src/interactors/adapters/runners/types";
-import { Register, RegisterStatusTag, RegisterStats } from "../../../src/interactors/registers/types";
+import { Register, RegisterStatusTag, RegisterStats, InputEntity } from "../../../src/interactors/registers/types";
 import { case3Mocks } from "../localAdapterTranformerMocks/case3Mocks";
 
 

@@ -2,18 +2,16 @@ import { AdapterRunOptions } from "../../../src/interactors/adapters/processes/t
 import { RegisterStats } from "../../../src/interactors/registers/types"
 import { LocalStepDefinition } from "../../../src/interactors/steps/processes/localStep"
 import { StepStatus, StepStatusTag } from "../../../src/interactors/steps/runners/types"
-import { case1Mocks } from "../../adapters/localAdapterExtractorMocks/case1Mocks"
 
 export const case3Definition: LocalStepDefinition = {
     id: "case3testLocalStep",
     adapterDefinitionId: "case1Extractor",
     retartTries: 1,
     definitionType: "LocalStepDefinition",
-    isInvalid: function (statusSummary: RegisterStats): boolean {
+    isInvalidRegistersSummary: function (statusSummary: RegisterStats): boolean {
         return false
     },
-    adapterDefinitionRunOptions: {
-        pushEntities: case1Mocks.inputEntities,
+    adapterRunOptions: {
         onlyFailedEntities: false
     }
 }
@@ -51,17 +49,11 @@ const mockFinalStatus: StepStatus = {
             registers_skipped: 1,
         },
         tryNumber: 2, //retries
-        isInvalid: false
+        isInvalidRegistersSummary: false
     }
 }
 
 const mockAdapterRunOptions: AdapterRunOptions = {
-    syncContext: {
-        flowId: "testFlow",
-        stepId: "testStep",
-        adapterId: "testAdapter",
-    },
-    usePushedEntities: true,
     onlyFailedEntities: false
 }
 

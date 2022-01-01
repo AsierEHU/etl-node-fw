@@ -1,8 +1,8 @@
-import { SyncContext, Register, RegisterStatusTag } from "../../../registers/types";
+import { SyncContext, Register, RegisterStatusTag, InputEntity } from "../../../registers/types";
 import { getWithInitFormat } from "../../../registers/utils";
-import { AdapterRunOptions, AdapterDefinition } from "../types";
+import { AdapterDefinition } from "../types";
 import { LocalAdapter } from "./localAdapter";
-import { InputEntity, ValidationResult, ValidationStatusTag } from "./types";
+import { ValidationResult, ValidationStatusTag } from "./types";
 import { getValidationResultWithMeta, validationTagToRegisterTag } from "./utils";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -26,17 +26,17 @@ export class LocalAdapterLoader<ad extends LocalAdapterLoaderDefinition<any, any
         return inputRegisters
     }
 
-    async processRegisters(inputRegisters: Register[], runOptions: AdapterRunOptions) {
+    async processRegisters(inputRegisters: Register[], syncContext: SyncContext) {
         const outputRegisters = [];
         for (const inputRegister of inputRegisters) {
-            const outputRegister = await this.loadRegister(inputRegister, runOptions)
+            const outputRegister = await this.loadRegister(inputRegister, syncContext)
             const outputValidatedRegister = await this.validateRegister(outputRegister)
             await this.registerDataAccess.save(outputValidatedRegister)
             outputRegisters.push(outputValidatedRegister)
         }
     }
 
-    private async loadRegister(inputRegister: Register, runOptions: AdapterRunOptions): Promise<Register> {
+    private async loadRegister(inputRegister: Register, syncContext: SyncContext): Promise<Register> {
         try {
             const inputEntity = inputRegister.entity;
             const outputEntity = await this.adapterDefinition.entityLoad(inputEntity);
@@ -51,7 +51,7 @@ export class LocalAdapterLoader<ad extends LocalAdapterLoaderDefinition<any, any
                 statusMeta: null,
                 entity: outputEntityWithMeta.entity,
                 meta: outputEntityWithMeta.meta || null,
-                syncContext: runOptions.syncContext
+                syncContext
             }
             return register
         } catch (error: any) {
@@ -65,7 +65,7 @@ export class LocalAdapterLoader<ad extends LocalAdapterLoaderDefinition<any, any
                 statusMeta: error.message,
                 entity: null,
                 meta: null,
-                syncContext: runOptions.syncContext
+                syncContext
             }
             return register
         }

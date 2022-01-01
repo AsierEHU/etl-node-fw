@@ -1,9 +1,8 @@
 import EventEmitter from 'events';
 import { cloneDeep } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
-import { SyncContext } from '../../registers/types';
 import { Flow, FlowDefinition, FlowRunOptions } from '../processes/types';
-import { FlowRunner, FlowStatusTag, FlowStatus } from './types';
+import { FlowRunner, FlowStatusTag, FlowStatus, } from './types';
 
 export class LocalFlowRunner implements FlowRunner {
 
@@ -17,8 +16,7 @@ export class LocalFlowRunner implements FlowRunner {
 
     async run(runOptions?: FlowRunOptions) {
         runOptions = cloneDeep(runOptions)
-        const flowStatus = this.buildStatus(runOptions?.syncContext)
-        runOptions = { ...runOptions, syncContext: { ...runOptions?.syncContext, flowId: flowStatus.id } }
+        const flowStatus = this.buildStatus()
         this.flowPresenter.emit("flowStatus", cloneDeep(flowStatus))
 
         flowStatus.statusTag = FlowStatusTag.active
@@ -26,7 +24,7 @@ export class LocalFlowRunner implements FlowRunner {
         this.flowPresenter.emit("flowStatus", cloneDeep(flowStatus))
 
         try {
-            const flowSummary = await this.flow.run(runOptions)
+            const flowSummary = await this.flow.run(flowStatus.syncContext, runOptions)
             flowStatus.statusSummary = flowSummary
             if (flowSummary.stepsPending) {
                 throw new Error("Flow finished with pending steps")
@@ -44,7 +42,7 @@ export class LocalFlowRunner implements FlowRunner {
         return cloneDeep(flowStatus);
     }
 
-    private buildStatus(syncContext?: SyncContext): FlowStatus {
+    private buildStatus(): FlowStatus {
         const id = uuidv4();
         const flowDefinition = this.flow.flowDefinition;
         const flowStatus: FlowStatus = {
@@ -56,7 +54,7 @@ export class LocalFlowRunner implements FlowRunner {
             timeStarted: null,
             timeFinished: null,
             statusSummary: null,
-            syncContext: { ...syncContext, flowId: id }
+            syncContext: { flowId: id }
         }
         return flowStatus
     }

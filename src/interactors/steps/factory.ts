@@ -13,7 +13,7 @@ const srdt = {
 const sddt = {
     ["LocalStep"]: {
         class: LocalStep,
-        dependencies: ["adapterFactory"],
+        dependencies: ["adapterFactory", "registerDataAccess"],
         runner: srdt["LocalStepRunner"]
     },
 }

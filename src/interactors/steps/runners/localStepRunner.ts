@@ -1,9 +1,8 @@
 import EventEmitter from 'events';
 import { cloneDeep } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
-import { AdapterRunnerRunOptions } from '../../adapters/runners/types';
 import { SyncContext } from '../../registers/types';
-import { Step, StepDefinition } from '../processes/types';
+import { Step, StepDefinition, StepRunOptions } from '../processes/types';
 import { StepRunner, StepStatusTag, StepStatus } from './types';
 
 /**
@@ -19,10 +18,9 @@ export class LocalStepRunner implements StepRunner {
         this.step = dependencies.step;
     }
 
-    async run(runOptions?: AdapterRunnerRunOptions) {
+    async run(syncContext: SyncContext, runOptions?: StepRunOptions) {
         runOptions = cloneDeep(runOptions)
-        const stepStatus = this.buildStatus(runOptions?.syncContext)
-        runOptions = { ...runOptions, syncContext: { ...runOptions?.syncContext, stepId: stepStatus.id } }
+        const stepStatus = this.buildStatus(syncContext)
         this.stepPresenter.emit("stepStatus", cloneDeep(stepStatus))
 
         stepStatus.statusTag = StepStatusTag.active
@@ -30,9 +28,9 @@ export class LocalStepRunner implements StepRunner {
         this.stepPresenter.emit("stepStatus", cloneDeep(stepStatus))
 
         try {
-            const stepSummary = await this.step.run(runOptions)
+            const stepSummary = await this.step.run(stepStatus.syncContext, runOptions)
             stepStatus.statusSummary = stepSummary
-            if (stepSummary.isInvalid) {
+            if (stepSummary.isInvalidRegistersSummary) {
                 stepStatus.statusTag = StepStatusTag.invalid
             } else {
                 stepStatus.statusTag = StepStatusTag.success
@@ -48,7 +46,7 @@ export class LocalStepRunner implements StepRunner {
         return cloneDeep(stepStatus);
     }
 
-    private buildStatus(syncContext?: SyncContext): StepStatus {
+    private buildStatus(syncContext: SyncContext): StepStatus {
         const id = uuidv4();
         const stepDefinition = this.step.stepDefinition;
         const stepStatus: StepStatus = {

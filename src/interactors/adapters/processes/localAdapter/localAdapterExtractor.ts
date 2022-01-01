@@ -1,8 +1,8 @@
-import { SyncContext, Register, RegisterStatusTag } from "../../../registers/types";
+import { SyncContext, Register, RegisterStatusTag, InputEntity } from "../../../registers/types";
 import { getWithInitFormat, initRegisters } from "../../../registers/utils";
 import { AdapterDefinition } from "../types";
 import { LocalAdapter } from "./localAdapter";
-import { InputEntity, ValidationResult, ValidationStatusTag, ToFixEntity, FixedEntity } from "./types";
+import { ValidationResult, ValidationStatusTag, ToFixEntity, FixedEntity } from "./types";
 import { getValidationResultWithMeta, validationTagToRegisterTag } from "./utils";
 
 
@@ -18,7 +18,7 @@ export class LocalAdapterExtractor<ad extends LocalAdapterExtractorDefinition<an
     }
 
     protected async getRegisters(syncContext: SyncContext): Promise<Register[]> {
-        const inputEntities = await this.adapterDefinition.entitiesGet();
+        const inputEntities = await this.adapterDefinition.entitiesGet(/*TODO: PushedConfig */);
         const inputEntitiesInitialValues = getWithInitFormat(inputEntities, this.adapterDefinition.outputType)
         const registers = initRegisters(inputEntitiesInitialValues, syncContext);
         return registers;

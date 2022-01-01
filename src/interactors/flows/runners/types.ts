@@ -12,10 +12,10 @@ export type FlowStatus = {
     id: string
     definitionId: string
     definitionType: string
-    statusTag: FlowStatusTag  //debugging
+    statusTag: FlowStatusTag
     statusMeta: FlowMeta
-    timeStarted: Date | null  //debugging
-    timeFinished: Date | null   //debugging
+    timeStarted: Date | null
+    timeFinished: Date | null
     statusSummary: FlowStatusSummary | null
     syncContext: SyncContext
 }
@@ -24,5 +24,5 @@ export type FlowMeta = string | object | null
 
 export interface FlowRunner {
     flow: Flow<FlowDefinition>
-    run(runOptions?: FlowRunOptions): Promise<FlowStatus> //start, if registers -> filter input by ids, if skip -> compare hash to skip
+    run(runOptions?: FlowRunOptions): Promise<FlowStatus>
 }

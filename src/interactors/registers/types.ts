@@ -66,3 +66,5 @@ export type RegisterStats = { //Audit
     registers_invalid: number
     registers_skipped: number
 }
+
+export type InputEntity<e extends object> = MetaEntity | null | e

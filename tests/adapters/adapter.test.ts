@@ -1,10 +1,9 @@
 import EventEmitter from "events";
 import { VolatileRegisterDataAccess } from "../../src/dataAccess/volatile";
 import { AdapterFactory } from "../../src/interactors/adapters/factory";
-import { InputEntity } from "../../src/interactors/adapters/processes/localAdapter/types";
 import { AdapterDefinition, AdapterRunOptions } from "../../src/interactors/adapters/processes/types";
-import { AdapterRunnerRunOptions, AdapterStatus, AdapterStatusTag } from "../../src/interactors/adapters/runners/types";
-import { RegisterDataAccess, Register, SyncContext, RegisterStatusTag } from "../../src/interactors/registers/types";
+import { AdapterStatus, AdapterStatusTag } from "../../src/interactors/adapters/runners/types";
+import { RegisterDataAccess, Register, RegisterStatusTag, InputEntity } from "../../src/interactors/registers/types";
 import { getWithInitFormat, initRegisters, isByGroupSource, isOrigin, isByRowSource } from "../../src/interactors/registers/utils";
 import { adapterMocksSuites } from "./mocks";
 
@@ -22,8 +21,7 @@ let syncContext = {
     flowId: "testFlow",
     stepId: "testStep",
 }
-let defaultRunOptions: AdapterRunnerRunOptions = {
-    syncContext
+let defaultRunOptions: AdapterRunOptions = {
 }
 
 const adapterTest = (
@@ -59,7 +57,7 @@ const adapterTest = (
 
         test("Presenter calls", async () => {
             const adapter1 = adapterFactory.createAdapterRunner(definition.id)
-            const finalAdapterStatus = await adapter1.run(defaultRunOptions);
+            const finalAdapterStatus = await adapter1.run(syncContext, defaultRunOptions);
             statusEqual(finalAdapterStatus, mocks.mockFinalStatus)
             expect(adapterStatusCallback.mock.calls.length).toBe(3)
             statusEqual(adapterStatusCallback.mock.results[0].value, mocks.mockInitialStatus)
@@ -72,17 +70,12 @@ const adapterTest = (
             }
         })
 
-        test("Presenter calls: runOptions", async () => {
+        test("Presenter calls runOptions", async () => {
             const adapter1 = adapterFactory.createAdapterRunner(definition.id)
-            const inputRunOptions: AdapterRunnerRunOptions = { ...defaultRunOptions, onlyFailedEntities: false, pushEntities: mocks.inputEntities }
-            const outputRunOptions: AdapterRunOptions = { syncContext: defaultRunOptions.syncContext as SyncContext, onlyFailedEntities: false, usePushedEntities: true }
-            const finalAdapterStatus = await adapter1.run(inputRunOptions);
-            runOptionsEqual(finalAdapterStatus.runOptions as AdapterRunOptions, outputRunOptions)
-            runOptionsEqual(adapterStatusCallback.mock.results[0].value.runOptions, outputRunOptions)
-            runOptionsEqual(adapterStatusCallback.mock.results[2].value.runOptions, outputRunOptions)
+            const runOptions: AdapterRunOptions = { ...defaultRunOptions, usePushedEntities: true, onlyFailedEntities: false }
+            await adapter1.run(syncContext, runOptions);
+            runOptionsEqual(adapterStatusCallback.mock.results[2].value.runOptions, runOptions)
         })
-
-        //test statussummary
     })
 
     describe(definition.definitionType + " - " + definition.id + " registers test", () => {
@@ -103,16 +96,16 @@ const adapterTest = (
 
         test("Registers result", async () => {
             const adapter1 = adapterFactory.createAdapterRunner(definition.id)
-            await adapter1.run(defaultRunOptions);
+            await adapter1.run(syncContext, defaultRunOptions);
             const registers = await registerDataAccess.getAll()
             registersEqual(registers, mocks.mockFinalRegisters)
         });
 
         test("runOptions:onlyFailedEntities", async () => {
             const adapter1 = adapterFactory.createAdapterRunner(definition.id)
-            await adapter1.run(defaultRunOptions);
+            await adapter1.run(syncContext, defaultRunOptions);
             const adapter2 = adapterFactory.createAdapterRunner(definition.id)
-            await adapter2.run({ ...defaultRunOptions, onlyFailedEntities: true });
+            await adapter2.run(syncContext, { ...defaultRunOptions, onlyFailedEntities: true });
             const registers = await registerDataAccess.getAll()
             const mockRegistersWithRetries = [
                 ...mocks.mockFinalRegisters,
@@ -121,9 +114,13 @@ const adapterTest = (
             registersEqual(registers, mockRegistersWithRetries)
         })
 
-        test("runOptions:pushEntities", async () => {
+        test("runOptions:usePushedEntities", async () => {
+            const inputEntitiesWithMeta = getWithInitFormat(mocks.inputEntities)
+            const inputRegisters = initRegisters(inputEntitiesWithMeta, { ...syncContext })
+            await registerDataAccess.saveAll(inputRegisters)
+
             const adapter1 = adapterFactory.createAdapterRunner(definition.id)
-            await adapter1.run({ ...defaultRunOptions, pushEntities: mocks.inputEntities })
+            await adapter1.run(syncContext, { ...defaultRunOptions, usePushedEntities: true })
             const registers = await registerDataAccess.getAll()
             const entitiesWithMeta = getWithInitFormat(mocks.inputEntities)
             const pushedRegisters = initRegisters(entitiesWithMeta, syncContext)
@@ -133,7 +130,7 @@ const adapterTest = (
 
         test("Not pending registers", async () => {
             const adapter1 = adapterFactory.createAdapterRunner(definition.id)
-            await adapter1.run(defaultRunOptions)
+            await adapter1.run(syncContext, defaultRunOptions)
             const registers = await registerDataAccess.getAll()
             registers.forEach(register => {
                 expect(register.statusTag).not.toBe(RegisterStatusTag.pending)
@@ -142,7 +139,7 @@ const adapterTest = (
 
         test("Relative and Absolute ids", async () => {
             const adapter1 = adapterFactory.createAdapterRunner(definition.id)
-            await adapter1.run(defaultRunOptions)
+            await adapter1.run(syncContext, defaultRunOptions)
             const registers = await registerDataAccess.getAll()
             for (const register of registers) {
                 await testSources(register);
@@ -198,11 +195,6 @@ const statusEqual = (adapterStatus: AdapterStatus, mockStatus: AdapterStatus) =>
     expect(adapterStatus).toEqual(mockStatus)
 }
 
-const runOptionsEqual = (runOtions: AdapterRunOptions, mockRunOptions: AdapterRunOptions) => {
-    runOtions.syncContext.adapterId = mockRunOptions.syncContext.adapterId
-    expect(runOtions).toEqual(mockRunOptions)
-}
-
 const registersEqual = (registers: Register[], mockFinalRegisters: Register[]) => {
     expect(registers.length).toBe(mockFinalRegisters.length)
     if (registers.length == mockFinalRegisters.length)
@@ -221,6 +213,10 @@ const registerEqual = (register: Register, mockFinalRegister: Register) => {
     register.sourceRelativeId = mockFinalRegister.sourceRelativeId
     register.syncContext.adapterId = mockFinalRegister.syncContext.adapterId
     expect(register).toEqual(mockFinalRegister)
+}
+
+const runOptionsEqual = (runOtions: AdapterRunOptions, mockRunOptions: AdapterRunOptions) => {
+    expect(runOtions).toEqual(mockRunOptions)
 }
 
 adapterMocksSuites.forEach(suite => {
