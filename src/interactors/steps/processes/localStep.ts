@@ -21,7 +21,7 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
 
         const definitionRunOptions = this.stepDefinition.adapterDefinitionRunOptions
         if (definitionRunOptions) {
-            runOptions.mockEntities = runOptions.mockEntities || definitionRunOptions.mockEntities
+            runOptions.pushEntities = runOptions.pushEntities || definitionRunOptions.pushEntities
             runOptions.onlyFailedEntities = runOptions.onlyFailedEntities || definitionRunOptions.onlyFailedEntities
             runOptions.syncContext = runOptions.syncContext || definitionRunOptions.syncContext
         }

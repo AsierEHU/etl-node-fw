@@ -14,7 +14,7 @@ export interface Adapter<ad extends AdapterDefinition> {
 
 export type AdapterRunOptions = {
     // getEntitiesOptions?: any
-    useMockedEntities?: boolean
+    usePushedEntities?: boolean
     onlyFailedEntities?: boolean
     syncContext: SyncContext
 }

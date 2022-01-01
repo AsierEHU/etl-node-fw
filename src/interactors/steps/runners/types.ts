@@ -8,7 +8,7 @@ export enum StepStatusTag {
     active = "active", //Ejecutandose
     success = "success", //sin erroes
     invalid = "invalid", // invalid business result
-    failed = "failed", //Software error or all records in (failed, invalid)
+    failed = "failed", //Software error
 }
 
 export type StepStatus = {

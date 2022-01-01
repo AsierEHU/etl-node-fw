@@ -26,12 +26,12 @@ export class LocalAdapterRunner implements AdapterRunner {
             syncContext: adapterStatus.syncContext,
             onlyFailedEntities: runOptions?.onlyFailedEntities
         }
-        if (runOptions?.mockEntities && !adapterRunOptions.onlyFailedEntities) {
-            const mockEntities = runOptions?.mockEntities || [];
-            const inputEntitiesWithMeta = getWithInitFormat(mockEntities)
+        if (runOptions?.pushEntities && !adapterRunOptions.onlyFailedEntities) {
+            const pushEntities = runOptions?.pushEntities || [];
+            const inputEntitiesWithMeta = getWithInitFormat(pushEntities)
             const inputRegisters = initRegisters(inputEntitiesWithMeta, { ...runOptions.syncContext })
             await this.registerDataAccess.saveAll(inputRegisters)
-            adapterRunOptions.useMockedEntities = true;
+            adapterRunOptions.usePushedEntities = true;
         }
 
         adapterStatus.runOptions = adapterRunOptions;

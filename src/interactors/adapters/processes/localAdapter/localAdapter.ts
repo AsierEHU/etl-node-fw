@@ -40,14 +40,14 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
             const oldInputRegisters = await arg.getRelativeRegisters(failedRegisters)
             registers = buildRegisterFromOthers(oldInputRegisters, runOptions.syncContext, this.adapterDefinition.outputType)
         }
-        else if (runOptions?.useMockedEntities) {
-            const mockedRegisters = await this.registerDataAccess.getAll(
+        else if (runOptions?.usePushedEntities) {
+            const pushedRegisters = await this.registerDataAccess.getAll(
                 {
-                    registerType: "$inputMocked",
+                    registerType: "$inputPushed",
                     stepId: runOptions.syncContext.stepId
                 }
             )
-            registers = buildRegisterFromOthers(mockedRegisters, runOptions.syncContext, this.adapterDefinition.outputType)
+            registers = buildRegisterFromOthers(pushedRegisters, runOptions.syncContext, this.adapterDefinition.outputType)
         }
         else {
             registers = await this.getRegisters(runOptions.syncContext)

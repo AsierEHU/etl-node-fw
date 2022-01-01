@@ -74,8 +74,8 @@ const adapterTest = (
 
         test("Presenter calls: runOptions", async () => {
             const adapter1 = adapterFactory.createAdapterRunner(definition.id)
-            const inputRunOptions: AdapterRunnerRunOptions = { ...defaultRunOptions, onlyFailedEntities: false, mockEntities: mocks.inputEntities }
-            const outputRunOptions: AdapterRunOptions = { syncContext: defaultRunOptions.syncContext as SyncContext, onlyFailedEntities: false, useMockedEntities: true }
+            const inputRunOptions: AdapterRunnerRunOptions = { ...defaultRunOptions, onlyFailedEntities: false, pushEntities: mocks.inputEntities }
+            const outputRunOptions: AdapterRunOptions = { syncContext: defaultRunOptions.syncContext as SyncContext, onlyFailedEntities: false, usePushedEntities: true }
             const finalAdapterStatus = await adapter1.run(inputRunOptions);
             runOptionsEqual(finalAdapterStatus.runOptions as AdapterRunOptions, outputRunOptions)
             runOptionsEqual(adapterStatusCallback.mock.results[0].value.runOptions, outputRunOptions)
@@ -121,12 +121,13 @@ const adapterTest = (
             registersEqual(registers, mockRegistersWithRetries)
         })
 
-        test("runOptions:mockEntities", async () => {
+        test("runOptions:pushEntities", async () => {
             const adapter1 = adapterFactory.createAdapterRunner(definition.id)
-            await adapter1.run({ ...defaultRunOptions, mockEntities: mocks.inputEntities })
+            await adapter1.run({ ...defaultRunOptions, pushEntities: mocks.inputEntities })
             const registers = await registerDataAccess.getAll()
             const entitiesWithMeta = getWithInitFormat(mocks.inputEntities)
-            const registersWithMocks = [...mocks.mockInitialRegisters, ...initRegisters(entitiesWithMeta, syncContext), ...mocks.mockNewRegisters]
+            const pushedRegisters = initRegisters(entitiesWithMeta, syncContext)
+            const registersWithMocks = [...mocks.mockInitialRegisters, ...pushedRegisters, ...mocks.mockNewRegisters]
             registersEqual(registers, registersWithMocks)
         })
 

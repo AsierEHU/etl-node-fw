@@ -13,7 +13,7 @@ export const case3Definition: LocalStepDefinition = {
         return false
     },
     adapterDefinitionRunOptions: {
-        mockEntities: case1Mocks.inputEntities,
+        pushEntities: case1Mocks.inputEntities,
         onlyFailedEntities: false
     }
 }
@@ -61,7 +61,7 @@ const mockAdapterRunOptions: AdapterRunOptions = {
         stepId: "testStep",
         adapterId: "testAdapter",
     },
-    useMockedEntities: true,
+    usePushedEntities: true,
     onlyFailedEntities: false
 }
 

@@ -54,7 +54,7 @@ export const initRegisters = (
         const inputEntityId = uuidv4();
         return {
             id: inputEntityId,
-            entityType: entity.entityType || "$inputMocked",
+            entityType: entity.entityType || "$inputPushed",
             sourceAbsoluteId: entity.sourceAbsoluteId || inputEntityId,
             sourceRelativeId: entity.sourceRelativeId || inputEntityId,
             sourceEntityId: entity.sourceEntityId || null,
