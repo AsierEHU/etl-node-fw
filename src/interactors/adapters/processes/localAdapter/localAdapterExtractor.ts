@@ -20,7 +20,6 @@ export class LocalAdapterExtractor<ad extends LocalAdapterExtractorDefinition<an
     protected async getRegisters(syncContext: SyncContext): Promise<Register[]> {
         const configPushedRegisters = await this.registerDataAccess.getAll({
             registerType: "$configPushed",
-            stepId: syncContext.stepId,
             flowId: syncContext.flowId
         })
         const configPushedEntity = configPushedRegisters[0]?.entity

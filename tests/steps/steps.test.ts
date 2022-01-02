@@ -3,12 +3,11 @@ import { VolatileRegisterDataAccess } from "../../src/dataAccess/volatile";
 import { AdapterFactory } from "../../src/interactors/adapters/factory";
 import { AdapterRunOptions } from "../../src/interactors/adapters/processes/types";
 import { RegisterDataAccess, SyncContext } from "../../src/interactors/registers/types";
-import { getWithInitFormat, initRegisters } from "../../src/interactors/registers/utils";
 import { StepFactory } from "../../src/interactors/steps/factory";
 import { StepDefinition, StepRunOptions } from "../../src/interactors/steps/processes/types";
 import { StepStatus, StepStatusTag } from "../../src/interactors/steps/runners/types";
 import { case1Definition, case1Mocks } from "../adapters/localAdapterExtractorMocks/case1Mocks";
-import { stepMocksSuites } from "./mocks";
+import { stepMocks } from "./mocks";
 
 const adapterDefinitions = [case1Definition];
 let adapterFactory: AdapterFactory
@@ -16,7 +15,7 @@ let adapterStatusCallback: any
 let registerDataAccess: RegisterDataAccess
 
 const stepDefinitions: StepDefinition[] = [];
-stepMocksSuites.forEach(suite => {
+stepMocks.forEach(suite => {
     stepDefinitions.push(suite.definition)
 })
 let stepFactory: StepFactory
@@ -123,12 +122,12 @@ const stepTest = (
         });
 
         test("runOptions:pushEntities", async () => {
-            const entityConfigPushed = { msg: "Push entities test" }
+            const entityInputPushed = { msg: "Push entities test" }
             const step1 = stepFactory.createStepRunner(definition.id)
-            const runOptions: StepRunOptions = { ...defaultRunOptions, pushEntities: [entityConfigPushed] }
+            const runOptions: StepRunOptions = { ...defaultRunOptions, pushEntities: [entityInputPushed] }
             await step1.run(syncContext, runOptions);
-            const registerConfigPushed = await registerDataAccess.getAll({ registerType: "$inputPushed" })
-            expect(registerConfigPushed[0].entity).toEqual(entityConfigPushed)
+            const registerInputPushed = await registerDataAccess.getAll({ registerType: "$inputPushed" })
+            expect(registerInputPushed[0].entity).toEqual(entityInputPushed)
         })
 
     })
@@ -149,7 +148,7 @@ const runOptionsEqual = (runOtions: AdapterRunOptions, mockRunOptions: AdapterRu
     expect(runOtions).toEqual(mockRunOptions)
 }
 
-stepMocksSuites.forEach(suite => {
+stepMocks.forEach(suite => {
     stepTest(suite.definition, suite.mocks)
 })
 

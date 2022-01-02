@@ -1,5 +1,5 @@
-import { localStepMocksSuite } from "./localStepMocks";
+import { localStepMocks } from "./localStepMocks";
 
-export const stepMocksSuites = [
-    ...localStepMocksSuite,
+export const stepMocks = [
+    ...localStepMocks,
 ]

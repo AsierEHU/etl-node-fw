@@ -5,7 +5,7 @@ import { RegisterDataAccess, SyncContext } from "../../src/interactors/registers
 import { FlowFactory } from "../../src/interactors/flows/factory";
 import { FlowDefinition, FlowRunOptions } from "../../src/interactors/flows/processes/types";
 import { case1Definition as adapterCase1Definition } from "../adapters/localAdapterExtractorMocks/case1Mocks";
-import { flowMocksSuites } from "./mocks";
+import { flowMocks } from "./mocks";
 import { StepFactory } from "../../src/interactors/steps/factory";
 import { case1Definition } from "../steps/localStepMocks/case1Mocks";
 import { case2Definition } from "../steps/localStepMocks/case2Mocks";
@@ -23,7 +23,7 @@ let stepFactory: StepFactory
 let stepStatusCallback: any
 
 const flowDefinitions: FlowDefinition[] = [];
-flowMocksSuites.forEach(suite => {
+flowMocks.forEach(suite => {
     flowDefinitions.push(suite.definition)
 })
 let flowFactory: FlowFactory
@@ -97,6 +97,60 @@ const flowTest = (
         })
 
     })
+
+    describe(definition.definitionType + " - " + definition.id + " registers test", () => {
+
+        beforeEach(() => {
+            const presenter = new EventEmitter()
+            flowStatusCallback = jest.fn(flowStatus => {
+                return flowStatus
+            })
+            flowErrorCallback = jest.fn(flowError => {
+                return flowError
+            })
+            stepStatusCallback = jest.fn(stepStatus => {
+                return stepStatus
+            })
+            adapterStatusCallback = jest.fn(adapterStatus => {
+                return adapterStatus
+            })
+            presenter.on("adapterStatus", adapterStatusCallback)
+            presenter.on("stepStatus", stepStatusCallback)
+            presenter.on("flowStatus", flowStatusCallback)
+            presenter.on("flowError", flowErrorCallback)
+
+            registerDataAccess = new VolatileRegisterDataAccess()
+            const adapterDependencies = {
+                adapterPresenter: presenter,
+                registerDataAccess,
+            }
+            adapterFactory = new AdapterFactory(adapterDefinitions, adapterDependencies)
+
+            const stepDependencies = {
+                stepPresenter: presenter,
+                registerDataAccess,
+                adapterFactory
+            }
+            stepFactory = new StepFactory(stepDefinitions, stepDependencies)
+
+            const flowDependencies = {
+                flowPresenter: presenter,
+                registerDataAccess,
+                stepFactory
+            }
+            flowFactory = new FlowFactory(flowDefinitions, flowDependencies)
+        });
+
+        test("runOptions:flowPushConfig", async () => {
+            const entityConfigPushed = { msg: "Push config test" }
+            const flow1 = flowFactory.createFlowRunner(definition.id)
+            const runOptions: FlowRunOptions = { ...defaultRunOptions, flowPushConfig: entityConfigPushed }
+            await flow1.run(runOptions);
+            const registerConfigPushed = await registerDataAccess.getAll({ registerType: "$configPushed" })
+            expect(registerConfigPushed[0].entity).toEqual(entityConfigPushed)
+        })
+
+    })
 }
 
 const statusEqual = (flowStatus: FlowStatus, mockStatus: FlowStatus) => {
@@ -110,7 +164,7 @@ const statusEqual = (flowStatus: FlowStatus, mockStatus: FlowStatus) => {
     expect(flowStatus).toEqual(mockStatus)
 }
 
-flowMocksSuites.forEach(suite => {
+flowMocks.forEach(suite => {
     flowTest(suite.definition, suite.mocks)
 })
 

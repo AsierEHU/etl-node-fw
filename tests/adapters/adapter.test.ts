@@ -5,11 +5,11 @@ import { AdapterDefinition, AdapterRunOptions } from "../../src/interactors/adap
 import { AdapterStatus, AdapterStatusTag } from "../../src/interactors/adapters/runners/types";
 import { RegisterDataAccess, Register, RegisterStatusTag, InputEntity } from "../../src/interactors/registers/types";
 import { getWithInitFormat, initRegisters, isByGroupSource, isOrigin, isByRowSource } from "../../src/interactors/registers/utils";
-import { adapterMocksSuites } from "./mocks";
+import { adapterMocks } from "./mocks";
 
 
 const adapterDefinitions: AdapterDefinition[] = [];
-adapterMocksSuites.forEach(suite => {
+adapterMocks.forEach(suite => {
     adapterDefinitions.push(suite.definition)
 })
 let adapterFactory: AdapterFactory
@@ -219,6 +219,6 @@ const runOptionsEqual = (runOtions: AdapterRunOptions, mockRunOptions: AdapterRu
     expect(runOtions).toEqual(mockRunOptions)
 }
 
-adapterMocksSuites.forEach(suite => {
+adapterMocks.forEach(suite => {
     adapterTest(suite.definition, suite.mocks)
 })

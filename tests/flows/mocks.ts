@@ -1,5 +1,5 @@
-import { localFlowMocksSuite } from "./localFlowMocks";
+import { localFlowMocks } from "./localFlowMocks";
 
-export const flowMocksSuites = [
-    ...localFlowMocksSuite,
+export const flowMocks = [
+    ...localFlowMocks,
 ]

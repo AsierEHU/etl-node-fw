@@ -27,8 +27,8 @@ export class LocalFlow<fd extends LocalFlowDefinition> implements Flow<fd> {
         syncContext = cloneDeep(syncContext)
 
         if (flowRunOptions?.flowPushConfig) {
-            const pushConfig = flowRunOptions?.flowPushConfig || [];
-            const inputEntitiesWithMeta = getWithInitFormat(pushConfig, "$configPushed")
+            const pushConfig = flowRunOptions?.flowPushConfig;
+            const inputEntitiesWithMeta = getWithInitFormat([pushConfig], "$configPushed")
             const inputRegisters = initRegisters(inputEntitiesWithMeta, syncContext)
             await this.registerDataAccess.saveAll(inputRegisters)
         }

@@ -1,11 +1,11 @@
-import { localAdapterExtractorMocksSuite } from "./localAdapterExtractorMocks";
-import { localAdapterTransformerMocksSuite } from "./localAdapterTranformerMocks";
-import { localAdapterLoaderMocksSuite } from "./localAdapterLoaderMocks"
-import { localAdapterFlexMocksSuite } from "./localAdapterFlexMocks";
+import { localAdapterExtractorMocks } from "./localAdapterExtractorMocks";
+import { localAdapterTransformerMocks } from "./localAdapterTranformerMocks";
+import { localAdapterLoaderMocks } from "./localAdapterLoaderMocks"
+import { localAdapterFlexMocks } from "./localAdapterFlexMocks";
 
-export const adapterMocksSuites = [
-    ...localAdapterExtractorMocksSuite,
-    ...localAdapterTransformerMocksSuite,
-    ...localAdapterLoaderMocksSuite,
-    ...localAdapterFlexMocksSuite
+export const adapterMocks = [
+    ...localAdapterExtractorMocks,
+    ...localAdapterTransformerMocks,
+    ...localAdapterLoaderMocks,
+    ...localAdapterFlexMocks
 ]
