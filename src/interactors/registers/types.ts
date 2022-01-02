@@ -52,7 +52,7 @@ export interface EntityFetcher {//For a specific syncContext
 
 export type RegisterInitValues = {
     entity: object | null,
-    entityType?: string,
+    entityType: string,
     meta?: any,
     sourceAbsoluteId?: string,
     sourceRelativeId?: string,

@@ -28,7 +28,7 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
 
         if (runOptions?.pushEntities) {
             const pushEntities = runOptions?.pushEntities || [];
-            const inputEntitiesWithMeta = getWithInitFormat(pushEntities)
+            const inputEntitiesWithMeta = getWithInitFormat(pushEntities, "$inputPushed")
             const inputRegisters = initRegisters(inputEntitiesWithMeta, { ...syncContext })
             await this.registerDataAccess.saveAll(inputRegisters)
             adapterRunOptions = { ...adapterRunOptions, usePushedEntities: true }

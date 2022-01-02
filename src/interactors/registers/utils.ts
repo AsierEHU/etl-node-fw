@@ -22,7 +22,7 @@ function isEntityWithMeta(entity?: any): entity is MetaEntity {
     return entity?.$entity != undefined
 }
 
-const getWithMetaFormat = (entities: any[]): MetaEntity[] => {
+export const getWithMetaFormat = (entities: any[]): MetaEntity[] => {
     return entities.map(entity => {
         if (isEntityWithMeta(entity)) {
             return entity
@@ -35,7 +35,7 @@ const getWithMetaFormat = (entities: any[]): MetaEntity[] => {
     })
 }
 
-export const getWithInitFormat = (entities: any[], entityType?: string): RegisterInitValues[] => {
+export const getWithInitFormat = (entities: any[], entityType: string): RegisterInitValues[] => {
     const entitiesWithMeta = getWithMetaFormat(entities);
     return entitiesWithMeta.map(entityWithMeta => {
         return {
@@ -52,13 +52,15 @@ export const initRegisters = (
 ): Register[] => {
     return inputEntities.map((entity) => {
         const inputEntityId = uuidv4();
+        const initialStatus = entity.entityType == "$inputPushed" || entity.entityType == "$configPushed" ?
+            RegisterStatusTag.success : RegisterStatusTag.pending
         return {
             id: inputEntityId,
             entityType: entity.entityType || "$inputPushed",
             sourceAbsoluteId: entity.sourceAbsoluteId || inputEntityId,
             sourceRelativeId: entity.sourceRelativeId || inputEntityId,
             sourceEntityId: entity.sourceEntityId || null,
-            statusTag: entity.entityType ? RegisterStatusTag.pending : RegisterStatusTag.success,
+            statusTag: initialStatus,
             statusMeta: null,
             entity: entity.entity,
             meta: entity.meta || null,
@@ -67,7 +69,7 @@ export const initRegisters = (
     })
 }
 
-export const buildRegisterFromOthers = (registers: Register[], syncContext: SyncContext, entityType?: string) => {
+export const buildRegisterFromOthers = (registers: Register[], syncContext: SyncContext, entityType: string) => {
     const entitiesInitialValues = registers.map(reg => {
         const initialValue: RegisterInitValues = {
             entity: reg.entity,

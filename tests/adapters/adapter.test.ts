@@ -35,7 +35,8 @@ const adapterTest = (
         inputEntities: InputEntity<any>[]
     }
 ) => {
-    describe(definition.definitionType + " - " + definition.id + " status test", () => {
+
+    describe(definition.definitionType, () => {
 
         beforeEach(() => {
             const adapterPresenter = new EventEmitter()
@@ -55,100 +56,86 @@ const adapterTest = (
             adapterFactory = new AdapterFactory(adapterDefinitions, adapterDependencies)
         });
 
-        test("Presenter calls", async () => {
-            const adapter1 = adapterFactory.createAdapterRunner(definition.id)
-            const finalAdapterStatus = await adapter1.run(syncContext, defaultRunOptions);
-            statusEqual(finalAdapterStatus, mocks.mockFinalStatus)
-            expect(adapterStatusCallback.mock.calls.length).toBe(3)
-            statusEqual(adapterStatusCallback.mock.results[0].value, mocks.mockInitialStatus)
-            statusEqual(adapterStatusCallback.mock.results[2].value, mocks.mockFinalStatus)
-            if (finalAdapterStatus.statusTag == AdapterStatusTag.failed) {
-                expect(adapterErrorCallback).toBeCalled()
-            }
-            else {
-                expect(adapterErrorCallback).not.toBeCalled()
-            }
-        })
+        afterEach(async () => {
 
-        test("Presenter calls runOptions", async () => {
-            const adapter1 = adapterFactory.createAdapterRunner(definition.id)
-            const runOptions: AdapterRunOptions = { ...defaultRunOptions, usePushedEntities: true, onlyFailedEntities: false }
-            await adapter1.run(syncContext, runOptions);
-            runOptionsEqual(adapterStatusCallback.mock.results[2].value.runOptions, runOptions)
-        })
-    })
-
-    describe(definition.definitionType + " - " + definition.id + " registers test", () => {
-
-        beforeEach(() => {
-            const adapterPresenter = new EventEmitter()
-            adapterStatusCallback = jest.fn(adapterStatus => {
-                return adapterStatus
-            })
-            adapterPresenter.on("adapterStatus", adapterStatusCallback)
-            registerDataAccess = new VolatileRegisterDataAccess(mocks.mockInitialRegisters)
-            const adapterDependencies = {
-                adapterPresenter,
-                registerDataAccess,
-            }
-            adapterFactory = new AdapterFactory(adapterDefinitions, adapterDependencies)
-        });
-
-        test("Registers result", async () => {
-            const adapter1 = adapterFactory.createAdapterRunner(definition.id)
-            await adapter1.run(syncContext, defaultRunOptions);
-            const registers = await registerDataAccess.getAll()
-            registersEqual(registers, mocks.mockFinalRegisters)
-        });
-
-        test("runOptions:onlyFailedEntities", async () => {
-            const adapter1 = adapterFactory.createAdapterRunner(definition.id)
-            await adapter1.run(syncContext, defaultRunOptions);
-            const adapter2 = adapterFactory.createAdapterRunner(definition.id)
-            await adapter2.run(syncContext, { ...defaultRunOptions, onlyFailedEntities: true });
-            const registers = await registerDataAccess.getAll()
-            const mockRegistersWithRetries = [
-                ...mocks.mockFinalRegisters,
-                ...mocks.mockFinalRegisters.filter(reg => reg.statusTag == RegisterStatusTag.failed && reg.entityType == definition.outputType)
-            ]
-            registersEqual(registers, mockRegistersWithRetries)
-        })
-
-        test("runOptions:usePushedEntities", async () => {
-            const inputEntitiesWithMeta = getWithInitFormat(mocks.inputEntities)
-            const inputRegisters = initRegisters(inputEntitiesWithMeta, { ...syncContext })
-            await registerDataAccess.saveAll(inputRegisters)
-
-            const adapter1 = adapterFactory.createAdapterRunner(definition.id)
-            await adapter1.run(syncContext, { ...defaultRunOptions, usePushedEntities: true })
-            const registers = await registerDataAccess.getAll()
-            const entitiesWithMeta = getWithInitFormat(mocks.inputEntities)
-            const pushedRegisters = initRegisters(entitiesWithMeta, syncContext)
-            const registersWithMocks = [...mocks.mockInitialRegisters, ...pushedRegisters, ...mocks.mockNewRegisters]
-            registersEqual(registers, registersWithMocks)
-        })
-
-        test("Not pending registers", async () => {
-            const adapter1 = adapterFactory.createAdapterRunner(definition.id)
-            await adapter1.run(syncContext, defaultRunOptions)
+            //TEST Not pending registers
             const registers = await registerDataAccess.getAll()
             registers.forEach(register => {
                 expect(register.statusTag).not.toBe(RegisterStatusTag.pending)
             })
+
+            //TEST Relative and Absolute ids
+            for (const register of registers) {
+                await testSources(register, registerDataAccess);
+            }
         })
 
-        test("Relative and Absolute ids", async () => {
-            const adapter1 = adapterFactory.createAdapterRunner(definition.id)
-            await adapter1.run(syncContext, defaultRunOptions)
-            const registers = await registerDataAccess.getAll()
-            for (const register of registers) {
-                await testSources(register);
-            }
+
+        describe(definition.definitionType + " - " + definition.id + " status test", () => {
+
+            test("Presenter calls", async () => {
+                const adapter1 = adapterFactory.createAdapterRunner(definition.id)
+                const finalAdapterStatus = await adapter1.run(syncContext, defaultRunOptions);
+                statusEqual(finalAdapterStatus, mocks.mockFinalStatus)
+                expect(adapterStatusCallback.mock.calls.length).toBe(3)
+                statusEqual(adapterStatusCallback.mock.results[0].value, mocks.mockInitialStatus)
+                statusEqual(adapterStatusCallback.mock.results[2].value, mocks.mockFinalStatus)
+                if (finalAdapterStatus.statusTag == AdapterStatusTag.failed) {
+                    expect(adapterErrorCallback).toBeCalled()
+                }
+                else {
+                    expect(adapterErrorCallback).not.toBeCalled()
+                }
+            })
+
+            test("Presenter calls runOptions", async () => {
+                const adapter1 = adapterFactory.createAdapterRunner(definition.id)
+                const runOptions: AdapterRunOptions = { ...defaultRunOptions, usePushedEntities: true, onlyFailedEntities: false }
+                await adapter1.run(syncContext, runOptions);
+                runOptionsEqual(adapterStatusCallback.mock.results[2].value.runOptions, runOptions)
+            })
+        })
+
+        describe(definition.definitionType + " - " + definition.id + " registers test", () => {
+
+            test("Registers result", async () => {
+                const adapter1 = adapterFactory.createAdapterRunner(definition.id)
+                await adapter1.run(syncContext, defaultRunOptions);
+                const registers = await registerDataAccess.getAll()
+                registersEqual(registers, mocks.mockFinalRegisters)
+            });
+
+            test("runOptions:onlyFailedEntities", async () => {
+                const adapter1 = adapterFactory.createAdapterRunner(definition.id)
+                await adapter1.run(syncContext, defaultRunOptions);
+                const adapter2 = adapterFactory.createAdapterRunner(definition.id)
+                await adapter2.run(syncContext, { ...defaultRunOptions, onlyFailedEntities: true });
+                const registers = await registerDataAccess.getAll()
+                const mockRegistersWithRetries = [
+                    ...mocks.mockFinalRegisters,
+                    ...mocks.mockFinalRegisters.filter(reg => reg.statusTag == RegisterStatusTag.failed && reg.entityType == definition.outputType)
+                ]
+                registersEqual(registers, mockRegistersWithRetries)
+            })
+
+            test("runOptions:usePushedEntities", async () => {
+                const inputEntitiesWithMeta = getWithInitFormat(mocks.inputEntities, "$inputPushed")
+                const inputRegisters = initRegisters(inputEntitiesWithMeta, { ...syncContext })
+                await registerDataAccess.saveAll(inputRegisters)
+
+                const adapter1 = adapterFactory.createAdapterRunner(definition.id)
+                await adapter1.run(syncContext, { ...defaultRunOptions, usePushedEntities: true })
+                const registers = await registerDataAccess.getAll()
+                const entitiesWithMeta = getWithInitFormat(mocks.inputEntities, "$inputPushed")
+                const pushedRegisters = initRegisters(entitiesWithMeta, syncContext)
+                const registersWithMocks = [...mocks.mockInitialRegisters, ...pushedRegisters, ...mocks.mockNewRegisters]
+                registersEqual(registers, registersWithMocks)
+            })
         })
     })
 }
 
-const testSources = async (register: Register) => {
+export const testSources = async (register: Register, registerDataAccess: RegisterDataAccess) => {
     if (isByGroupSource(register)) {
         if (register.id == register.sourceAbsoluteId && register.id == register.sourceRelativeId) {
             throw Error("Imposible case")
@@ -158,7 +145,7 @@ const testSources = async (register: Register) => {
         } else if (register.sourceRelativeId != register.sourceAbsoluteId) {
             expect(isOrigin(register)).toBe(false)
             const relativeRegister = await registerDataAccess.get(register.sourceRelativeId as string) as Register
-            await testSources(relativeRegister)
+            await testSources(relativeRegister, registerDataAccess)
         }
         else {
             throw new Error("Unexpected case")
@@ -174,7 +161,7 @@ const testSources = async (register: Register) => {
         } else if (register.sourceRelativeId != register.sourceAbsoluteId) {
             expect(isOrigin(register)).toBe(false)
             const relativeRegister = await registerDataAccess.get(register.sourceRelativeId as string) as Register
-            await testSources(relativeRegister)
+            await testSources(relativeRegister, registerDataAccess)
         }
         else {
             throw new Error("Unexpected case")

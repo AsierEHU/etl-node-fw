@@ -1,5 +1,5 @@
 import { SyncContext, Register, RegisterStatusTag, InputEntity } from "../../../registers/types";
-import { getWithInitFormat } from "../../../registers/utils";
+import { getWithMetaFormat } from "../../../registers/utils";
 import { AdapterDefinition } from "../types";
 import { LocalAdapter } from "./localAdapter";
 import { ValidationResult, ValidationStatusTag } from "./types";
@@ -40,7 +40,7 @@ export class LocalAdapterLoader<ad extends LocalAdapterLoaderDefinition<any, any
         try {
             const inputEntity = inputRegister.entity;
             const outputEntity = await this.adapterDefinition.entityLoad(inputEntity);
-            const [outputEntityWithMeta] = getWithInitFormat([outputEntity])
+            const [outputEntityWithMeta] = getWithMetaFormat([outputEntity])
             const register: Register = {
                 id: uuidv4(),
                 entityType: this.adapterDefinition.outputType,
@@ -49,8 +49,8 @@ export class LocalAdapterLoader<ad extends LocalAdapterLoaderDefinition<any, any
                 sourceEntityId: inputRegister.sourceEntityId,
                 statusTag: RegisterStatusTag.pending,
                 statusMeta: null,
-                entity: outputEntityWithMeta.entity,
-                meta: outputEntityWithMeta.meta || null,
+                entity: outputEntityWithMeta.$entity,
+                meta: outputEntityWithMeta.$meta || null,
                 syncContext
             }
             return register
