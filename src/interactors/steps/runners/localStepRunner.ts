@@ -20,6 +20,8 @@ export class LocalStepRunner implements StepRunner {
 
     async run(syncContext: SyncContext, runOptions?: StepRunOptions) {
         runOptions = cloneDeep(runOptions)
+        syncContext = cloneDeep(syncContext)
+        
         const stepStatus = this.buildStatus(syncContext)
         this.stepPresenter.emit("stepStatus", cloneDeep(stepStatus))
 

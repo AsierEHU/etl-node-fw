@@ -18,7 +18,13 @@ export class LocalAdapterExtractor<ad extends LocalAdapterExtractorDefinition<an
     }
 
     protected async getRegisters(syncContext: SyncContext): Promise<Register[]> {
-        const inputEntities = await this.adapterDefinition.entitiesGet(/*TODO: PushedConfig */);
+        const configPushedRegisters = await this.registerDataAccess.getAll({
+            registerType: "$configPushed",
+            stepId: syncContext.stepId,
+            flowId: syncContext.flowId
+        })
+        const configPushedEntity = configPushedRegisters[0]?.entity
+        const inputEntities = await this.adapterDefinition.entitiesGet(configPushedEntity);
         const inputEntitiesInitialValues = getWithInitFormat(inputEntities, this.adapterDefinition.outputType)
         const registers = initRegisters(inputEntitiesInitialValues, syncContext);
         return registers;
@@ -74,7 +80,7 @@ export abstract class LocalAdapterExtractorDefinition<output extends object> imp
     abstract readonly definitionType: string;
     abstract readonly id: string;
     abstract readonly outputType: string
-    abstract readonly entitiesGet: () => Promise<InputEntity<output>[]>
+    abstract readonly entitiesGet: (configPushed?: any) => Promise<InputEntity<output>[]>
     abstract readonly entityValidate: (inputEntity: output | null) => Promise<ValidationResult | ValidationStatusTag> //data quality, error handling (error prevention), managin Bad Data-> triage or CleanUp
     abstract readonly entityFix: (toFixEntity: ToFixEntity<output>) => Promise<FixedEntity<output> | null> //error handling (error response), managin Bad Data-> CleanUp
 }

@@ -3,10 +3,11 @@ import { VolatileRegisterDataAccess } from "../../src/dataAccess/volatile";
 import { AdapterFactory } from "../../src/interactors/adapters/factory";
 import { AdapterRunOptions } from "../../src/interactors/adapters/processes/types";
 import { RegisterDataAccess, SyncContext } from "../../src/interactors/registers/types";
+import { getWithInitFormat, initRegisters } from "../../src/interactors/registers/utils";
 import { StepFactory } from "../../src/interactors/steps/factory";
 import { StepDefinition, StepRunOptions } from "../../src/interactors/steps/processes/types";
 import { StepStatus, StepStatusTag } from "../../src/interactors/steps/runners/types";
-import { case1Definition } from "../adapters/localAdapterExtractorMocks/case1Mocks";
+import { case1Definition, case1Mocks } from "../adapters/localAdapterExtractorMocks/case1Mocks";
 import { stepMocksSuites } from "./mocks";
 
 const adapterDefinitions = [case1Definition];
@@ -87,6 +88,47 @@ const stepTest = (
             await step1.run(syncContext, runOptions);
             const adapterRunOptions: AdapterRunOptions = { ...mocks.mockAdapterRunOptions, usePushedEntities: true }
             runOptionsEqual(adapterStatusCallback.mock.results[2].value.runOptions, adapterRunOptions)
+        })
+
+    })
+
+    describe(definition.definitionType + " - " + definition.id + " registers test", () => {
+
+        beforeEach(() => {
+            const presenter = new EventEmitter()
+            stepStatusCallback = jest.fn(stepStatus => {
+                return stepStatus
+            })
+            stepErrorCallback = jest.fn(stepError => {
+                return stepError
+            })
+            adapterStatusCallback = jest.fn(adapterStatus => {
+                return adapterStatus
+            })
+            presenter.on("adapterStatus", adapterStatusCallback)
+            presenter.on("stepStatus", stepStatusCallback)
+            presenter.on("stepError", stepErrorCallback)
+            registerDataAccess = new VolatileRegisterDataAccess()
+            const adapterDependencies = {
+                adapterPresenter: presenter,
+                registerDataAccess,
+            }
+            adapterFactory = new AdapterFactory(adapterDefinitions, adapterDependencies)
+            const stepDependencies = {
+                stepPresenter: presenter,
+                registerDataAccess: registerDataAccess,
+                adapterFactory
+            }
+            stepFactory = new StepFactory(stepDefinitions, stepDependencies)
+        });
+
+        test("runOptions:pushEntities", async () => {
+            const entityConfigPushed = { msg: "Push entities test" }
+            const step1 = stepFactory.createStepRunner(definition.id)
+            const runOptions: StepRunOptions = { ...defaultRunOptions, pushEntities: [entityConfigPushed] }
+            await step1.run(syncContext, runOptions);
+            const registerConfigPushed = await registerDataAccess.getAll({ registerType: "$inputPushed" })
+            expect(registerConfigPushed[0].entity).toEqual(entityConfigPushed)
         })
 
     })
