@@ -26,7 +26,7 @@ Special entity reserved [$]types Tags:
 
 Source data lineage types:
 - Row ["v4UUID"]: When the source entity is from a single row
-- Set ["set-(setRegisterType)_(setRegisterStatus)-..."]: When the source entity is from one or more sets
+- Set ["set-(setRegisterType)-..."]: When the source entity is from one or more sets
 ### Adapters
 Run the Definition about how to ETL entities.
 Each adapter produce only one Entity type.
@@ -60,7 +60,7 @@ Define the order execution and dependencies between steps.
 - Interacting with (ETL Runners)
 ## Default implementations overview [WIP]
 ### Adapters
-- LocalAdapter family:
+- LocalAdapter family: For small sets running in one local computer
     - LocalAdapterExtractor
     - LocalAdapterRowTransformer
     - LocalAdapterSetTransformer

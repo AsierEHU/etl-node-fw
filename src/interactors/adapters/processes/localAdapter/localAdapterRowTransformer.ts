@@ -8,8 +8,6 @@ import { v4 as uuidv4 } from 'uuid';
  * row-by-row
  * 1 input 1 output
  */
-
-//TODO: Row transformer
 export class LocalAdapterRowTransformer<ad extends LocalAdapterTransformerRowDefinition<any, any>> extends LocalAdapter<ad>{
 
     constructor(dependencies: any) {

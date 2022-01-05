@@ -36,7 +36,7 @@ const adapterTest = (
     }
 ) => {
 
-    describe(definition.definitionType, () => {
+    describe(definition.definitionType + " - " + definition.id, () => {
 
         beforeEach(() => {
             const adapterPresenter = new EventEmitter()
@@ -71,7 +71,7 @@ const adapterTest = (
         })
 
 
-        describe(definition.definitionType + " - " + definition.id + " status test", () => {
+        describe("Status test", () => {
 
             test("Presenter calls", async () => {
                 const adapter1 = adapterFactory.createAdapterRunner(definition.id)
@@ -96,7 +96,7 @@ const adapterTest = (
             })
         })
 
-        describe(definition.definitionType + " - " + definition.id + " registers test", () => {
+        describe("Registers test", () => {
 
             test("Registers result", async () => {
                 const adapter1 = adapterFactory.createAdapterRunner(definition.id)

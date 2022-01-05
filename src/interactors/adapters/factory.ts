@@ -1,5 +1,5 @@
 import { LocalAdapterExtractor } from "./processes/localAdapter/localAdapterExtractor"
-import { LocalAdapterFlex } from "./processes/localAdapter/localAdapterFlex"
+import { LocalAdapterSetTransformer } from "./processes/localAdapter/localAdapterSetTransformer"
 import { LocalAdapterLoader } from "./processes/localAdapter/localAdapterLoader"
 import { LocalAdapterRowTransformer } from "./processes/localAdapter/localAdapterRowTransformer"
 import { AdapterDefinition, Adapter } from "./processes/types"
@@ -30,8 +30,8 @@ const addt = {
         dependencies: ["registerDataAccess"],
         runner: ardt["LocalAdapterRunner"]
     },
-    ["LocalAdapterFlex"]: {
-        class: LocalAdapterFlex,
+    ["LocalAdapterSetTransformer"]: {
+        class: LocalAdapterSetTransformer,
         dependencies: ["registerDataAccess"],
         runner: ardt["LocalAdapterRunner"]
     }
@@ -41,7 +41,7 @@ const AdapterDefinitionTree: { [key: string]: any } = {
     ["LocalAdapterLoaderDefinition"]: addt["LocalAdapterLoader"],
     ["LocalAdapterExtractorDefinition"]: addt["LocalAdapterExtractor"],
     ["LocalAdapterTransformerRowDefinition"]: addt["LocalAdapterRowTransformer"],
-    ["LocalAdapterFlexDefinition"]: addt["LocalAdapterFlex"],
+    ["LocalAdapterSetTransformerDefinition"]: addt["LocalAdapterSetTransformer"],
 }
 
 export class AdapterFactory {

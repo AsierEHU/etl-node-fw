@@ -2,7 +2,7 @@ import { LocalAdapterLoaderDefinition } from "../../../src/interactors/adapters/
 import { ValidationResult, ValidationStatusTag } from "../../../src/interactors/adapters/processes/localAdapter/types";
 import { AdapterStatus, AdapterStatusTag } from "../../../src/interactors/adapters/runners/types";
 import { Register, RegisterStatusTag, RegisterStats, InputEntity } from "../../../src/interactors/registers/types";
-import { case3Mocks } from "../localAdapterTranformerMocks/case3Mocks";
+import { case3Mocks } from "../localAdapterRowTranformerMocks/case3Mocks";
 
 
 type outputClass = {

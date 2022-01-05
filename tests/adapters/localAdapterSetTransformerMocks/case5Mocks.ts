@@ -1,7 +1,6 @@
-import { LocalAdapterFlexDefinition } from "../../../src/interactors/adapters/processes/localAdapter/localAdapterFlex";
-import { ValidationStatusTag } from "../../../src/interactors/adapters/processes/localAdapter/types";
+import { LocalAdapterSetTransformerDefinition } from "../../../src/interactors/adapters/processes/localAdapter/localAdapterSetTransformer";
 import { AdapterStatus, AdapterStatusTag } from "../../../src/interactors/adapters/runners/types";
-import { Register, EntityFetcher, RegisterDataFilter, RegisterStatusTag, RegisterStats, InputEntity } from "../../../src/interactors/registers/types";
+import { Register, RegisterStatusTag, RegisterStats, InputEntity } from "../../../src/interactors/registers/types";
 import { case4Mocks } from "../localAdapterLoaderMocks/case4Mocks";
 
 
@@ -12,22 +11,16 @@ const mockInitialRegisters: Register[] = case4Mocks.mockFinalRegisters
 const inputEntities: InputEntity<result2Class>[] = [
     { successTotal: 1 }
 ];
-export const case5Definition: LocalAdapterFlexDefinition<result2Class> = {
-    id: "case5Flex",
+export const case5Definition: LocalAdapterSetTransformerDefinition<result2Class> = {
+    id: "case5SetTransformer",
+    inputTypes: ["resultClass"],
     outputType: "result2Class",
-    definitionType: "LocalAdapterFlexDefinition",
-    async entitiesGet(entityFetcher: EntityFetcher) {
-        const filter: RegisterDataFilter = {
-            registerType: "resultClass",
-            registerStatus: RegisterStatusTag.success
-        };
-        const entities = await entityFetcher.getEntities(filter);
+    definitionType: "LocalAdapterSetTransformerDefinition",
+    async setsProcess(sets) {
+        const entities = sets["resultClass"]
         return [{
             successTotal: entities.length
         }];
-    },
-    async entityValidate(outputEntity: result2Class | null) {
-        return ValidationStatusTag.valid
     }
 }
 const mockNewRegisters: Register[] = [
@@ -55,8 +48,8 @@ const mockFinalRegisters: Register[] = [
     ...mockNewRegisters
 ]
 const mockInitialStatus: AdapterStatus = {
-    definitionId: "case5Flex",
-    definitionType: "LocalAdapterFlexDefinition",
+    definitionId: "case5SetTransformer",
+    definitionType: "LocalAdapterSetTransformerDefinition",
     id: "testAdapter",
     outputType: "result2Class",
     runOptions: null,

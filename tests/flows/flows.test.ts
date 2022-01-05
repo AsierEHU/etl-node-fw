@@ -41,7 +41,7 @@ const flowTest = (
     }
 ) => {
 
-    describe(definition.definitionType, () => {
+    describe(definition.definitionType + " - " + definition.id, () => {
 
         beforeEach(() => {
             const presenter = new EventEmitter()
@@ -98,7 +98,7 @@ const flowTest = (
             }
         })
 
-        describe(definition.definitionType + " - " + definition.id + " status test", () => {
+        describe("Status test", () => {
 
             test("Presenter calls", async () => {
                 const flow1 = flowFactory.createFlowRunner(definition.id)
@@ -117,7 +117,7 @@ const flowTest = (
 
         })
 
-        describe(definition.definitionType + " - " + definition.id + " registers test", () => {
+        describe("Registers test", () => {
 
             test("runOptions:flowPushConfig", async () => {
                 const entityConfigPushed = { msg: "Push config test" }

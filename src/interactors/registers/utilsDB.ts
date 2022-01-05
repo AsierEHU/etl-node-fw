@@ -49,6 +49,7 @@ export class AdvancedRegisterFetcher {
     }
 
     async getRelativeRegisters(baseRegisters: Register[]): Promise<Register[]> {
+        //TODO: SET relatives registers types
         const uniqueBaseRegisters = uniqBy(baseRegisters, 'sourceRelativeId')
         const targetRegistersIds = uniqueBaseRegisters.map(baseRegister => baseRegister.sourceRelativeId) as string[]
         const targetRegisters = await this.registerDataAccess.getAll(undefined, targetRegistersIds)
@@ -56,6 +57,7 @@ export class AdvancedRegisterFetcher {
     }
 
     async getAbsoluteRegisters(baseRegisters: Register[]): Promise<Register[]> {
+        //TODO: SET absolute registers types
         const uniqueBaseRegisters = uniqBy(baseRegisters, 'sourceAbsoluteId')
         const targetRegistersIds = uniqueBaseRegisters.map(baseRegister => baseRegister.sourceAbsoluteId) as string[]
         const targetRegisters = await this.registerDataAccess.getAll(undefined, targetRegistersIds)

@@ -38,7 +38,7 @@ const stepTest = (
     }
 ) => {
 
-    describe(definition.definitionType, () => {
+    describe(definition.definitionType + " - " + definition.id, () => {
 
         beforeEach(() => {
             const presenter = new EventEmitter()
@@ -83,7 +83,7 @@ const stepTest = (
         })
 
 
-        describe(definition.definitionType + " - " + definition.id + " status test", () => {
+        describe("Status test", () => {
 
             test("Presenter calls", async () => {
                 const step1 = stepFactory.createStepRunner(definition.id)
@@ -110,7 +110,7 @@ const stepTest = (
 
         })
 
-        describe(definition.definitionType + " - " + definition.id + " registers test", () => {
+        describe("Registers test", () => {
 
             test("runOptions:pushEntities", async () => {
                 const entityInputPushed = { msg: "Push entities test" }

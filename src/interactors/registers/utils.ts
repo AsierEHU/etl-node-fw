@@ -84,9 +84,9 @@ export const buildRegisterFromOthers = (registers: Register[], syncContext: Sync
     return initRegisters(entitiesInitialValues, syncContext)
 }
 
-export const generateSetSourceId = (setTypes: RegisterDataFilter[]) => {
-    const sourceId = setTypes.reduce((id, set) => {
-        return id + "-" + set.registerType + "_" + set.registerStatus
+export const generateSetSourceId = (setTypes: string[]) => {
+    const sourceId = setTypes.reduce((id, setType) => {
+        return id + "-" + setType
     }, "set")
 
     return sourceId

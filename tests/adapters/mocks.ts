@@ -1,7 +1,7 @@
 import { localAdapterExtractorMocks } from "./localAdapterExtractorMocks";
-import { localAdapterTransformerMocks } from "./localAdapterTranformerMocks";
+import { localAdapterTransformerMocks } from "./localAdapterRowTranformerMocks";
 import { localAdapterLoaderMocks } from "./localAdapterLoaderMocks"
-import { localAdapterFlexMocks } from "./localAdapterFlexMocks";
+import { localAdapterFlexMocks } from "./localAdapterSetTransformerMocks";
 
 export const adapterMocks = [
     ...localAdapterExtractorMocks,
