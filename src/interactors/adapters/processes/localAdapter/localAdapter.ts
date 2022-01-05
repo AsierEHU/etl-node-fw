@@ -1,5 +1,5 @@
 import { cloneDeep } from "lodash";
-import { RegisterDataAccess, Register, RegisterStatusTag, SyncContext } from "../../../registers/types";
+import { RegisterDataAccess, Register, RegisterStatusTag, SyncContext, reservedRegisterEntityTypes } from "../../../registers/types";
 import { buildRegisterFromOthers } from "../../../registers/utils";
 import { AdvancedRegisterFetcher } from "../../../registers/utilsDB";
 import { AdapterDefinition, Adapter, AdapterRunOptions } from "../types";
@@ -45,7 +45,7 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
         else if (runOptions?.usePushedEntities) {
             const pushedRegisters = await this.registerDataAccess.getAll(
                 {
-                    registerType: "$inputPushed",
+                    registerType: reservedRegisterEntityTypes.entityPushed,
                     stepId: syncContext.stepId,
                     flowId: syncContext.flowId
                 }

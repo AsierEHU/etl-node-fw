@@ -1,7 +1,7 @@
 import { EventEmitter } from "stream";
 import { VolatileRegisterDataAccess } from "../../src/dataAccess/volatile";
 import { AdapterFactory } from "../../src/interactors/adapters/factory";
-import { RegisterDataAccess, RegisterStatusTag, SyncContext } from "../../src/interactors/registers/types";
+import { RegisterDataAccess, RegisterStatusTag, reservedRegisterEntityTypes, SyncContext } from "../../src/interactors/registers/types";
 import { FlowFactory } from "../../src/interactors/flows/factory";
 import { FlowDefinition, FlowRunOptions } from "../../src/interactors/flows/processes/types";
 import { case1Definition as adapterCase1Definition } from "../adapters/localAdapterExtractorMocks/case1Mocks";
@@ -124,7 +124,7 @@ const flowTest = (
                 const flow1 = flowFactory.createFlowRunner(definition.id)
                 const runOptions: FlowRunOptions = { ...defaultRunOptions, flowPushConfig: entityConfigPushed }
                 await flow1.run(runOptions);
-                const registerConfigPushed = await registerDataAccess.getAll({ registerType: "$configPushed" })
+                const registerConfigPushed = await registerDataAccess.getAll({ registerType: reservedRegisterEntityTypes.extractorConfig })
                 expect(registerConfigPushed[0].entity).toEqual(entityConfigPushed)
             })
 

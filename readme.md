@@ -2,58 +2,82 @@
 ETL Node Framework is a tool focused on ETL best practices.
 
 Observability by default:
-- Traces / data lineage
+- Data lineage
 - Events
 - Metrics
 - Documentation
 - Testing
 
 Tools for:
-- Data quality / manage bad data
+- Ensuring data quality
+- Managing bad data
 - Error handling
+## ETL Framework concepts
+### Entities
+Input and Ouput raw payload. The information that you want to Extract, Transform and Load.
+### Registers
+Meta information about the entities after being processed.
+Keep Sync context, data lineage and process status data.
+Tag the entities type.
 
-## Examples / how it works
-- Defining DBs and Presenters
-- Using Factories
-- Interacting with (Flows, Steps, Adapters...)
+Special entity reserved [$]types Tags:
+- $entityPushed: Used for working with entities in "Push mode"
+- $extractorConfig: Used for define Extractors configuration
 
-## ETL Framework engines
+Source data lineage types:
+- Row ["v4UUID"]: When the source entity is from a single row
+- Set ["set-(setRegisterType)_(setRegisterStatus)-..."]: When the source entity is from one or more sets
+### Adapters
+Run the Definition about how to ETL entities.
+Each adapter produce only one Entity type.
+Forces to implement some validations to ensure data quality, error prevention and decisions about how to manage bad data.
+Can Work in "Push" or "Pull" modes.
+- "Pull Mode" (default): Adapter is in charge of obtain the input entities. 
+- "Push Mode": Adapter only obtain previously loaded entities.
 
-- **Factories**: Create new runners by definition.
-- **ETL Runners**: Expose process status and metrics. Perform pre and post Adapter running tasks.
-- **ETL process**: Tranform a definition into a result. Return summaraized results (monitoring).
-
-## ETL Framework elements
-
-- **Registers**: Data lineage, Manage bad data
+Types:
+- **Extractors**: Input new entities into the flow.
+- **Transformers**: Create new entities from existing entities.
+    - Row: Unique Row source needed for the output
+    - Set: One or more Sets of data needed for the output
+- **Loaders**: Save entities into the final storage. Save ouput resuls.
+### Steps
+Define how an Adapter must be ran in an specific Flow.
+Implements some error handling tools like retries and force to define how the flow must continue in case of not success.
+### Flows
+Define the order execution and dependencies between steps.
+## ETL Framework patterns
 - **Definitions**: Behaviour configuration. Acts like process documentation.
-- **Adapters**: Manage registers, Manage bad data, Ensure data quality, Pull and push
-- **Steps**: error handling
-- **Flows**:
-
-Interpreters overview
-
-- LocalAdapterLoader
-- LocalAdapterExtractor: 
-- LocalAdapterTransformer
-- LocalAdapterFlex
-- LocalStep
-- LocalFlow
-
-Runners overview
+- **Processes**: Tranform a definition into a result. Return summaraized results (monitoring).
+- **Runners**: Run Processes exposing their status, errors and metrics.
+- **Factories**: Create new runners by definition.
+- **DataAccess**: Interface for handling Entities and Registers
+- **presenters**: Event channels with Status and Errors information.
+## Examples / how it works [WIP]
+- Implementing DBs and Presenters
+- Implementing Definitions
+- Using Factories
+- Interacting with (ETL Runners)
+## Default implementations overview [WIP]
+### Adapters
+- LocalAdapter family:
+    - LocalAdapterExtractor
+    - LocalAdapterRowTransformer
+    - LocalAdapterSetTransformer
+    - LocalAdapterLoader
 - LocalAdapterRunner
+### Steps
+- LocalStep
 - LocalStepRunner
+### Flows
+- LocalLinealFlow
 - LocalFlowRunner
-
-
-
-Extensibility [WIP]
-- Include new desfinitions and runners
+## Extensibility [WIP]
+- Developing own ETL Elements
 - Testing
-
-Next features
+## Next features [WIP]
 - Process in batch (reducers)
 - Tree flows (instead of lineal)
 - Document store
 - SQL store
-    - Stage tables adapters
+- Stage tables adapters

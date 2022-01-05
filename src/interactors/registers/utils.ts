@@ -1,21 +1,21 @@
 import { v4 as uuidv4 } from 'uuid';
-import { RegisterInitValues, MetaEntity, Register, RegisterStatusTag, SyncContext } from "./types"
+import { RegisterInitValues, MetaEntity, Register, RegisterStatusTag, SyncContext, reservedRegisterEntityTypes, registerSourceType, RegisterDataFilter } from "./types"
 
 export const isOrigin = (register: Register): boolean => {
     if (isByRowSource(register))
         return register.id == register.sourceAbsoluteId && register.id == register.sourceRelativeId
-    else if (isByGroupSource(register))
+    else if (isBySetSource(register))
         return register.sourceAbsoluteId == register.sourceRelativeId
     else
-        throw Error("Unknown register origin type")
+        throw Error("Unknown register source type")
 }
 
 export function isByRowSource(register: Register): boolean {
-    return register.sourceRelativeId != null && !register.sourceRelativeId.startsWith("00000000")
+    return register.sourceRelativeId != null && !register.sourceRelativeId.startsWith("set")
 }
 
-export function isByGroupSource(register: Register): boolean {
-    return register.sourceRelativeId != null && register.sourceRelativeId.startsWith("00000000")
+export function isBySetSource(register: Register): boolean {
+    return register.sourceRelativeId != null && register.sourceRelativeId.startsWith("set")
 }
 
 function isEntityWithMeta(entity?: any): entity is MetaEntity {
@@ -52,11 +52,11 @@ export const initRegisters = (
 ): Register[] => {
     return inputEntities.map((entity) => {
         const inputEntityId = uuidv4();
-        const initialStatus = entity.entityType == "$inputPushed" || entity.entityType == "$configPushed" ?
+        const initialStatus = entity.entityType == reservedRegisterEntityTypes.entityPushed || entity.entityType == reservedRegisterEntityTypes.extractorConfig ?
             RegisterStatusTag.success : RegisterStatusTag.pending
         return {
             id: inputEntityId,
-            entityType: entity.entityType || "$inputPushed",
+            entityType: entity.entityType || reservedRegisterEntityTypes.entityPushed,
             sourceAbsoluteId: entity.sourceAbsoluteId || inputEntityId,
             sourceRelativeId: entity.sourceRelativeId || inputEntityId,
             sourceEntityId: entity.sourceEntityId || null,
@@ -82,4 +82,12 @@ export const buildRegisterFromOthers = (registers: Register[], syncContext: Sync
         return initialValue
     })
     return initRegisters(entitiesInitialValues, syncContext)
+}
+
+export const generateSetSourceId = (setTypes: RegisterDataFilter[]) => {
+    const sourceId = setTypes.reduce((id, set) => {
+        return id + "-" + set.registerType + "_" + set.registerStatus
+    }, "set")
+
+    return sourceId
 }

@@ -68,3 +68,13 @@ export type RegisterStats = { //Audit
 }
 
 export type InputEntity<e extends object> = MetaEntity | null | e
+
+export enum reservedRegisterEntityTypes {
+    entityPushed = "$entityPushed",
+    extractorConfig = "$extractorConfig"
+}
+
+export enum registerSourceType {
+    row = "row",
+    set = "set"
+}

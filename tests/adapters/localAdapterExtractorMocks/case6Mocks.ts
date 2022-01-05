@@ -1,7 +1,7 @@
 import { LocalAdapterExtractorDefinition } from "../../../src/interactors/adapters/processes/localAdapter/localAdapterExtractor";
 import { ValidationStatusTag, ToFixEntity } from "../../../src/interactors/adapters/processes/localAdapter/types";
 import { AdapterStatus, AdapterStatusTag } from "../../../src/interactors/adapters/runners/types";
-import { Register, InputEntity, RegisterStatusTag, RegisterStats } from "../../../src/interactors/registers/types";
+import { Register, InputEntity, RegisterStatusTag, RegisterStats, reservedRegisterEntityTypes } from "../../../src/interactors/registers/types";
 
 
 type inputClass = {
@@ -10,7 +10,7 @@ type inputClass = {
 }
 const mockInitialRegisters: Register[] = [{
     id: "fb7bc93a-17c1-467c-951d-58bf119c1955",
-    entityType: "$configPushed",
+    entityType: reservedRegisterEntityTypes.extractorConfig,
     sourceAbsoluteId: "fb7bc93a-17c1-467c-951d-58bf119c1955",
     sourceRelativeId: "fb7bc93a-17c1-467c-951d-58bf119c1955",
     sourceEntityId: null,

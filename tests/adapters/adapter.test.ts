@@ -3,8 +3,8 @@ import { VolatileRegisterDataAccess } from "../../src/dataAccess/volatile";
 import { AdapterFactory } from "../../src/interactors/adapters/factory";
 import { AdapterDefinition, AdapterRunOptions } from "../../src/interactors/adapters/processes/types";
 import { AdapterStatus, AdapterStatusTag } from "../../src/interactors/adapters/runners/types";
-import { RegisterDataAccess, Register, RegisterStatusTag, InputEntity } from "../../src/interactors/registers/types";
-import { getWithInitFormat, initRegisters, isByGroupSource, isOrigin, isByRowSource } from "../../src/interactors/registers/utils";
+import { RegisterDataAccess, Register, RegisterStatusTag, InputEntity, reservedRegisterEntityTypes } from "../../src/interactors/registers/types";
+import { getWithInitFormat, initRegisters, isBySetSource, isOrigin, isByRowSource } from "../../src/interactors/registers/utils";
 import { adapterMocks } from "./mocks";
 
 
@@ -119,14 +119,14 @@ const adapterTest = (
             })
 
             test("runOptions:usePushedEntities", async () => {
-                const inputEntitiesWithMeta = getWithInitFormat(mocks.inputEntities, "$inputPushed")
+                const inputEntitiesWithMeta = getWithInitFormat(mocks.inputEntities, reservedRegisterEntityTypes.entityPushed)
                 const inputRegisters = initRegisters(inputEntitiesWithMeta, { ...syncContext })
                 await registerDataAccess.saveAll(inputRegisters)
 
                 const adapter1 = adapterFactory.createAdapterRunner(definition.id)
                 await adapter1.run(syncContext, { ...defaultRunOptions, usePushedEntities: true })
                 const registers = await registerDataAccess.getAll()
-                const entitiesWithMeta = getWithInitFormat(mocks.inputEntities, "$inputPushed")
+                const entitiesWithMeta = getWithInitFormat(mocks.inputEntities, reservedRegisterEntityTypes.entityPushed)
                 const pushedRegisters = initRegisters(entitiesWithMeta, syncContext)
                 const registersWithMocks = [...mocks.mockInitialRegisters, ...pushedRegisters, ...mocks.mockNewRegisters]
                 registersEqual(registers, registersWithMocks)
@@ -136,7 +136,7 @@ const adapterTest = (
 }
 
 export const testSources = async (register: Register, registerDataAccess: RegisterDataAccess) => {
-    if (isByGroupSource(register)) {
+    if (isBySetSource(register)) {
         if (register.id == register.sourceAbsoluteId && register.id == register.sourceRelativeId) {
             throw Error("Imposible case")
         }

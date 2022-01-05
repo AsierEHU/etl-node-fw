@@ -1,4 +1,4 @@
-import { SyncContext, Register, RegisterStatusTag, InputEntity } from "../../../registers/types";
+import { SyncContext, Register, RegisterStatusTag, InputEntity, reservedRegisterEntityTypes } from "../../../registers/types";
 import { getWithInitFormat, initRegisters } from "../../../registers/utils";
 import { AdapterDefinition } from "../types";
 import { LocalAdapter } from "./localAdapter";
@@ -19,10 +19,11 @@ export class LocalAdapterExtractor<ad extends LocalAdapterExtractorDefinition<an
 
     protected async getRegisters(syncContext: SyncContext): Promise<Register[]> {
         const configPushedRegisters = await this.registerDataAccess.getAll({
-            registerType: "$configPushed",
+            registerType: reservedRegisterEntityTypes.extractorConfig,
             flowId: syncContext.flowId
         })
         const configPushedEntity = configPushedRegisters[0]?.entity
+        //TODO: Use entityFetcher. Add to entity fetcher a custom method for the "configPushed" type.
         const inputEntities = await this.adapterDefinition.entitiesGet(configPushedEntity);
         const inputEntitiesInitialValues = getWithInitFormat(inputEntities, this.adapterDefinition.outputType)
         const registers = initRegisters(inputEntitiesInitialValues, syncContext);

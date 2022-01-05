@@ -1,5 +1,5 @@
 import { SyncContext, Register, RegisterDataFilter, RegisterStatusTag, EntityFetcher, InputEntity } from "../../../registers/types";
-import { getWithInitFormat, initRegisters } from "../../../registers/utils";
+import { generateSetSourceId, getWithInitFormat, initRegisters } from "../../../registers/utils";
 import { ContextEntityFetcher } from "../../../registers/utilsDB";
 import { AdapterDefinition } from "../types";
 import { LocalAdapter } from "./localAdapter";
@@ -11,6 +11,8 @@ import { getValidationResultWithMeta, validationTagToRegisterTag } from "./utils
  * row-by-row
  * unknown input 1 output
  */
+
+//TODO: Set transformer
 export class LocalAdapterFlex<ad extends LocalAdapterFlexDefinition<any>> extends LocalAdapter<ad>{
 
     constructor(dependencies: any) {
@@ -25,20 +27,12 @@ export class LocalAdapterFlex<ad extends LocalAdapterFlexDefinition<any>> extend
         const inputEntities = await this.adapterDefinition.entitiesGet(entityFetcher);
         const inputEntitiesInitialValues = getWithInitFormat(inputEntities, this.adapterDefinition.outputType)
         const registers = initRegisters(inputEntitiesInitialValues, syncContext);
-        this.calculateSourceId(registers, entityFetcher.getHistory())
+        const sourceId = generateSetSourceId(entityFetcher.getHistory())
+        for (const register of registers) {
+            register.sourceRelativeId = sourceId
+            register.sourceAbsoluteId = sourceId
+        }
         return registers;
-    }
-
-    private calculateSourceId(registers: Register[], history: RegisterDataFilter[]) {
-        const sourceId = history.reduce((id, curr) => {
-            return id + "-" + curr.registerType + "_" + curr.registerStatus
-        }, "00000000")
-
-        if (sourceId != "00000000")
-            for (const register of registers) {
-                register.sourceRelativeId = sourceId
-                register.sourceAbsoluteId = sourceId
-            }
     }
 
     async processRegisters(outputRegisters: Register[]) {

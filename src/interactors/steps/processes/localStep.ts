@@ -2,7 +2,7 @@ import { cloneDeep } from "lodash";
 import { AdapterFactory } from "../../adapters/factory";
 import { AdapterRunOptions } from "../../adapters/processes/types";
 import { AdapterStatusTag } from "../../adapters/runners/types";
-import { RegisterDataAccess, RegisterStats, SyncContext } from "../../registers/types";
+import { RegisterDataAccess, RegisterStats, reservedRegisterEntityTypes, SyncContext } from "../../registers/types";
 import { getWithInitFormat, initRegisters } from "../../registers/utils";
 import { Step, StepStatusSummary, StepDefinition, StepRunOptions } from "./types";
 /**
@@ -28,7 +28,7 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
 
         if (runOptions?.pushEntities) {
             const pushEntities = runOptions?.pushEntities || [];
-            const inputEntitiesWithMeta = getWithInitFormat(pushEntities, "$inputPushed")
+            const inputEntitiesWithMeta = getWithInitFormat(pushEntities, reservedRegisterEntityTypes.entityPushed)
             const inputRegisters = initRegisters(inputEntitiesWithMeta, { ...syncContext })
             await this.registerDataAccess.saveAll(inputRegisters)
             adapterRunOptions = { ...adapterRunOptions, usePushedEntities: true }
