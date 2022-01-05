@@ -1,5 +1,6 @@
-import { SyncContext, Register, RegisterStatusTag, InputEntity, reservedRegisterEntityTypes } from "../../../registers/types";
+import { SyncContext, Register, RegisterStatusTag, InputEntity, EntityFetcher } from "../../../registers/types";
 import { getWithInitFormat, initRegisters } from "../../../registers/utils";
+import { ContextEntityFetcher } from "../../../registers/utilsDB";
 import { AdapterDefinition } from "../types";
 import { LocalAdapter } from "./localAdapter";
 import { ValidationResult, ValidationStatusTag, ToFixEntity, FixedEntity } from "./types";
@@ -18,13 +19,11 @@ export class LocalAdapterExtractor<ad extends LocalAdapterExtractorDefinition<an
     }
 
     protected async getRegisters(syncContext: SyncContext): Promise<Register[]> {
-        const configPushedRegisters = await this.registerDataAccess.getAll({
-            registerType: reservedRegisterEntityTypes.extractorConfig,
-            flowId: syncContext.flowId
-        })
-        const configPushedEntity = configPushedRegisters[0]?.entity
-        //TODO: Use entityFetcher. Add to entity fetcher a custom method for the "configPushed" type.
-        const inputEntities = await this.adapterDefinition.entitiesGet(configPushedEntity);
+        const entityFetcher = new ContextEntityFetcher(
+            { flowId: syncContext.flowId },
+            this.registerDataAccess
+        )
+        const inputEntities = await this.adapterDefinition.entitiesGet(entityFetcher);
         const inputEntitiesInitialValues = getWithInitFormat(inputEntities, this.adapterDefinition.outputType)
         const registers = initRegisters(inputEntitiesInitialValues, syncContext);
         return registers;
@@ -80,7 +79,7 @@ export abstract class LocalAdapterExtractorDefinition<output extends object> imp
     abstract readonly definitionType: string;
     abstract readonly id: string;
     abstract readonly outputType: string
-    abstract readonly entitiesGet: (configPushed?: any) => Promise<InputEntity<output>[]>
+    abstract readonly entitiesGet: (entityFetcher: EntityFetcher) => Promise<InputEntity<output>[]>
     abstract readonly entityValidate: (inputEntity: output | null) => Promise<ValidationResult | ValidationStatusTag> //data quality, error handling (error prevention), managin Bad Data-> triage or CleanUp
     abstract readonly entityFix: (toFixEntity: ToFixEntity<output>) => Promise<FixedEntity<output> | null> //error handling (error response), managin Bad Data-> CleanUp
 }

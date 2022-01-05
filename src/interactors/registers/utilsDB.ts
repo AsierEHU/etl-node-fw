@@ -1,5 +1,5 @@
 import { uniqBy } from "lodash"
-import { EntityFetcher, SyncContext, RegisterDataAccess, RegisterDataFilter, Register, MetaEntity, RegisterStatusTag, RegisterStats } from "./types"
+import { EntityFetcher, SyncContext, RegisterDataAccess, RegisterDataFilter, Register, MetaEntity, RegisterStatusTag, RegisterStats, reservedRegisterEntityTypes } from "./types"
 
 export class ContextEntityFetcher implements EntityFetcher {
 
@@ -25,6 +25,14 @@ export class ContextEntityFetcher implements EntityFetcher {
             }
             return metaEntity
         })
+    }
+
+    async getExtractorConfigEntity() {
+        const configPushedRegisters = await this.registerDataAccess.getAll({
+            registerType: reservedRegisterEntityTypes.extractorConfig,
+            flowId: this.syncContext.flowId
+        })
+        return configPushedRegisters[0]?.entity
     }
 
     getHistory(): RegisterDataFilter[] {

@@ -27,8 +27,9 @@ export const case6Definition: LocalAdapterExtractorDefinition<inputClass> = {
     id: "case6Extractor",
     definitionType: "LocalAdapterExtractorDefinition",
     outputType: "inputClass",
-    async entitiesGet(config) {
-        return [{ field: config.msg, y: 50 }]
+    async entitiesGet(entityFetcher) {
+        const configEntity = await entityFetcher.getExtractorConfigEntity()
+        return [{ field: configEntity.msg, y: 50 }]
     },
     async entityValidate(entity: inputClass | null) {
         return ValidationStatusTag.valid;
