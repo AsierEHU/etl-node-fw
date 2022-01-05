@@ -1,4 +1,4 @@
-import { LocalAdapterTransformerDefinition } from "../../../src/interactors/adapters/processes/localAdapter/localAdapterTransformer";
+import { LocalAdapterTransformerRowDefinition } from "../../../src/interactors/adapters/processes/localAdapter/localAdapterRowTransformer";
 import { AdapterStatus, AdapterStatusTag } from "../../../src/interactors/adapters/runners/types";
 import { Register, RegisterStatusTag, RegisterStats, InputEntity } from "../../../src/interactors/registers/types";
 import { case1Mocks } from "../localAdapterExtractorMocks/case1Mocks";
@@ -32,9 +32,9 @@ const inputEntities: InputEntity<inputClass>[] = [
         y: 30,
     },
 ];
-export const case3Definition: LocalAdapterTransformerDefinition<inputClass, outputClass> = {
+export const case3Definition: LocalAdapterTransformerRowDefinition<inputClass, outputClass> = {
     id: "case3Transformer",
-    definitionType: "LocalAdapterTransformerDefinition",
+    definitionType: "LocalAdapterTransformerRowDefinition",
     inputType: "inputClass",
     outputType: "outputClass",
     async entityProcess(entity: inputClass) {
@@ -115,7 +115,7 @@ const mockFinalRegisters: Register[] = [
 ]
 const mockInitialStatus: AdapterStatus = {
     definitionId: "case3Transformer",
-    definitionType: "LocalAdapterTransformerDefinition",
+    definitionType: "LocalAdapterTransformerRowDefinition",
     id: "testAdapter",
     outputType: "outputClass",
     runOptions: null,

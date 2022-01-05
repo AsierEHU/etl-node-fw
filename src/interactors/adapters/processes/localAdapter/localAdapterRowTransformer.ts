@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
  */
 
 //TODO: Row transformer
-export class LocalAdapterTransformer<ad extends LocalAdapterTransformerDefinition<any, any>> extends LocalAdapter<ad>{
+export class LocalAdapterRowTransformer<ad extends LocalAdapterTransformerRowDefinition<any, any>> extends LocalAdapter<ad>{
 
     constructor(dependencies: any) {
         super(dependencies)
@@ -70,7 +70,7 @@ export class LocalAdapterTransformer<ad extends LocalAdapterTransformerDefinitio
 
 }
 
-export abstract class LocalAdapterTransformerDefinition<input, output> implements AdapterDefinition {
+export abstract class LocalAdapterTransformerRowDefinition<input, output> implements AdapterDefinition {
     abstract readonly id: string;
     abstract readonly inputType: string
     abstract readonly outputType: string
