@@ -102,5 +102,7 @@ export const generateSetSourceId = (setTypes: string[]): string => {
 
 export const getSetSourceIdTypes = (setSourceId: string): string[] => {
     const [set, ...types] = setSourceId.split("-")
+    if (set != "set")
+        throw Error("Not SET source type")
     return types
 }
