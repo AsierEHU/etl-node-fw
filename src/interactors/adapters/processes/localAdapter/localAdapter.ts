@@ -4,14 +4,6 @@ import { buildRegisterFromOthers } from "../../../registers/utils";
 import { AdvancedRegisterFetcher } from "../../../registers/utilsDB";
 import { AdapterDefinition, Adapter, AdapterRunOptions } from "../types";
 
-
-/**
- * Local adapter
- * Persistance registers
- * row-by-row
- * Throw excepcion on unexpected error (all records fail)
- * Check failed on handle error (1 record fails)
- */
 export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
 
     public readonly adapterDefinition: ad;
@@ -25,15 +17,15 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
     async run(syncContext: SyncContext, runOptions?: AdapterRunOptions) {
         runOptions = cloneDeep(runOptions)
         syncContext = cloneDeep(syncContext)
-        const registers = await this.getInitialRegisters(syncContext, runOptions);
+        const registers = await this.buildInitialRegisters(syncContext, runOptions);
         await this.processRegisters(registers, syncContext);
     }
 
-    private async getInitialRegisters(syncContext: SyncContext, runOptions?: AdapterRunOptions): Promise<Register[]> {
+    private async buildInitialRegisters(syncContext: SyncContext, runOptions?: AdapterRunOptions): Promise<Register[]> {
         let registers = [];
         if (runOptions?.onlyFailedEntities) {
             const failedRegisters = await this.registerDataAccess.getAll({
-                registerType: this.adapterDefinition.outputType,
+                entityType: this.adapterDefinition.outputType,
                 registerStatus: RegisterStatusTag.failed,
                 stepId: syncContext.stepId,
                 flowId: syncContext.flowId
@@ -47,7 +39,7 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
             for (const entityType of runOptions?.usePushedEntityTypes) {
                 const pushedRegistersInType = await this.registerDataAccess.getAll(
                     {
-                        registerType: entityType,
+                        entityType: entityType,
                         stepId: syncContext.stepId,
                         flowId: syncContext.flowId,
                         adapterId: AdapterSpecialIds.pushEntity

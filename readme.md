@@ -25,11 +25,11 @@ Special entity reserved [$]types Tags:
 
 Source data lineage types:
 - Row ["v4UUID"]: When the source entity is from a single row
-- Set ["set-(setRegisterType)-..."]: When the source entity is from one or more sets
+- Set ["set-(entityType1)-..."]: When the source entity is from one or more sets
 ### Adapters
 Run the Definition about how to ETL entities.
 Each adapter produce only one Entity type.
-Forces to implement some validations to ensure data quality, error prevention and decisions about how to manage bad data.
+Can force to implement some validations to ensure data quality, error prevention and decisions about how to manage bad data.
 Can Work in "Push" or "Pull" modes.
 - "Pull Mode" (default): Adapter is in charge of obtain the input entities. 
 - "Push Mode": Adapter only obtain previously loaded entities. Used special reserved [$]AdapterId: $pushEntity
@@ -59,12 +59,14 @@ Define the order execution and dependencies between steps.
 - Interacting with (ETL Runners)
 ## Default implementations overview [WIP]
 ### Adapters
-- LocalAdapter family: For small sets running in one local computer
-    - LocalAdapterExtractor
-    - LocalAdapterRowTransformer
-    - LocalAdapterSetTransformer
-    - LocalAdapterLoader
-- LocalAdapterRunner
+- **LocalAdapter family**: For small sets running in one local computer
+    - **LocalAdapterExtractor**: Enforce data quality and error prevention applying validators. Can apply automatic clean-up actions or tagging as "invalid" records for triage.
+    - **LocalAdapterRowTransformer**: Row by row transformation.
+    - **LocalAdapterSetTransformer**: Sets to rows transformation.
+    - **LocalAdapterLoader**: Apply output validations to check entities has been loaded correctly.
+- **LocalAdapterRunner**: Check status for local adapters. Set failed status in case of any adapter (not register) exception thrown.
+    - "adapterStatus" channel: for status change events.
+    - "adapterError" channel: for exceptions raised.
 ### Steps
 - LocalStep
 - LocalStepRunner

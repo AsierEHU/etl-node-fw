@@ -37,7 +37,7 @@ export type RegisterDataFilter = {
     flowId?: string,
     stepId?: string,
     adapterId?: string,
-    registerType?: string,
+    entityType?: string,
     registerStatus?: RegisterStatusTag
 }
 
@@ -70,7 +70,7 @@ export type RegisterStats = { //Audit
 
 export type InputEntity<e extends object> = MetaEntity | null | e
 
-export enum reservedRegisterEntityTypes {
+export enum reservedEntityTypes {
     flowConfig = "$flowConfig"
 }
 

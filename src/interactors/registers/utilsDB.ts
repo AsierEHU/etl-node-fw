@@ -1,5 +1,5 @@
 import { uniqBy, uniq } from "lodash"
-import { EntityFetcher, SyncContext, RegisterDataAccess, RegisterDataFilter, Register, MetaEntity, RegisterStatusTag, RegisterStats, reservedRegisterEntityTypes } from "./types"
+import { EntityFetcher, SyncContext, RegisterDataAccess, RegisterDataFilter, Register, MetaEntity, RegisterStatusTag, RegisterStats, reservedEntityTypes } from "./types"
 import { getSetSourceIdTypes, isRowSourceType, isSetSourceType } from "./utils"
 
 export class ContextEntityFetcher implements EntityFetcher {
@@ -30,7 +30,7 @@ export class ContextEntityFetcher implements EntityFetcher {
 
     async getFlowConfig() {
         const configPushedRegisters = await this.registerDataAccess.getAll({
-            registerType: reservedRegisterEntityTypes.flowConfig,
+            entityType: reservedEntityTypes.flowConfig,
             flowId: this.syncContext.flowId
         })
         return configPushedRegisters[0]?.entity
@@ -81,10 +81,10 @@ export class AdvancedRegisterFetcher {
         setRegisterTypes = uniq(setRegisterTypes)
 
         let targetRegisters = await this.registerDataAccess.getAll(undefined, rowRegisterIds)
-        for (const registerType of setRegisterTypes) {
+        for (const entityType of setRegisterTypes) {
             const setRegisters = await this.registerDataAccess.getAll(
                 {
-                    registerType: registerType,
+                    entityType: entityType,
                     registerStatus: RegisterStatusTag.success
                 }
             )

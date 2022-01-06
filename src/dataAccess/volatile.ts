@@ -49,8 +49,8 @@ export class VolatileRegisterDataAccess implements RegisterDataAccess {
             repoRegisters = repoRegisters.filter(repoRegister => repoRegister.syncContext.stepId == filter.stepId)
         if (filter?.flowId)
             repoRegisters = repoRegisters.filter(repoRegister => repoRegister.syncContext.flowId == filter.flowId)
-        if (filter?.registerType)
-            repoRegisters = repoRegisters.filter(repoRegister => repoRegister.entityType == filter.registerType)
+        if (filter?.entityType)
+            repoRegisters = repoRegisters.filter(repoRegister => repoRegister.entityType == filter.entityType)
         if (filter?.registerStatus)
             repoRegisters = repoRegisters.filter(repoRegister => repoRegister.statusTag == filter.registerStatus)
 

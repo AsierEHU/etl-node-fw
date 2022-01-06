@@ -3,11 +3,6 @@ import { AdapterRunOptions, AdapterDefinition } from "../types";
 import { LocalAdapter } from "./localAdapter";
 import { v4 as uuidv4 } from 'uuid';
 
-/**
- * Local async step, persistance
- * row-by-row
- * 1 input 1 output
- */
 export class LocalAdapterRowTransformer<ad extends LocalAdapterTransformerRowDefinition<any, any>> extends LocalAdapter<ad>{
 
     constructor(dependencies: any) {
@@ -16,7 +11,7 @@ export class LocalAdapterRowTransformer<ad extends LocalAdapterTransformerRowDef
 
     protected async getRegisters(syncContext: SyncContext): Promise<Register[]> {
         const inputRegisters = await this.registerDataAccess.getAll({
-            registerType: this.adapterDefinition.inputType,
+            entityType: this.adapterDefinition.inputType,
             registerStatus: RegisterStatusTag.success,
             flowId: syncContext.flowId
         })

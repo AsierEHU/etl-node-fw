@@ -6,11 +6,6 @@ import { ValidationResult, ValidationStatusTag } from "./types";
 import { getValidationResultWithMeta, validationTagToRegisterTag } from "./utils";
 import { v4 as uuidv4 } from 'uuid';
 
-/**
- * Local async step, persistance
- * row-by-row
- * 1 input 1 output
- */
 export class LocalAdapterLoader<ad extends LocalAdapterLoaderDefinition<any, any>> extends LocalAdapter<ad>{
 
     constructor(dependencies: any) {
@@ -19,7 +14,7 @@ export class LocalAdapterLoader<ad extends LocalAdapterLoaderDefinition<any, any
 
     protected async getRegisters(syncContext: SyncContext): Promise<Register[]> {
         const inputRegisters = await this.registerDataAccess.getAll({
-            registerType: this.adapterDefinition.inputType,
+            entityType: this.adapterDefinition.inputType,
             registerStatus: RegisterStatusTag.success,
             flowId: syncContext.flowId
         })
@@ -91,5 +86,5 @@ export abstract class LocalAdapterLoaderDefinition<input extends object, output 
     abstract readonly outputType: string
     abstract readonly definitionType: string;
     abstract readonly entityLoad: (entity: input) => Promise<InputEntity<output>>
-    abstract readonly entityValidate: (outputEntity: output | null) => Promise<ValidationResult | ValidationStatusTag> //data quality, error handling (error prevention), managin Bad Data-> triage or CleanUp
+    abstract readonly entityValidate: (outputEntity: output | null) => Promise<ValidationResult | ValidationStatusTag>
 }

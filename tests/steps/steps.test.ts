@@ -2,7 +2,7 @@ import { EventEmitter } from "stream";
 import { VolatileRegisterDataAccess } from "../../src/dataAccess/volatile";
 import { AdapterFactory } from "../../src/interactors/adapters/factory";
 import { AdapterRunOptions } from "../../src/interactors/adapters/processes/types";
-import { RegisterDataAccess, RegisterStatusTag, reservedRegisterEntityTypes, SyncContext } from "../../src/interactors/registers/types";
+import { RegisterDataAccess, RegisterStatusTag, reservedEntityTypes, SyncContext } from "../../src/interactors/registers/types";
 import { StepFactory } from "../../src/interactors/steps/factory";
 import { StepDefinition, StepRunOptions } from "../../src/interactors/steps/processes/types";
 import { StepStatus, StepStatusTag } from "../../src/interactors/steps/runners/types";
@@ -118,7 +118,7 @@ const stepTest = (
                 const step1 = stepFactory.createStepRunner(definition.id)
                 const runOptions: StepRunOptions = { ...defaultRunOptions, pushEntities: { [entityPushedType]: [entityInputPushed] } }
                 await step1.run(syncContext, runOptions);
-                const registerInputPushed = await registerDataAccess.getAll({ registerType: entityPushedType })
+                const registerInputPushed = await registerDataAccess.getAll({ entityType: entityPushedType })
                 expect(registerInputPushed[0].entity).toEqual(entityInputPushed)
             })
 

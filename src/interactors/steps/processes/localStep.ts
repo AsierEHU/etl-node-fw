@@ -2,7 +2,7 @@ import { cloneDeep } from "lodash";
 import { AdapterFactory } from "../../adapters/factory";
 import { AdapterRunOptions } from "../../adapters/processes/types";
 import { AdapterStatusTag } from "../../adapters/runners/types";
-import { AdapterSpecialIds, RegisterDataAccess, RegisterStats, reservedRegisterEntityTypes, SyncContext } from "../../registers/types";
+import { AdapterSpecialIds, RegisterDataAccess, RegisterStats, reservedEntityTypes, SyncContext } from "../../registers/types";
 import { getWithInitFormat, initRegisters } from "../../registers/utils";
 import { Step, StepStatusSummary, StepDefinition, StepRunOptions } from "./types";
 /**

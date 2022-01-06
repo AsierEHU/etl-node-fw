@@ -6,12 +6,6 @@ import { LocalAdapter } from "./localAdapter";
 import { ValidationResult, ValidationStatusTag, ToFixEntity, FixedEntity } from "./types";
 import { getValidationResultWithMeta, validationTagToRegisterTag } from "./utils";
 
-
-/**
- * Local async step, persistance
- * row-by-row
- * 1 input 1 output
- */
 export class LocalAdapterExtractor<ad extends LocalAdapterExtractorDefinition<any>> extends LocalAdapter<ad>{
 
     constructor(dependencies: any) {
@@ -80,6 +74,6 @@ export abstract class LocalAdapterExtractorDefinition<output extends object> imp
     abstract readonly id: string;
     abstract readonly outputType: string
     abstract readonly entitiesGet: (entityFetcher: EntityFetcher) => Promise<InputEntity<output>[]>
-    abstract readonly entityValidate: (inputEntity: output | null) => Promise<ValidationResult | ValidationStatusTag> //data quality, error handling (error prevention), managin Bad Data-> triage or CleanUp
-    abstract readonly entityFix: (toFixEntity: ToFixEntity<output>) => Promise<FixedEntity<output> | null> //error handling (error response), managin Bad Data-> CleanUp
+    abstract readonly entityValidate: (inputEntity: output | null) => Promise<ValidationResult | ValidationStatusTag>
+    abstract readonly entityFix: (toFixEntity: ToFixEntity<output>) => Promise<FixedEntity<output> | null>
 }

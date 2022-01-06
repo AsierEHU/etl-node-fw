@@ -4,12 +4,6 @@ import { AdapterDefinition } from "../types";
 import { LocalAdapter } from "./localAdapter";
 import { v4 as uuidv4 } from 'uuid';
 
-/**
- * Local async step, persistance
- * row-by-row
- * unknown input 1 output
- */
-
 export class LocalAdapterSetTransformer<ad extends LocalAdapterSetTransformerDefinition<any>> extends LocalAdapter<ad>{
 
     constructor(dependencies: any) {
@@ -20,7 +14,7 @@ export class LocalAdapterSetTransformer<ad extends LocalAdapterSetTransformerDef
         let registers: Register[] = []
         for (const inputType of this.adapterDefinition.inputTypes) {
             const inputRegisters = await this.registerDataAccess.getAll({
-                registerType: inputType,
+                entityType: inputType,
                 registerStatus: RegisterStatusTag.success,
                 flowId: syncContext.flowId
             })
