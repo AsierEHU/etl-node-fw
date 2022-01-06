@@ -32,7 +32,7 @@ Each adapter produce only one Entity type.
 Forces to implement some validations to ensure data quality, error prevention and decisions about how to manage bad data.
 Can Work in "Push" or "Pull" modes.
 - "Pull Mode" (default): Adapter is in charge of obtain the input entities. 
-- "Push Mode": Adapter only obtain previously loaded entities. Used special Adapter id $pushEntity
+- "Push Mode": Adapter only obtain previously loaded entities. Used special reserved [$]AdapterId: $pushEntity
 
 Types:
 - **Extractors**: Input new entities into the flow.

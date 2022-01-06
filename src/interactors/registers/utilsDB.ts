@@ -27,7 +27,7 @@ export class ContextEntityFetcher implements EntityFetcher {
         })
     }
 
-    async getExtractorConfigEntity() {
+    async getFlowConfig() {
         const configPushedRegisters = await this.registerDataAccess.getAll({
             registerType: reservedRegisterEntityTypes.flowConfig,
             flowId: this.syncContext.flowId

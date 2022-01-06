@@ -48,7 +48,7 @@ export type MetaEntity = {
 }
 export interface EntityFetcher {//For a specific syncContext
     getEntities: (filter?: RegisterDataFilter) => Promise<MetaEntity[]>
-    getExtractorConfigEntity: () => Promise<any>
+    getFlowConfig: () => Promise<any>
 }
 
 export type RegisterInitValues = {

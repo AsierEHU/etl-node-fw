@@ -32,7 +32,7 @@ export const case6Definition: LocalAdapterExtractorDefinition<inputClass> = {
     definitionType: "LocalAdapterExtractorDefinition",
     outputType: "inputClass",
     async entitiesGet(entityFetcher) {
-        const configEntity = await entityFetcher.getExtractorConfigEntity()
+        const configEntity = await entityFetcher.getFlowConfig()
         return [{ field: configEntity.msg, y: 50 }]
     },
     async entityValidate(entity: inputClass | null) {
