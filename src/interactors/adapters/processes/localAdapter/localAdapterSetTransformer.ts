@@ -47,9 +47,9 @@ export class LocalAdapterSetTransformer<ad extends LocalAdapterSetTransformerDef
         }
         const sourceId = generateSetSourceId(this.adapterDefinition.inputTypes)
         try {
-            const inputEntities = await this.adapterDefinition.setsProcess(sets)
-            const inputEntitiesInitialValues = getWithInitFormat(inputEntities, this.adapterDefinition.outputType)
-            return inputEntitiesInitialValues.map((entity) => {
+            const outputEntities = await this.adapterDefinition.setsProcess(sets)
+            const outputEntitiesInitialValues = getWithInitFormat(outputEntities, this.adapterDefinition.outputType)
+            return outputEntitiesInitialValues.map((entity) => {
                 return {
                     id: uuidv4(),
                     entityType: entity.entityType,

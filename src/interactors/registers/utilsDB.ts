@@ -1,5 +1,6 @@
-import { uniqBy } from "lodash"
+import { uniqBy, uniq } from "lodash"
 import { EntityFetcher, SyncContext, RegisterDataAccess, RegisterDataFilter, Register, MetaEntity, RegisterStatusTag, RegisterStats, reservedRegisterEntityTypes } from "./types"
+import { getSetSourceIdTypes, isRowSourceType, isSetSourceType } from "./utils"
 
 export class ContextEntityFetcher implements EntityFetcher {
 
@@ -49,18 +50,48 @@ export class AdvancedRegisterFetcher {
     }
 
     async getRelativeRegisters(baseRegisters: Register[]): Promise<Register[]> {
-        //TODO: SET relatives registers types
-        const uniqueBaseRegisters = uniqBy(baseRegisters, 'sourceRelativeId')
-        const targetRegistersIds = uniqueBaseRegisters.map(baseRegister => baseRegister.sourceRelativeId) as string[]
-        const targetRegisters = await this.registerDataAccess.getAll(undefined, targetRegistersIds)
-        return targetRegisters
+        return this.getSourceRegisters('sourceRelativeId', baseRegisters)
     }
 
     async getAbsoluteRegisters(baseRegisters: Register[]): Promise<Register[]> {
-        //TODO: SET absolute registers types
-        const uniqueBaseRegisters = uniqBy(baseRegisters, 'sourceAbsoluteId')
-        const targetRegistersIds = uniqueBaseRegisters.map(baseRegister => baseRegister.sourceAbsoluteId) as string[]
-        const targetRegisters = await this.registerDataAccess.getAll(undefined, targetRegistersIds)
+        return this.getSourceRegisters('sourceAbsoluteId', baseRegisters)
+    }
+
+    private async getSourceRegisters(sourceType: 'sourceRelativeId' | 'sourceAbsoluteId', baseRegisters: Register[]) {
+        const uniqueBaseRegisters = uniqBy(baseRegisters, sourceType)
+        const targetRegistersIds = uniqueBaseRegisters.map(baseRegister => baseRegister[sourceType]) as string[]
+
+        const setRegisterIds = [];
+        const rowRegisterIds = [];
+
+        for (const targetRegistersId of targetRegistersIds) {
+            if (isSetSourceType(targetRegistersId)) {
+                setRegisterIds.push(targetRegistersId)
+            } else if (isRowSourceType(targetRegistersId)) {
+                rowRegisterIds.push(targetRegistersId)
+            } else {
+                throw Error("Unknown source type")
+            }
+        }
+
+        let setRegisterTypes: string[] = []
+        for (const setRegisterId of setRegisterIds) {
+            setRegisterTypes.push(...getSetSourceIdTypes(setRegisterId))
+        }
+        setRegisterTypes = uniq(setRegisterTypes)
+
+        let targetRegisters = await this.registerDataAccess.getAll(undefined, rowRegisterIds)
+        for (const registerType of setRegisterTypes) {
+            const setRegisters = await this.registerDataAccess.getAll(
+                {
+                    registerType: registerType,
+                    registerStatus: RegisterStatusTag.success
+                }
+            )
+            targetRegisters.push(...setRegisters)
+        }
+        targetRegisters = uniqBy(targetRegisters, "id")
+
         return targetRegisters
     }
 
