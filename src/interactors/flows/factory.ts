@@ -1,6 +1,6 @@
 import { LocalLinealFlow } from "./processes/localLinealFlow"
 import { Flow, FlowDefinition } from "./processes/types"
-import { LocalLinealFlowRunner } from "./runners/localFlowRunner"
+import { LocalLinealFlowRunner } from "./runners/localLinealFlowRunner"
 import { FlowRunner } from "./runners/types"
 
 
