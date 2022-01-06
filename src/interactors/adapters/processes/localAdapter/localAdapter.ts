@@ -1,5 +1,5 @@
 import { cloneDeep } from "lodash";
-import { RegisterDataAccess, Register, RegisterStatusTag, SyncContext, reservedRegisterEntityTypes } from "../../../registers/types";
+import { RegisterDataAccess, Register, RegisterStatusTag, SyncContext, reservedRegisterEntityTypes, AdapterSpecialIds } from "../../../registers/types";
 import { buildRegisterFromOthers } from "../../../registers/utils";
 import { AdvancedRegisterFetcher } from "../../../registers/utilsDB";
 import { AdapterDefinition, Adapter, AdapterRunOptions } from "../types";
@@ -42,15 +42,20 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
             const oldInputRegisters = await arg.getRelativeRegisters(failedRegisters)
             registers = buildRegisterFromOthers(oldInputRegisters, syncContext, this.adapterDefinition.outputType)
         }
-        else if (runOptions?.usePushedEntities) {
-            const pushedRegisters = await this.registerDataAccess.getAll(
-                {
-                    registerType: reservedRegisterEntityTypes.entityPushed,
-                    stepId: syncContext.stepId,
-                    flowId: syncContext.flowId
-                }
-            )
-            registers = buildRegisterFromOthers(pushedRegisters, syncContext, this.adapterDefinition.outputType)
+        else if (runOptions?.usePushedEntityTypes) {
+            let pushedRegisters: Register[] = [];
+            for (const entityType of runOptions?.usePushedEntityTypes) {
+                const pushedRegistersInType = await this.registerDataAccess.getAll(
+                    {
+                        registerType: entityType,
+                        stepId: syncContext.stepId,
+                        flowId: syncContext.flowId,
+                        adapterId: AdapterSpecialIds.pushEntity
+                    }
+                )
+                pushedRegisters = [...pushedRegisters, ...pushedRegistersInType]
+            }
+            registers = buildRegisterFromOthers(pushedRegisters, syncContext)
         }
         else {
             registers = await this.getRegisters(syncContext)

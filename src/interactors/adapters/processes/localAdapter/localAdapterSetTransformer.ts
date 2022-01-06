@@ -87,6 +87,6 @@ export abstract class LocalAdapterSetTransformerDefinition<output extends object
     abstract readonly inputTypes: string[]
     abstract readonly outputType: string
     abstract readonly definitionType: string;
-    abstract readonly setsProcess: (sets: { [key: string]: object[] }) => Promise<InputEntity<output>[]>
+    abstract readonly setsProcess: (sets: { [type: string]: object[] }) => Promise<InputEntity<output>[]>
 }
 

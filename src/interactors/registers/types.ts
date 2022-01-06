@@ -71,8 +71,11 @@ export type RegisterStats = { //Audit
 export type InputEntity<e extends object> = MetaEntity | null | e
 
 export enum reservedRegisterEntityTypes {
-    entityPushed = "$entityPushed",
-    extractorConfig = "$extractorConfig"
+    flowConfig = "$flowConfig"
+}
+
+export enum AdapterSpecialIds {
+    pushEntity = "$pushEntity"
 }
 
 export enum registerSourceType {

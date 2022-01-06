@@ -14,24 +14,26 @@ type outputClass = {
     }
 }
 const mockInitialRegisters: Register[] = case1Mocks.mockFinalRegisters
-const inputEntities: InputEntity<inputClass>[] = [
-    {
-        $entity: {
-            field: "Raw Object text",
-            y: 23,
+const inputEntities = {
+    ["inputClass"]: [
+        {
+            $entity: {
+                field: "Raw Object text",
+                y: 23,
+            },
+            $meta: "rawMocked to success",
+            $id: "userDefinedId1"
         },
-        $meta: "rawMocked to success",
-        $id: "userDefinedId1"
-    },
-    {
-        field: "Raw Object text 2",
-        y: 1,
-    },
-    {
-        field: "Raw Object text 3",
-        y: 30,
-    },
-];
+        {
+            field: "Raw Object text 2",
+            y: 1,
+        },
+        {
+            field: "Raw Object text 3",
+            y: 30,
+        },
+    ]
+}
 export const case3Definition: LocalAdapterTransformerRowDefinition<inputClass, outputClass> = {
     id: "case3Transformer",
     definitionType: "LocalAdapterTransformerRowDefinition",

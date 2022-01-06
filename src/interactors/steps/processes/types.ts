@@ -21,5 +21,5 @@ export type StepStatusSummary = {
 }
 
 export type StepRunOptions = {
-    pushEntities?: InputEntity<any>[],
+    pushEntities?: { [type: string]: InputEntity<any>[] },
 }

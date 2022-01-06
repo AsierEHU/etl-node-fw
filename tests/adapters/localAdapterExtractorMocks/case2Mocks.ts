@@ -9,7 +9,7 @@ type inputClass = {
     y: number,
 }
 const mockInitialRegisters: Register[] = []
-const inputEntities: InputEntity<inputClass>[] = [];
+const inputEntities = {};
 export const case2Definition: LocalAdapterExtractorDefinition<inputClass> = {
     id: "case2Extractor",
     definitionType: "LocalAdapterExtractorDefinition",

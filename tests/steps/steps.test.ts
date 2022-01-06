@@ -102,9 +102,9 @@ const stepTest = (
 
             test("Presenter calls runOptions", async () => {
                 const step1 = stepFactory.createStepRunner(definition.id)
-                const runOptions: StepRunOptions = { ...defaultRunOptions, pushEntities: [] }
+                const runOptions: StepRunOptions = { ...defaultRunOptions, pushEntities: {} }
                 await step1.run(syncContext, runOptions);
-                const adapterRunOptions: AdapterRunOptions = { ...mocks.mockAdapterRunOptions, usePushedEntities: true }
+                const adapterRunOptions: AdapterRunOptions = { ...mocks.mockAdapterRunOptions, usePushedEntityTypes: [] }
                 runOptionsEqual(adapterStatusCallback.mock.results[2].value.runOptions, adapterRunOptions)
             })
 
@@ -114,10 +114,11 @@ const stepTest = (
 
             test("runOptions:pushEntities", async () => {
                 const entityInputPushed = { msg: "Push entities test" }
+                const entityPushedType = "testInput"
                 const step1 = stepFactory.createStepRunner(definition.id)
-                const runOptions: StepRunOptions = { ...defaultRunOptions, pushEntities: [entityInputPushed] }
+                const runOptions: StepRunOptions = { ...defaultRunOptions, pushEntities: { [entityPushedType]: [entityInputPushed] } }
                 await step1.run(syncContext, runOptions);
-                const registerInputPushed = await registerDataAccess.getAll({ registerType: reservedRegisterEntityTypes.entityPushed })
+                const registerInputPushed = await registerDataAccess.getAll({ registerType: entityPushedType })
                 expect(registerInputPushed[0].entity).toEqual(entityInputPushed)
             })
 

@@ -3,7 +3,7 @@ import { VolatileRegisterDataAccess } from "../../src/dataAccess/volatile";
 import { AdapterFactory } from "../../src/interactors/adapters/factory";
 import { AdapterDefinition, AdapterRunOptions } from "../../src/interactors/adapters/processes/types";
 import { AdapterStatus, AdapterStatusTag } from "../../src/interactors/adapters/runners/types";
-import { RegisterDataAccess, Register, RegisterStatusTag, InputEntity, reservedRegisterEntityTypes } from "../../src/interactors/registers/types";
+import { RegisterDataAccess, Register, RegisterStatusTag, InputEntity, reservedRegisterEntityTypes, AdapterSpecialIds } from "../../src/interactors/registers/types";
 import { getWithInitFormat, initRegisters, isBySetSource, isOrigin, isByRowSource } from "../../src/interactors/registers/utils";
 import { adapterMocks } from "./mocks";
 
@@ -32,7 +32,7 @@ const adapterTest = (
         mockNewRegisters: Register[],
         mockFinalRegisters: Register[],
         mockInitialRegisters: Register[],
-        inputEntities: InputEntity<any>[]
+        inputEntities: { [type: string]: any[] }
     }
 ) => {
 
@@ -90,7 +90,7 @@ const adapterTest = (
 
             test("Presenter calls runOptions", async () => {
                 const adapter1 = adapterFactory.createAdapterRunner(definition.id)
-                const runOptions: AdapterRunOptions = { ...defaultRunOptions, usePushedEntities: true, onlyFailedEntities: false }
+                const runOptions: AdapterRunOptions = { ...defaultRunOptions, usePushedEntityTypes: ["testType"], onlyFailedEntities: false }
                 await adapter1.run(syncContext, runOptions);
                 runOptionsEqual(adapterStatusCallback.mock.results[2].value.runOptions, runOptions)
             })
@@ -118,16 +118,24 @@ const adapterTest = (
                 registersEqual(registers, mockRegistersWithRetries)
             })
 
-            test("runOptions:usePushedEntities", async () => {
-                const inputEntitiesWithMeta = getWithInitFormat(mocks.inputEntities, reservedRegisterEntityTypes.entityPushed)
-                const inputRegisters = initRegisters(inputEntitiesWithMeta, { ...syncContext })
-                await registerDataAccess.saveAll(inputRegisters)
+            test("runOptions:usePushedEntityTypes", async () => {
+                const entityTypes = Object.keys(mocks.inputEntities);
+                let pushedRegisters: Register[] = []
+                for (const entityType of entityTypes) {
+                    const inputEntitiesWithMeta = getWithInitFormat(mocks.inputEntities[entityType], entityType)
+                    const inputRegisters = initRegisters(inputEntitiesWithMeta, {
+                        stepId: syncContext.stepId,
+                        flowId: syncContext.flowId,
+                        adapterId: AdapterSpecialIds.pushEntity
+                    })
+                    await registerDataAccess.saveAll(inputRegisters)
+                    pushedRegisters = [...pushedRegisters, ...inputRegisters]
+                }
 
                 const adapter1 = adapterFactory.createAdapterRunner(definition.id)
-                await adapter1.run(syncContext, { ...defaultRunOptions, usePushedEntities: true })
+                await adapter1.run(syncContext, { ...defaultRunOptions, usePushedEntityTypes: entityTypes })
                 const registers = await registerDataAccess.getAll()
-                const entitiesWithMeta = getWithInitFormat(mocks.inputEntities, reservedRegisterEntityTypes.entityPushed)
-                const pushedRegisters = initRegisters(entitiesWithMeta, syncContext)
+
                 const registersWithMocks = [...mocks.mockInitialRegisters, ...pushedRegisters, ...mocks.mockNewRegisters]
                 registersEqual(registers, registersWithMocks)
             })

@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { RegisterInitValues, MetaEntity, Register, RegisterStatusTag, SyncContext, reservedRegisterEntityTypes, registerSourceType, RegisterDataFilter } from "./types"
+import { RegisterInitValues, MetaEntity, Register, RegisterStatusTag, SyncContext, reservedRegisterEntityTypes, registerSourceType, RegisterDataFilter, AdapterSpecialIds } from "./types"
 
 export const isOrigin = (register: Register): boolean => {
     if (isByRowSource(register))
@@ -52,11 +52,11 @@ export const initRegisters = (
 ): Register[] => {
     return inputEntities.map((entity) => {
         const inputEntityId = uuidv4();
-        const initialStatus = entity.entityType == reservedRegisterEntityTypes.entityPushed || entity.entityType == reservedRegisterEntityTypes.extractorConfig ?
+        const initialStatus = syncContext.adapterId == AdapterSpecialIds.pushEntity || entity.entityType == reservedRegisterEntityTypes.flowConfig ?
             RegisterStatusTag.success : RegisterStatusTag.pending
         return {
             id: inputEntityId,
-            entityType: entity.entityType || reservedRegisterEntityTypes.entityPushed,
+            entityType: entity.entityType,
             sourceAbsoluteId: entity.sourceAbsoluteId || inputEntityId,
             sourceRelativeId: entity.sourceRelativeId || inputEntityId,
             sourceEntityId: entity.sourceEntityId || null,
@@ -69,7 +69,7 @@ export const initRegisters = (
     })
 }
 
-export const buildRegisterFromOthers = (registers: Register[], syncContext: SyncContext, entityType: string) => {
+export const buildRegisterFromOthers = (registers: Register[], syncContext: SyncContext, entityType?: string) => {
     const entitiesInitialValues = registers.map(reg => {
         const initialValue: RegisterInitValues = {
             entity: reg.entity,
@@ -77,7 +77,7 @@ export const buildRegisterFromOthers = (registers: Register[], syncContext: Sync
             sourceAbsoluteId: reg.sourceAbsoluteId || undefined,
             sourceRelativeId: reg.id,
             sourceEntityId: reg.sourceEntityId || undefined,
-            entityType
+            entityType: entityType || reg.entityType
         }
         return initialValue
     })

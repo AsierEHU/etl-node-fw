@@ -12,6 +12,6 @@ export interface Adapter<ad extends AdapterDefinition> {
 }
 
 export type AdapterRunOptions = {
-    usePushedEntities?: boolean
+    usePushedEntityTypes?: string[]
     onlyFailedEntities?: boolean
 }

@@ -2,7 +2,7 @@ import { cloneDeep } from "lodash";
 import { AdapterFactory } from "../../adapters/factory";
 import { AdapterRunOptions } from "../../adapters/processes/types";
 import { AdapterStatusTag } from "../../adapters/runners/types";
-import { RegisterDataAccess, RegisterStats, reservedRegisterEntityTypes, SyncContext } from "../../registers/types";
+import { AdapterSpecialIds, RegisterDataAccess, RegisterStats, reservedRegisterEntityTypes, SyncContext } from "../../registers/types";
 import { getWithInitFormat, initRegisters } from "../../registers/utils";
 import { Step, StepStatusSummary, StepDefinition, StepRunOptions } from "./types";
 /**
@@ -27,11 +27,14 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
         let adapterRunOptions = this.stepDefinition.adapterRunOptions
 
         if (runOptions?.pushEntities) {
-            const pushEntities = runOptions?.pushEntities || [];
-            const inputEntitiesWithMeta = getWithInitFormat(pushEntities, reservedRegisterEntityTypes.entityPushed)
-            const inputRegisters = initRegisters(inputEntitiesWithMeta, { ...syncContext })
-            await this.registerDataAccess.saveAll(inputRegisters)
-            adapterRunOptions = { ...adapterRunOptions, usePushedEntities: true }
+            const pushEntityTypes = Object.keys(runOptions?.pushEntities)
+            for (const pushEntityType of pushEntityTypes) {
+                const pushEntities = runOptions?.pushEntities[pushEntityType]
+                const inputEntitiesWithMeta = getWithInitFormat(pushEntities, pushEntityType)
+                const inputRegisters = initRegisters(inputEntitiesWithMeta, { ...syncContext, adapterId: AdapterSpecialIds.pushEntity })
+                await this.registerDataAccess.saveAll(inputRegisters)
+            }
+            adapterRunOptions = { ...adapterRunOptions, usePushedEntityTypes: pushEntityTypes }
         }
 
         const stepStatusSummary: StepStatusSummary = {

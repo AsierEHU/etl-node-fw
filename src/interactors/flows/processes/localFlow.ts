@@ -28,7 +28,7 @@ export class LocalFlow<fd extends LocalFlowDefinition> implements Flow<fd> {
 
         if (flowRunOptions?.flowPushConfig) {
             const pushConfig = flowRunOptions?.flowPushConfig;
-            const inputEntitiesWithMeta = getWithInitFormat([pushConfig], reservedRegisterEntityTypes.extractorConfig)
+            const inputEntitiesWithMeta = getWithInitFormat([pushConfig], reservedRegisterEntityTypes.flowConfig)
             const inputRegisters = initRegisters(inputEntitiesWithMeta, syncContext)
             await this.registerDataAccess.saveAll(inputRegisters)
         }

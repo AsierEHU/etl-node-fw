@@ -17,23 +17,26 @@ type resultClass = {
 }
 
 const mockInitialRegisters: Register[] = case3Mocks.mockFinalRegisters
-const inputEntities: InputEntity<outputClass>[] = [
-    {
-        $entity: {
-            text: "Raw Object text",
-            others: {
-                x: 23,
+const inputEntities = {
+    ["outputClass"]: [
+        {
+            $entity: {
+                text: "Raw Object text",
+                others: {
+                    x: 23,
+                },
             },
+            $id: "userDefinedId1"
         },
-        $id: "userDefinedId1"
-    },
-    {
-        text: "Raw Object text 2",
-        others: {
-            x: 1,
-        },
-    }
-];
+        {
+            text: "Raw Object text 2",
+            others: {
+                x: 1,
+            },
+        }
+    ]
+}
+
 export const case4Definition: LocalAdapterLoaderDefinition<outputClass, resultClass> = {
     id: "case4Loader",
     definitionType: "LocalAdapterLoaderDefinition",

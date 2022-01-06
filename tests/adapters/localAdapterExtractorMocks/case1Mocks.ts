@@ -8,49 +8,51 @@ type inputClass = {
     y: number,
 }
 const mockInitialRegisters: Register[] = []
-const inputEntities: InputEntity<inputClass>[] = [
-    {
-        $entity: {
-            field: "Raw Object text",
-            y: 23,
+const inputEntities = {
+    ["inputClass"]: [
+        {
+            $entity: {
+                field: "Raw Object text",
+                y: 23,
+            },
+            $meta: "rawMocked to success",
+            $id: "userDefinedId1"
         },
-        $meta: "rawMocked to success",
-        $id: "userDefinedId1"
-    },
-    null,
-    {
-        field: "Raw Object text 2",
-        y: 0,
-    },
-    {
-        $entity: {
-            field: "Raw Object text 3",
-            y: -34,
+        null,
+        {
+            field: "Raw Object text 2",
+            y: 0,
         },
-        $meta: "rawMocked to skip"
-    },
-    {
-        $entity: {
-            field: "Raw Object text 3",
-            y: 30,
+        {
+            $entity: {
+                field: "Raw Object text 3",
+                y: -34,
+            },
+            $meta: "rawMocked to skip"
         },
-        $meta: "rawMocked to fail"
-    },
-    {
-        field: "Raw Object text 4",
-        y: -1,
-    },
-    {
-        field: "Raw Object text 5",
-        y: 1,
-    },
-];
+        {
+            $entity: {
+                field: "Raw Object text 3",
+                y: 30,
+            },
+            $meta: "rawMocked to fail"
+        },
+        {
+            field: "Raw Object text 4",
+            y: -1,
+        },
+        {
+            field: "Raw Object text 5",
+            y: 1,
+        },
+    ]
+}
 export const case1Definition: LocalAdapterExtractorDefinition<inputClass> = {
     id: "case1Extractor",
     definitionType: "LocalAdapterExtractorDefinition",
     outputType: "inputClass",
     async entitiesGet() {
-        return inputEntities;
+        return inputEntities["inputClass"];
     },
     async entityValidate(entity: inputClass | null) {
         if (entity == null) {

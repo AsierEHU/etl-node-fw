@@ -124,7 +124,7 @@ const flowTest = (
                 const flow1 = flowFactory.createFlowRunner(definition.id)
                 const runOptions: FlowRunOptions = { ...defaultRunOptions, flowPushConfig: entityConfigPushed }
                 await flow1.run(runOptions);
-                const registerConfigPushed = await registerDataAccess.getAll({ registerType: reservedRegisterEntityTypes.extractorConfig })
+                const registerConfigPushed = await registerDataAccess.getAll({ registerType: reservedRegisterEntityTypes.flowConfig })
                 expect(registerConfigPushed[0].entity).toEqual(entityConfigPushed)
             })
 

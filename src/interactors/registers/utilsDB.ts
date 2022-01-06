@@ -29,7 +29,7 @@ export class ContextEntityFetcher implements EntityFetcher {
 
     async getExtractorConfigEntity() {
         const configPushedRegisters = await this.registerDataAccess.getAll({
-            registerType: reservedRegisterEntityTypes.extractorConfig,
+            registerType: reservedRegisterEntityTypes.flowConfig,
             flowId: this.syncContext.flowId
         })
         return configPushedRegisters[0]?.entity

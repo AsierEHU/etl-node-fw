@@ -3,14 +3,18 @@ import { AdapterStatus, AdapterStatusTag } from "../../../src/interactors/adapte
 import { Register, RegisterStatusTag, RegisterStats, InputEntity } from "../../../src/interactors/registers/types";
 import { case4Mocks } from "../localAdapterLoaderMocks/case4Mocks";
 
-
+type resultClass = {
+    success: boolean,
+}
 type result2Class = {
     successTotal: number
 }
 const mockInitialRegisters: Register[] = case4Mocks.mockFinalRegisters
-const inputEntities: InputEntity<result2Class>[] = [
-    { successTotal: 1 }
-];
+const inputEntities = {
+    ["resultClass"]: [
+        { success: true }
+    ]
+}
 export const case5Definition: LocalAdapterSetTransformerDefinition<result2Class> = {
     id: "case5SetTransformer",
     inputTypes: ["resultClass"],
