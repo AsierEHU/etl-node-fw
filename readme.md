@@ -70,7 +70,7 @@ Define the order execution and dependencies between steps.
 - LocalStepRunner
 ### Flows
 - LocalLinealFlow
-- LocalFlowRunner
+- LocalLinealFlowRunner
 ## Extensibility [WIP]
 - Developing own ETL Elements
 - Testing

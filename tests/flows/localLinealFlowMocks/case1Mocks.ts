@@ -1,15 +1,15 @@
-import { LocalFlowDefinition } from "../../../src/interactors/flows/processes/localFlow"
+import { LocalLinealFlowDefinition } from "../../../src/interactors/flows/processes/localLinealFlow"
 import { FlowStatus, FlowStatusTag } from "../../../src/interactors/flows/runners/types"
 
-export const case1Definition: LocalFlowDefinition = {
-    id: "case1testLocalFlow",
-    definitionType: "LocalFlowDefinition",
+export const case1Definition: LocalLinealFlowDefinition = {
+    id: "case1testLocalLinealFlow",
+    definitionType: "LocalLinealFlowDefinition",
     stepsDefinitionFlow: [{ id: "case1testLocalStep" }, { id: "case3testLocalStep" }]
 }
 
 const mockInitialStatus: FlowStatus = {
-    definitionId: "case1testLocalFlow",
-    definitionType: "LocalFlowDefinition",
+    definitionId: "case1testLocalLinealFlow",
+    definitionType: "LocalLinealFlowDefinition",
     id: "testFlow",
     statusSummary: null,
     syncContext: { flowId: "testFlow" },
@@ -20,8 +20,8 @@ const mockInitialStatus: FlowStatus = {
 }
 
 const mockFinalStatus: FlowStatus = {
-    definitionId: "case1testLocalFlow",
-    definitionType: "LocalFlowDefinition",
+    definitionId: "case1testLocalLinealFlow",
+    definitionType: "LocalLinealFlowDefinition",
     id: "testFlow",
     timeStarted: null,
     timeFinished: null,

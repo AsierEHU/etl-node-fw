@@ -10,7 +10,7 @@ import { Flow, FlowDefinition, FlowRunOptions, FlowStatusSummary } from "./types
 /**
  * Lineal async flow, monolith, persistence
  */
-export class LocalFlow<fd extends LocalFlowDefinition> implements Flow<fd> {
+export class LocalLinealFlow<fd extends LocalLinealFlowDefinition> implements Flow<fd> {
 
     public readonly flowDefinition: fd
     private readonly stepFactory: StepFactory;
@@ -77,7 +77,7 @@ export class LocalFlow<fd extends LocalFlowDefinition> implements Flow<fd> {
     }
 }
 
-export abstract class LocalFlowDefinition implements FlowDefinition {
+export abstract class LocalLinealFlowDefinition implements FlowDefinition {
     abstract readonly id: string
     abstract readonly definitionType: string;
     abstract readonly stepsDefinitionFlow: { id: string, runOptions?: StepRunOptions, successMandatory?: boolean }[]

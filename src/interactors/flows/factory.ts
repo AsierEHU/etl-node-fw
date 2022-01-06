@@ -1,26 +1,26 @@
-import { LocalFlow } from "./processes/localFlow"
+import { LocalLinealFlow } from "./processes/localLinealFlow"
 import { Flow, FlowDefinition } from "./processes/types"
-import { LocalFlowRunner } from "./runners/localFlowRunner"
+import { LocalLinealFlowRunner } from "./runners/localFlowRunner"
 import { FlowRunner } from "./runners/types"
 
 
 const frdt = {
-    ["LocalFlowRunner"]: {
-        class: LocalFlowRunner,
+    ["LocalLinealFlowRunner"]: {
+        class: LocalLinealFlowRunner,
         dependencies: ["flowPresenter"],
     }
 }
 
 const fddt = {
-    ["LocalFlow"]: {
-        class: LocalFlow,
+    ["LocalLinealFlow"]: {
+        class: LocalLinealFlow,
         dependencies: ["flowFactory", "registerDataAccess"],
-        runner: frdt["LocalFlowRunner"]
+        runner: frdt["LocalLinealFlowRunner"]
     },
 }
 
 const FlowDefinitionTree: { [key: string]: any } = {
-    ["LocalFlowDefinition"]: fddt["LocalFlow"],
+    ["LocalLinealFlowDefinition"]: fddt["LocalLinealFlow"],
 }
 
 export class FlowFactory {

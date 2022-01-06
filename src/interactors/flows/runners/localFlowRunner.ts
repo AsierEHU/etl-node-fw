@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Flow, FlowDefinition, FlowRunOptions } from '../processes/types';
 import { FlowRunner, FlowStatusTag, FlowStatus, } from './types';
 
-export class LocalFlowRunner implements FlowRunner {
+export class LocalLinealFlowRunner implements FlowRunner {
 
     public readonly flow: Flow<FlowDefinition>;
     private readonly flowPresenter: EventEmitter
