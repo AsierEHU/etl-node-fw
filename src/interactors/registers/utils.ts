@@ -15,7 +15,7 @@ export function isByRowSource(register: Register): boolean {
 }
 
 export function isRowSourceType(sourceId: string | null): boolean {
-    return sourceId != null && !sourceId.startsWith("set")
+    return sourceId != null && !sourceId.startsWith(registerSourceType.set)
 }
 
 export function isBySetSource(register: Register): boolean {
@@ -23,7 +23,7 @@ export function isBySetSource(register: Register): boolean {
 }
 
 export function isSetSourceType(sourceId: string | null): boolean {
-    return sourceId != null && sourceId.startsWith("set")
+    return sourceId != null && sourceId.startsWith(registerSourceType.set)
 }
 
 function isEntityWithMeta(entity?: any): entity is MetaEntity {
@@ -95,14 +95,14 @@ export const buildRegisterFromOthers = (registers: Register[], syncContext: Sync
 export const generateSetSourceId = (setTypes: string[]): string => {
     const sourceId = setTypes.reduce((id, setType) => {
         return id + "-" + setType
-    }, "set")
+    }, registerSourceType.set)
 
     return sourceId
 }
 
 export const getSetSourceIdTypes = (setSourceId: string): string[] => {
     const [set, ...types] = setSourceId.split("-")
-    if (set != "set")
+    if (set != registerSourceType.set)
         throw Error("Not SET source type")
     return types
 }
