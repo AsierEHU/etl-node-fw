@@ -2,10 +2,10 @@ import { SyncContext } from "../../registers/types"
 import { FlowStatusSummary, Flow, FlowDefinition, FlowRunOptions } from "../processes/types"
 
 export enum FlowStatusTag {
-    pending = "pending", //pendiente de ejecución
-    active = "active", //Ejecutandose
-    success = "success", //sin erroes
-    failed = "failed", //SW error
+    pending = "pending",
+    active = "active",
+    success = "success",
+    failed = "failed",
 }
 
 export type FlowStatus = {

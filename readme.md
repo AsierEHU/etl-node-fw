@@ -49,16 +49,17 @@ Define the order execution and dependencies between steps.
 ## ETL Framework patterns
 - **Definitions**: Behaviour configuration. Acts like process documentation.
 - **Processes**: Tranform a definition into a result. Return summaraized results (monitoring).
-- **Runners**: Run Processes exposing their status, errors and metrics.
+- **Runners**: Run Processes exposing their status changes, errors and metrics.
 - **Factories**: Create new runners by definition.
 - **DataAccess**: Interface for handling Entities and Registers
 - **presenters**: Event channels with Status and Errors information.
+## Reference [WIP]
 ## Examples / how it works [WIP]
 - Implementing DBs and Presenters
 - Implementing Definitions
 - Using Factories
 - Interacting with (ETL Runners)
-## Default implementations overview [WIP]
+## Default implementations overview
 ### Adapters
 - **LocalAdapter family**: For small sets running in one local computer
     - **LocalAdapterExtractor**: Enforce data quality and error prevention applying validators. Can apply automatic clean-up actions or tagging as "invalid" records for triage.
@@ -76,6 +77,8 @@ Define the order execution and dependencies between steps.
 ### Flows
 - **LocalLinealFlow**: Run steps one by one in the defined order. Can force tu use specific params in each Step, and apply an error response behavior depending of the Step sucssesfullness.
 - **LocalLinealFlowRunner**: Check status for local flows. Sets "failed" status in case of any flow exception thrown. Flow finishing with pending for run steps will be considered an exception and tagged wit status "failed". 
+    - "flowStatus" channel: for status change events.
+    - "flowError" channel: for exceptions raised.
 ## Extensibility [WIP]
 - Developing own ETL Elements
 - Testing

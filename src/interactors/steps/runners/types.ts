@@ -3,11 +3,11 @@ import { StepStatusSummary, Step, StepDefinition, StepRunOptions } from "../proc
 
 
 export enum StepStatusTag {
-    pending = "pending", //pendiente de ejecución
-    active = "active", //Ejecutandose
-    success = "success", //sin erroes
-    invalid = "invalid", // invalid business result
-    failed = "failed", //Software error
+    pending = "pending",
+    active = "active",
+    success = "success",
+    invalid = "invalid",
+    failed = "failed",
 }
 
 export type StepStatus = {

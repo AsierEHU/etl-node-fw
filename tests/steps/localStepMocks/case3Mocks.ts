@@ -38,8 +38,8 @@ const mockFinalStatus: StepStatus = {
         flowId: "testFlow",
         stepId: "testStep",
     },
-    timeStarted: null,  //debugging
-    timeFinished: null,   //debugging
+    timeStarted: null,
+    timeFinished: null,
     statusSummary: {
         registerStats: {
             registers_total: 7,
@@ -48,7 +48,7 @@ const mockFinalStatus: StepStatus = {
             registers_invalid: 1,
             registers_skipped: 1,
         },
-        tryNumber: 2, //retries
+        tryNumber: 2,
         isInvalidRegistersSummary: false
     }
 }

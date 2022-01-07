@@ -24,8 +24,8 @@ export type AdapterMeta = string | object | null
 
 
 export enum AdapterStatusTag {
-    pending = "pending", //pendiente de ejecución
-    active = "active", //Ejecutandose
-    success = "success", //sin erroes
-    failed = "failed", //Software error
+    pending = "pending",
+    active = "active",
+    success = "success",
+    failed = "failed",
 }

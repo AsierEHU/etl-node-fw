@@ -1,13 +1,13 @@
 export type Register = {
-    id: string //datalineage, unique
+    id: string
     entityType: string
-    sourceRelativeId: string | null //datalineage
-    sourceAbsoluteId: string | null //datalineage
-    sourceEntityId: string | null //datalineage
-    statusTag: RegisterStatusTag  //managing bad data
+    sourceRelativeId: string | null
+    sourceAbsoluteId: string | null
+    sourceEntityId: string | null
+    statusTag: RegisterStatusTag
     statusMeta: RegisterMeta
-    entity: object | null, //register itself
-    meta: RegisterMeta, //save here for example every info need for final step (Alerts, csv name...)
+    entity: object | null,
+    meta: RegisterMeta,
     syncContext: SyncContext
 }
 
@@ -15,10 +15,10 @@ export type RegisterMeta = string | object | null
 
 export enum RegisterStatusTag {
     pending = "pending",
-    success = "success", //SW - Business
-    failed = "failed",  //SW - Business
-    invalid = "invalid", //Business
-    skipped = "skipped", //Business
+    success = "success",
+    failed = "failed",
+    invalid = "invalid",
+    skipped = "skipped",
 }
 
 export type SyncContext = {
@@ -26,7 +26,7 @@ export type SyncContext = {
     stepId?: string,
     adapterId?: string,
 }
-export interface RegisterDataAccess {//For a specific syncContext
+export interface RegisterDataAccess {
     save: (register: Register) => Promise<void>
     saveAll: (registers: Register[]) => Promise<void>
     get: (id: string) => Promise<Register | null>
@@ -46,7 +46,7 @@ export type MetaEntity = {
     $meta?: any,
     $id?: string
 }
-export interface EntityFetcher {//For a specific syncContext
+export interface EntityFetcher {
     getEntities: (filter?: RegisterDataFilter) => Promise<MetaEntity[]>
     getFlowConfig: () => Promise<any>
 }
@@ -60,7 +60,7 @@ export type RegisterInitValues = {
     sourceEntityId?: string,
 }
 
-export type RegisterStats = { //Audit
+export type RegisterStats = {
     registers_total: number
     registers_success: number
     registers_failed: number
