@@ -4,7 +4,8 @@ import { AdapterRunOptions } from "../../adapters/processes/types";
 import { AdapterStatusTag } from "../../adapters/runners/types";
 import { AdapterSpecialIds, RegisterDataAccess, RegisterStats, reservedEntityTypes, SyncContext } from "../../registers/types";
 import { getWithInitFormat, initRegisters } from "../../registers/utils";
-import { Step, StepStatusSummary, StepDefinition, StepRunOptions } from "./types";
+import { LocalStepDefinition } from "../definitions/types";
+import { Step, StepStatusSummary, StepRunOptions } from "./types";
 
 export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
 
@@ -104,13 +105,4 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
     private canRetry(tryNumber: number): boolean {
         return tryNumber <= this.stepDefinition.retartTries
     }
-}
-
-export abstract class LocalStepDefinition implements StepDefinition {
-    abstract readonly adapterRunOptions: AdapterRunOptions | null;
-    abstract readonly adapterDefinitionId: string;
-    abstract readonly definitionType: string;
-    abstract readonly id: string
-    abstract readonly retartTries: number
-    abstract isInvalidRegistersSummary(statusSummary: RegisterStats): boolean
 }

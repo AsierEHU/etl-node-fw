@@ -1,5 +1,6 @@
 import { SyncContext } from "../../registers/types"
-import { StepStatusSummary, Step, StepDefinition, StepRunOptions } from "../processes/types"
+import { StepDefinition } from "../definitions/types"
+import { StepStatusSummary, Step, StepRunOptions } from "../processes/types"
 
 
 export enum StepStatusTag {

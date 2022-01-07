@@ -1,9 +1,8 @@
-import { SyncContext, Register, RegisterStatusTag, InputEntity, EntityFetcher } from "../../../registers/types";
+import { SyncContext, Register, RegisterStatusTag } from "../../../registers/types";
 import { getWithInitFormat, initRegisters } from "../../../registers/utils";
 import { ContextEntityFetcher } from "../../../registers/utilsDB";
-import { AdapterDefinition } from "../types";
+import { LocalAdapterExtractorDefinition } from "../../definitions/localAdapter/types";
 import { LocalAdapter } from "./localAdapter";
-import { ValidationResult, ValidationStatusTag, ToFixEntity, FixedEntity } from "./types";
 import { getValidationResultWithMeta, validationTagToRegisterTag } from "./utils";
 
 export class LocalAdapterExtractor<ad extends LocalAdapterExtractorDefinition<any>> extends LocalAdapter<ad>{
@@ -67,13 +66,4 @@ export class LocalAdapterExtractor<ad extends LocalAdapterExtractorDefinition<an
         }
     }
 
-}
-
-export abstract class LocalAdapterExtractorDefinition<output extends object> implements AdapterDefinition {
-    abstract readonly definitionType: string;
-    abstract readonly id: string;
-    abstract readonly outputType: string
-    abstract readonly entitiesGet: (entityFetcher: EntityFetcher) => Promise<InputEntity<output>[]>
-    abstract readonly entityValidate: (inputEntity: output | null) => Promise<ValidationResult | ValidationStatusTag>
-    abstract readonly entityFix: (toFixEntity: ToFixEntity<output>) => Promise<FixedEntity<output> | null>
 }

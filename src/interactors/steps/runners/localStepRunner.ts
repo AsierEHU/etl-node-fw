@@ -2,7 +2,8 @@ import EventEmitter from 'events';
 import { cloneDeep } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import { SyncContext } from '../../registers/types';
-import { Step, StepDefinition, StepRunOptions } from '../processes/types';
+import { StepDefinition } from '../definitions/types';
+import { Step, StepRunOptions } from '../processes/types';
 import { StepRunner, StepStatusTag, StepStatus } from './types';
 
 export class LocalStepRunner implements StepRunner {
@@ -18,7 +19,7 @@ export class LocalStepRunner implements StepRunner {
     async run(syncContext: SyncContext, runOptions?: StepRunOptions) {
         runOptions = cloneDeep(runOptions)
         syncContext = cloneDeep(syncContext)
-        
+
         const stepStatus = this.buildStatus(syncContext)
         this.stepPresenter.emit("stepStatus", cloneDeep(stepStatus))
 

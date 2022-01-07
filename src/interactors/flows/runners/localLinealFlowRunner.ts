@@ -1,7 +1,8 @@
 import EventEmitter from 'events';
 import { cloneDeep } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
-import { Flow, FlowDefinition, FlowRunOptions } from '../processes/types';
+import { FlowDefinition } from '../definitions/types';
+import { Flow, FlowRunOptions } from '../processes/types';
 import { FlowRunner, FlowStatusTag, FlowStatus, } from './types';
 
 export class LocalLinealFlowRunner implements FlowRunner {

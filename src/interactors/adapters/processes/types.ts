@@ -1,10 +1,5 @@
 import { SyncContext } from "../../registers/types";
-
-export interface AdapterDefinition {
-    readonly id: string
-    readonly outputType: string
-    readonly definitionType: string
-}
+import { AdapterDefinition } from "../definitions/types";
 
 export interface Adapter<ad extends AdapterDefinition> {
     readonly adapterDefinition: ad

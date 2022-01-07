@@ -2,7 +2,8 @@ import { cloneDeep } from "lodash";
 import { RegisterDataAccess, Register, RegisterStatusTag, SyncContext, AdapterSpecialIds } from "../../../registers/types";
 import { buildRegisterFromOthers } from "../../../registers/utils";
 import { AdvancedRegisterFetcher } from "../../../registers/utilsDB";
-import { AdapterDefinition, Adapter, AdapterRunOptions } from "../types";
+import { AdapterDefinition } from "../../definitions/types";
+import { Adapter, AdapterRunOptions } from "../types";
 
 export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adapter<ad>{
 

@@ -1,5 +1,6 @@
 import { SyncContext } from "../../registers/types"
-import { FlowStatusSummary, Flow, FlowDefinition, FlowRunOptions } from "../processes/types"
+import { FlowDefinition } from "../definitions/types"
+import { FlowStatusSummary, Flow, FlowRunOptions } from "../processes/types"
 
 export enum FlowStatusTag {
     pending = "pending",

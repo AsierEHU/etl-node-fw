@@ -1,7 +1,7 @@
 import { SyncContext, Register, RegisterStatusTag } from "../../../registers/types";
-import { AdapterDefinition } from "../types";
 import { LocalAdapter } from "./localAdapter";
 import { v4 as uuidv4 } from 'uuid';
+import { LocalAdapterTransformerRowDefinition } from "../../definitions/localAdapter/types";
 
 export class LocalAdapterRowTransformer<ad extends LocalAdapterTransformerRowDefinition<any, any>> extends LocalAdapter<ad>{
 
@@ -61,12 +61,4 @@ export class LocalAdapterRowTransformer<ad extends LocalAdapterTransformerRowDef
         return outputRegisters;
     }
 
-}
-
-export abstract class LocalAdapterTransformerRowDefinition<input, output> implements AdapterDefinition {
-    abstract readonly id: string;
-    abstract readonly inputType: string
-    abstract readonly outputType: string
-    abstract readonly definitionType: string;
-    abstract readonly entityProcess: (entity: input) => Promise<output>
 }

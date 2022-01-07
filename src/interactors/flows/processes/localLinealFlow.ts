@@ -3,9 +3,9 @@ import { cloneDeep } from "lodash";
 import { RegisterDataAccess, reservedEntityTypes, SyncContext } from "../../registers/types";
 import { getWithInitFormat, initRegisters } from "../../registers/utils";
 import { StepFactory } from "../../steps/factory"
-import { StepRunOptions } from "../../steps/processes/types";
 import { StepStatusTag } from "../../steps/runners/types"
-import { Flow, FlowDefinition, FlowRunOptions, FlowStatusSummary } from "./types"
+import { LocalLinealFlowDefinition } from "../definitions/types";
+import { Flow, FlowRunOptions, FlowStatusSummary } from "./types"
 
 export class LocalLinealFlow<fd extends LocalLinealFlowDefinition> implements Flow<fd> {
 
@@ -72,10 +72,4 @@ export class LocalLinealFlow<fd extends LocalLinealFlowDefinition> implements Fl
 
         return flowStatusSummary
     }
-}
-
-export abstract class LocalLinealFlowDefinition implements FlowDefinition {
-    abstract readonly id: string
-    abstract readonly definitionType: string;
-    abstract readonly stepsDefinitionFlow: { id: string, runOptions?: StepRunOptions, successMandatory?: boolean }[]
 }

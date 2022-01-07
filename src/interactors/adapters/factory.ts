@@ -2,9 +2,10 @@ import { LocalAdapterExtractor } from "./processes/localAdapter/localAdapterExtr
 import { LocalAdapterSetTransformer } from "./processes/localAdapter/localAdapterSetTransformer"
 import { LocalAdapterLoader } from "./processes/localAdapter/localAdapterLoader"
 import { LocalAdapterRowTransformer } from "./processes/localAdapter/localAdapterRowTransformer"
-import { AdapterDefinition, Adapter } from "./processes/types"
+import { Adapter } from "./processes/types"
 import { LocalAdapterRunner } from "./runners/localAdapterRunner"
 import { AdapterRunner } from "./runners/types"
+import { AdapterDefinition } from "./definitions/types"
 
 
 const ardt = {

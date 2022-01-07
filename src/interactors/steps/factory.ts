@@ -1,5 +1,6 @@
+import { StepDefinition } from "./definitions/types"
 import { LocalStep } from "./processes/localStep"
-import { StepDefinition, Step } from "./processes/types"
+import { Step } from "./processes/types"
 import { LocalStepRunner } from "./runners/localStepRunner"
 import { StepRunner } from "./runners/types"
 

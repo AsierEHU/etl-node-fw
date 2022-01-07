@@ -3,7 +3,8 @@ import { cloneDeep } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import { RegisterDataAccess, SyncContext } from '../../registers/types';
 import { AdvancedRegisterFetcher } from '../../registers/utilsDB';
-import { Adapter, AdapterDefinition, AdapterRunOptions } from '../processes/types';
+import { AdapterDefinition } from '../definitions/types';
+import { Adapter, AdapterRunOptions } from '../processes/types';
 import { AdapterRunner, AdapterStatusTag, AdapterStatus } from './types';
 
 export class LocalAdapterRunner implements AdapterRunner {

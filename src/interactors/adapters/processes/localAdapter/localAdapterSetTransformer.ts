@@ -1,8 +1,8 @@
-import { SyncContext, Register, RegisterStatusTag, InputEntity } from "../../../registers/types";
+import { SyncContext, Register, RegisterStatusTag } from "../../../registers/types";
 import { generateSetSourceId, getWithInitFormat } from "../../../registers/utils";
-import { AdapterDefinition } from "../types";
 import { LocalAdapter } from "./localAdapter";
 import { v4 as uuidv4 } from 'uuid';
+import { LocalAdapterSetTransformerDefinition } from "../../definitions/localAdapter/types";
 
 export class LocalAdapterSetTransformer<ad extends LocalAdapterSetTransformerDefinition<any>> extends LocalAdapter<ad>{
 
@@ -75,12 +75,3 @@ export class LocalAdapterSetTransformer<ad extends LocalAdapterSetTransformerDef
     }
 
 }
-
-export abstract class LocalAdapterSetTransformerDefinition<output extends object> implements AdapterDefinition {
-    abstract readonly id: string;
-    abstract readonly inputTypes: string[]
-    abstract readonly outputType: string
-    abstract readonly definitionType: string;
-    abstract readonly setsProcess: (sets: { [type: string]: object[] }) => Promise<InputEntity<output>[]>
-}
-

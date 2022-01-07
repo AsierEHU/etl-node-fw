@@ -1,5 +1,6 @@
 import { SyncContext, RegisterStats } from "../../registers/types"
-import { Adapter, AdapterDefinition, AdapterRunOptions } from "../processes/types"
+import { AdapterDefinition } from "../definitions/types"
+import { Adapter, AdapterRunOptions } from "../processes/types"
 
 export interface AdapterRunner {
     adapter: Adapter<AdapterDefinition>

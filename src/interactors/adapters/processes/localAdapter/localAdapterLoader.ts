@@ -1,10 +1,9 @@
 import { SyncContext, Register, RegisterStatusTag, InputEntity } from "../../../registers/types";
 import { getWithMetaFormat } from "../../../registers/utils";
-import { AdapterDefinition } from "../types";
 import { LocalAdapter } from "./localAdapter";
-import { ValidationResult, ValidationStatusTag } from "./types";
 import { getValidationResultWithMeta, validationTagToRegisterTag } from "./utils";
 import { v4 as uuidv4 } from 'uuid';
+import { LocalAdapterLoaderDefinition } from "../../definitions/localAdapter/types";
 
 export class LocalAdapterLoader<ad extends LocalAdapterLoaderDefinition<any, any>> extends LocalAdapter<ad>{
 
@@ -78,13 +77,4 @@ export class LocalAdapterLoader<ad extends LocalAdapterLoaderDefinition<any, any
         }
         return register;
     }
-}
-
-export abstract class LocalAdapterLoaderDefinition<input extends object, output extends object> implements AdapterDefinition {
-    abstract readonly id: string;
-    abstract readonly inputType: string
-    abstract readonly outputType: string
-    abstract readonly definitionType: string;
-    abstract readonly entityLoad: (entity: input) => Promise<InputEntity<output>>
-    abstract readonly entityValidate: (outputEntity: output | null) => Promise<ValidationResult | ValidationStatusTag>
 }
