@@ -5,9 +5,7 @@ import { AdapterStatusTag } from "../../adapters/runners/types";
 import { AdapterSpecialIds, RegisterDataAccess, RegisterStats, reservedEntityTypes, SyncContext } from "../../registers/types";
 import { getWithInitFormat, initRegisters } from "../../registers/utils";
 import { Step, StepStatusSummary, StepDefinition, StepRunOptions } from "./types";
-/**
- * Local async step, persistance
- */
+
 export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
 
     public readonly stepDefinition: sd;

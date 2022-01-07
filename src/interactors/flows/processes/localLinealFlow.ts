@@ -7,9 +7,6 @@ import { StepRunOptions } from "../../steps/processes/types";
 import { StepStatusTag } from "../../steps/runners/types"
 import { Flow, FlowDefinition, FlowRunOptions, FlowStatusSummary } from "./types"
 
-/**
- * Lineal async flow, monolith, persistence
- */
 export class LocalLinealFlow<fd extends LocalLinealFlowDefinition> implements Flow<fd> {
 
     public readonly flowDefinition: fd

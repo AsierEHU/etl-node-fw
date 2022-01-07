@@ -42,6 +42,7 @@ Types:
 - **Loaders**: Save entities into the final storage. Save ouput resuls.
 ### Steps
 Define how an Adapter must be ran in an specific Flow.
+Can run adapters in "Push" and "Pull" mode.
 Implements some error handling tools like retries and force to define how the flow must continue in case of not success.
 ### Flows
 Define the order execution and dependencies between steps.
@@ -64,15 +65,17 @@ Define the order execution and dependencies between steps.
     - **LocalAdapterRowTransformer**: Row by row transformation.
     - **LocalAdapterSetTransformer**: Sets to rows transformation.
     - **LocalAdapterLoader**: Apply output validations to check entities has been loaded correctly.
-- **LocalAdapterRunner**: Check status for local adapters. Set failed status in case of any adapter (not register) exception thrown.
+- **LocalAdapterRunner**: Check status for local adapters. Set "failed" status in case of any adapter (not register) exception thrown.
     - "adapterStatus" channel: for status change events.
     - "adapterError" channel: for exceptions raised.
 ### Steps
-- LocalStep
-- LocalStepRunner
+- **LocalStep**: Retries config for failed Records and Adapters. Can define invalid status depending on the final records summary defined in the definition config.
+- **LocalStepRunner**: Check status for local steps. Sets "failed" status in case of any step exception thrown. Sets "invalid" status in case of definition invalid exception.
+    - "stepStatus" channel: for status change events.
+    - "stepError" channel: for exceptions raised.
 ### Flows
-- LocalLinealFlow
-- LocalLinealFlowRunner
+- **LocalLinealFlow**: Run steps one by one in the defined order. Can force tu use specific params in each Step, and apply an error response behavior depending of the Step sucssesfullness.
+- **LocalLinealFlowRunner**: Check status for local flows. Sets "failed" status in case of any flow exception thrown. Flow finishing with pending for run steps will be considered an exception and tagged wit status "failed". 
 ## Extensibility [WIP]
 - Developing own ETL Elements
 - Testing

@@ -5,9 +5,6 @@ import { SyncContext } from '../../registers/types';
 import { Step, StepDefinition, StepRunOptions } from '../processes/types';
 import { StepRunner, StepStatusTag, StepStatus } from './types';
 
-/**
- * Local async step, persistance
- */
 export class LocalStepRunner implements StepRunner {
 
     public readonly step: Step<StepDefinition>;
