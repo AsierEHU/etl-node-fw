@@ -9,7 +9,7 @@
     "test": "jest"
   },
   "author": "Asier López",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/jest": "^27.0.3",
     "@types/lodash": "^4.14.178",
