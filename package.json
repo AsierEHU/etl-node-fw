@@ -1,13 +1,11 @@
 {
   "name": "etl-node-fw",
-  "version": "0.0.1",
-  "description": "",
-  "main": "dist/index.js",
-  "directories": {
-    "doc": "doc"
-  },
+  "version": "1.0.0-alpha",
+  "description": "ETL Node Framework",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
   "scripts": {
-    "start": "tsc && node dist/index.js",
+    "build": "tsc",
     "test": "jest"
   },
   "author": "Asier López",

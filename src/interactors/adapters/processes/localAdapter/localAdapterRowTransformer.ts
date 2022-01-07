@@ -1,5 +1,5 @@
 import { SyncContext, Register, RegisterStatusTag } from "../../../registers/types";
-import { AdapterRunOptions, AdapterDefinition } from "../types";
+import { AdapterDefinition } from "../types";
 import { LocalAdapter } from "./localAdapter";
 import { v4 as uuidv4 } from 'uuid';
 

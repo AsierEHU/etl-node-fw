@@ -1,5 +1,5 @@
 import { SyncContext, Register, RegisterStatusTag, InputEntity } from "../../../registers/types";
-import { generateSetSourceId, getWithInitFormat, initRegisters } from "../../../registers/utils";
+import { generateSetSourceId, getWithInitFormat } from "../../../registers/utils";
 import { AdapterDefinition } from "../types";
 import { LocalAdapter } from "./localAdapter";
 import { v4 as uuidv4 } from 'uuid';
