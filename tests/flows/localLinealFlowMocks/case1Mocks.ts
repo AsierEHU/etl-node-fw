@@ -1,5 +1,4 @@
-import { LocalLinealFlowDefinition } from "../../../src/interactors/flows/processes/localLinealFlow"
-import { FlowStatus, FlowStatusTag } from "../../../src/interactors/flows/runners/types"
+import { LocalLinealFlowDefinition, FlowStatus, FlowStatusTag } from "../../../src"
 
 export const case1Definition: LocalLinealFlowDefinition = {
     id: "case1testLocalLinealFlow",

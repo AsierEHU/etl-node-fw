@@ -1,7 +1,4 @@
-import { AdapterRunOptions } from "../../../src/interactors/adapters/processes/types"
-import { RegisterStats } from "../../../src/interactors/registers/types"
-import { LocalStepDefinition } from "../../../src/interactors/steps/processes/localStep"
-import { StepStatus, StepStatusTag } from "../../../src/interactors/steps/runners/types"
+import { LocalStepDefinition, RegisterStats, StepStatus, StepStatusTag, AdapterRunOptions } from "../../../src"
 
 export const case3Definition: LocalStepDefinition = {
     id: "case3testLocalStep",

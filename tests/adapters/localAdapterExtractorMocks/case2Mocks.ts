@@ -1,8 +1,4 @@
-import { LocalAdapterExtractorDefinition } from "../../../src/interactors/adapters/processes/localAdapter/localAdapterExtractor";
-import { ValidationStatusTag, ToFixEntity } from "../../../src/interactors/adapters/processes/localAdapter/types";
-import { AdapterStatus, AdapterStatusTag } from "../../../src/interactors/adapters/runners/types";
-import { Register, InputEntity } from "../../../src/interactors/registers/types";
-
+import { Register, LocalAdapterExtractorDefinition, ValidationStatusTag, ToFixEntity, AdapterStatus, AdapterStatusTag } from "../../../src";
 
 type inputClass = {
     field: string,

@@ -1,11 +1,5 @@
 import { EventEmitter } from "stream";
-import { VolatileRegisterDataAccess } from "../../src/dataAccess/volatile";
-import { AdapterFactory } from "../../src/interactors/adapters/factory";
-import { AdapterRunOptions } from "../../src/interactors/adapters/processes/types";
-import { RegisterDataAccess, RegisterStatusTag, reservedEntityTypes, SyncContext } from "../../src/interactors/registers/types";
-import { StepFactory } from "../../src/interactors/steps/factory";
-import { StepDefinition, StepRunOptions } from "../../src/interactors/steps/processes/types";
-import { StepStatus, StepStatusTag } from "../../src/interactors/steps/runners/types";
+import { AdapterFactory, RegisterDataAccess, StepDefinition, StepFactory, SyncContext, StepStatus, AdapterRunOptions, VolatileRegisterDataAccess, RegisterStatusTag, StepStatusTag, StepRunOptions } from "../../src";
 import { testSources } from "../adapters/adapter.test";
 import { case1Definition } from "../adapters/localAdapterExtractorMocks/case1Mocks";
 import { stepMocks } from "./mocks";

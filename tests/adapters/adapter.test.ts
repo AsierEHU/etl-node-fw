@@ -1,9 +1,5 @@
 import EventEmitter from "events";
-import { VolatileRegisterDataAccess } from "../../src/dataAccess/volatile";
-import { AdapterFactory } from "../../src/interactors/adapters/factory";
-import { AdapterDefinition, AdapterRunOptions } from "../../src/interactors/adapters/processes/types";
-import { AdapterStatus, AdapterStatusTag } from "../../src/interactors/adapters/runners/types";
-import { RegisterDataAccess, Register, RegisterStatusTag, AdapterSpecialIds } from "../../src/interactors/registers/types";
+import { AdapterDefinition, AdapterFactory, AdapterRunOptions, AdapterStatus, VolatileRegisterDataAccess, AdapterStatusTag, AdapterSpecialIds, Register, RegisterDataAccess, RegisterStatusTag } from "../../src";
 import { getWithInitFormat, initRegisters, isBySetSource, isOrigin, isByRowSource } from "../../src/interactors/registers/utils";
 import { adapterMocks } from "./mocks";
 
