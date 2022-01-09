@@ -3,6 +3,7 @@ ETL Node Framework is a tool focused on ETL best practices.
 
 Observability by default:
 - Data lineage
+- Traces
 - Events
 - Metrics
 - Documentation
