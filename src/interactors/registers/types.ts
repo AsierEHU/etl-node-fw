@@ -8,6 +8,8 @@ export type Register = {
     statusMeta: RegisterMeta
     entity: object | null,
     meta: RegisterMeta,
+    date: Date,
+    definitionId: string
     syncContext: SyncContext
 }
 
@@ -54,6 +56,7 @@ export interface EntityFetcher {
 export type RegisterInitValues = {
     entity: object | null,
     entityType: string,
+    definitionId: string,
     meta?: any,
     sourceAbsoluteId?: string,
     sourceRelativeId?: string,

@@ -43,7 +43,7 @@ export const getWithMetaFormat = (entities: any[]): MetaEntity[] => {
     })
 }
 
-export const getWithInitFormat = (entities: any[], entityType: string): RegisterInitValues[] => {
+export const getWithInitFormat = (entities: any[], entityType: string, definitionId: string): RegisterInitValues[] => {
     const entitiesWithMeta = getWithMetaFormat(entities);
     return entitiesWithMeta.map(entityWithMeta => {
         return {
@@ -51,6 +51,7 @@ export const getWithInitFormat = (entities: any[], entityType: string): Register
             entityType,
             sourceEntityId: entityWithMeta.$id,
             meta: entityWithMeta.$meta,
+            definitionId
         }
     })
 }
@@ -72,12 +73,15 @@ export const initRegisters = (
             statusMeta: null,
             entity: entity.entity,
             meta: entity.meta || null,
+            date: new Date(),
+            definitionId: entity.definitionId,
             syncContext,
+
         }
     })
 }
 
-export const buildRegisterFromOthers = (registers: Register[], syncContext: SyncContext, entityType?: string) => {
+export const buildRegisterFromOthers = (registers: Register[], syncContext: SyncContext) => {
     const entitiesInitialValues = registers.map(reg => {
         const initialValue: RegisterInitValues = {
             entity: reg.entity,
@@ -85,7 +89,8 @@ export const buildRegisterFromOthers = (registers: Register[], syncContext: Sync
             sourceAbsoluteId: reg.sourceAbsoluteId || undefined,
             sourceRelativeId: reg.id,
             sourceEntityId: reg.sourceEntityId || undefined,
-            entityType: entityType || reg.entityType
+            entityType: reg.entityType,
+            definitionId: reg.definitionId
         }
         return initialValue
     })

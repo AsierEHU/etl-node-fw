@@ -65,6 +65,8 @@ const mockNewRegisters: Register[] = [
             },
         },
         meta: null,
+        date: new Date(),
+        definitionId: case3Definition.id,
         syncContext: {
             flowId: "testFlow",
             stepId: "testStep",
@@ -86,6 +88,8 @@ const mockNewRegisters: Register[] = [
             },
         },
         meta: null,
+        date: new Date(),
+        definitionId: case3Definition.id,
         syncContext: {
             flowId: "testFlow",
             stepId: "testStep",
@@ -102,6 +106,8 @@ const mockNewRegisters: Register[] = [
         statusMeta: "Y 30 error!!",
         entity: null,
         meta: null,
+        date: new Date(),
+        definitionId: case3Definition.id,
         syncContext: {
             flowId: "testFlow",
             stepId: "testStep",

@@ -25,7 +25,10 @@ export class LocalLinealFlow<fd extends LocalLinealFlowDefinition> implements Fl
 
         if (flowRunOptions?.flowPushConfig) {
             const pushConfig = flowRunOptions?.flowPushConfig;
-            const inputEntitiesWithMeta = getWithInitFormat([pushConfig], reservedEntityTypes.flowConfig)
+            const inputEntitiesWithMeta = getWithInitFormat(
+                [pushConfig],
+                reservedEntityTypes.flowConfig,
+                this.flowDefinition.id)
             const inputRegisters = initRegisters(inputEntitiesWithMeta, syncContext)
             await this.registerDataAccess.saveAll(inputRegisters)
         }

@@ -125,6 +125,8 @@ const mockNewRegisters: Register[] = [
             y: 23,
         },
         meta: "rawMocked to success",
+        date: new Date(),
+        definitionId: case1Definition.id,
         syncContext: {
             flowId: "testFlow",
             stepId: "testStep",
@@ -145,6 +147,8 @@ const mockNewRegisters: Register[] = [
         },
         entity: null,
         meta: null,
+        date: new Date(),
+        definitionId: case1Definition.id,
         syncContext: {
             flowId: "testFlow",
             stepId: "testStep",
@@ -164,6 +168,8 @@ const mockNewRegisters: Register[] = [
             y: 1,
         },
         meta: null,
+        date: new Date(),
+        definitionId: case1Definition.id,
         syncContext: {
             flowId: "testFlow",
             stepId: "testStep",
@@ -183,6 +189,8 @@ const mockNewRegisters: Register[] = [
             y: -34,
         },
         meta: "rawMocked to skip",
+        date: new Date(),
+        definitionId: case1Definition.id,
         syncContext: {
             flowId: "testFlow",
             stepId: "testStep",
@@ -202,6 +210,8 @@ const mockNewRegisters: Register[] = [
             y: 30,
         },
         meta: "rawMocked to fail",
+        date: new Date(),
+        definitionId: case1Definition.id,
         syncContext: {
             flowId: "testFlow",
             stepId: "testStep",
@@ -221,6 +231,8 @@ const mockNewRegisters: Register[] = [
             y: -1,
         },
         meta: null,
+        date: new Date(),
+        definitionId: case1Definition.id,
         syncContext: {
             flowId: "testFlow",
             stepId: "testStep",
@@ -240,6 +252,8 @@ const mockNewRegisters: Register[] = [
             y: 1,
         },
         meta: null,
+        date: new Date(),
+        definitionId: case1Definition.id,
         syncContext: {
             flowId: "testFlow",
             stepId: "testStep",

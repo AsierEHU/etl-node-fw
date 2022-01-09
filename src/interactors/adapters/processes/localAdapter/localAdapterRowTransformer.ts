@@ -39,6 +39,8 @@ export class LocalAdapterRowTransformer<ad extends LocalAdapterTransformerRowDef
                     statusMeta: null,
                     entity: outputEntity,
                     meta: null,
+                    date: new Date(),
+                    definitionId: this.adapterDefinition.id,
                     syncContext
                 }
                 outputRegisters.push(register)
@@ -53,6 +55,8 @@ export class LocalAdapterRowTransformer<ad extends LocalAdapterTransformerRowDef
                     statusMeta: error.message,
                     entity: null,
                     meta: null,
+                    date: new Date(),
+                    definitionId: this.adapterDefinition.id,
                     syncContext
                 }
                 outputRegisters.push(register)

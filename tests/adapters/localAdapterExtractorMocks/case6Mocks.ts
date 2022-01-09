@@ -4,25 +4,6 @@ type inputClass = {
     field: string,
     y: number,
 }
-const mockInitialRegisters: Register[] = [{
-    id: "fb7bc93a-17c1-467c-951d-58bf119c1955",
-    entityType: reservedEntityTypes.flowConfig,
-    sourceAbsoluteId: "fb7bc93a-17c1-467c-951d-58bf119c1955",
-    sourceRelativeId: "fb7bc93a-17c1-467c-951d-58bf119c1955",
-    sourceEntityId: null,
-    statusTag: RegisterStatusTag.success,
-    statusMeta: null,
-    entity: { msg: "Push config test" },
-    meta: null,
-    syncContext: {
-        flowId: "testFlow",
-    },
-}]
-const inputEntities = {
-    ["inputClass"]: [
-        { field: "Push config test", y: 50 }
-    ]
-}
 export const case6Definition: LocalAdapterExtractorDefinition<inputClass> = {
     id: "case6Extractor",
     definitionType: "LocalAdapterExtractorDefinition",
@@ -38,6 +19,27 @@ export const case6Definition: LocalAdapterExtractorDefinition<inputClass> = {
         return null
     },
 }
+const mockInitialRegisters: Register[] = [{
+    id: "fb7bc93a-17c1-467c-951d-58bf119c1955",
+    entityType: reservedEntityTypes.flowConfig,
+    sourceAbsoluteId: "fb7bc93a-17c1-467c-951d-58bf119c1955",
+    sourceRelativeId: "fb7bc93a-17c1-467c-951d-58bf119c1955",
+    sourceEntityId: null,
+    statusTag: RegisterStatusTag.success,
+    statusMeta: null,
+    entity: { msg: "Push config test" },
+    meta: null,
+    date: new Date(),
+    definitionId: case6Definition.id,
+    syncContext: {
+        flowId: "testFlow",
+    },
+}]
+const inputEntities = {
+    ["inputClass"]: [
+        { field: "Push config test", y: 50 }
+    ]
+}
 const mockNewRegisters: Register[] = [{
     id: "fb7bc93a-17c1-467c-951d-58bf119c1922",
     entityType: "inputClass",
@@ -48,6 +50,8 @@ const mockNewRegisters: Register[] = [{
     statusMeta: null,
     entity: { field: "Push config test", y: 50 },
     meta: null,
+    date: new Date(),
+    definitionId: case6Definition.id,
     syncContext: {
         flowId: "testFlow",
         stepId: "testStep",

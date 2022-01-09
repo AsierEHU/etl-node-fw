@@ -68,6 +68,8 @@ const mockNewRegisters: Register[] = [
             success: true,
         },
         meta: null,
+        date: new Date(),
+        definitionId: case4Definition.id,
         syncContext: {
             flowId: "testFlow",
             stepId: "testStep",
@@ -86,6 +88,8 @@ const mockNewRegisters: Register[] = [
             success: false,
         },
         meta: null,
+        date: new Date(),
+        definitionId: case4Definition.id,
         syncContext: {
             flowId: "testFlow",
             stepId: "testStep",

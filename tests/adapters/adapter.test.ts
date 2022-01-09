@@ -118,7 +118,7 @@ const adapterTest = (
                 const entityTypes = Object.keys(mocks.inputEntities);
                 let pushedRegisters: Register[] = []
                 for (const entityType of entityTypes) {
-                    const inputEntitiesWithMeta = getWithInitFormat(mocks.inputEntities[entityType], entityType)
+                    const inputEntitiesWithMeta = getWithInitFormat(mocks.inputEntities[entityType], entityType, definition.id)
                     const inputRegisters = initRegisters(inputEntitiesWithMeta, {
                         stepId: syncContext.stepId,
                         flowId: syncContext.flowId,
@@ -190,7 +190,10 @@ const registersEqual = (registers: Register[], mockFinalRegisters: Register[]) =
     expect(registers.length).toBe(mockFinalRegisters.length)
     if (registers.length == mockFinalRegisters.length)
         registers.forEach((register, index) => {
-            registerEqual(register, mockFinalRegisters[index])
+            const mockRegister = mockFinalRegisters[index]
+            expect(register.date).not.toBeNull()
+            register.date = mockRegister.date
+            registerEqual(register, mockRegister)
         })
 }
 

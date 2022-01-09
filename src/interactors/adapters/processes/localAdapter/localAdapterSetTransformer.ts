@@ -42,7 +42,11 @@ export class LocalAdapterSetTransformer<ad extends LocalAdapterSetTransformerDef
         const sourceId = generateSetSourceId(this.adapterDefinition.inputTypes)
         try {
             const outputEntities = await this.adapterDefinition.setsProcess(sets)
-            const outputEntitiesInitialValues = getWithInitFormat(outputEntities, this.adapterDefinition.outputType)
+            const outputEntitiesInitialValues = getWithInitFormat(
+                outputEntities,
+                this.adapterDefinition.outputType,
+                this.adapterDefinition.id
+            )
             return outputEntitiesInitialValues.map((entity) => {
                 return {
                     id: uuidv4(),
@@ -54,6 +58,8 @@ export class LocalAdapterSetTransformer<ad extends LocalAdapterSetTransformerDef
                     statusMeta: null,
                     entity: entity.entity,
                     meta: entity.meta || null,
+                    date: new Date(),
+                    definitionId: entity.definitionId,
                     syncContext,
                 }
             })
@@ -68,6 +74,8 @@ export class LocalAdapterSetTransformer<ad extends LocalAdapterSetTransformerDef
                 statusMeta: error.message,
                 entity: null,
                 meta: null,
+                date: new Date(),
+                definitionId: this.adapterDefinition.id,
                 syncContext
             }
             return [register]

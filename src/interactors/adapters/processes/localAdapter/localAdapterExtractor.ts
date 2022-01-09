@@ -17,7 +17,11 @@ export class LocalAdapterExtractor<ad extends LocalAdapterExtractorDefinition<an
             this.registerDataAccess
         )
         const inputEntities = await this.adapterDefinition.entitiesGet(entityFetcher);
-        const inputEntitiesInitialValues = getWithInitFormat(inputEntities, this.adapterDefinition.outputType)
+        const inputEntitiesInitialValues = getWithInitFormat(
+            inputEntities,
+            this.adapterDefinition.outputType,
+            this.adapterDefinition.id
+        )
         const registers = initRegisters(inputEntitiesInitialValues, syncContext);
         return registers;
     }

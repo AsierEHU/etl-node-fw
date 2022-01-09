@@ -35,6 +35,8 @@ const mockNewRegisters: Register[] = [
         statusMeta: "Test set case7 error, set length: 1",
         entity: null,
         meta: null,
+        date: new Date(),
+        definitionId: case7Definition.id,
         syncContext: {
             flowId: "testFlow",
             stepId: "testStep",

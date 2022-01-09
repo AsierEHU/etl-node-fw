@@ -29,7 +29,11 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
             const pushEntityTypes = Object.keys(runOptions?.pushEntities)
             for (const pushEntityType of pushEntityTypes) {
                 const pushEntities = runOptions?.pushEntities[pushEntityType]
-                const inputEntitiesWithMeta = getWithInitFormat(pushEntities, pushEntityType)
+                const inputEntitiesWithMeta = getWithInitFormat(
+                    pushEntities,
+                    pushEntityType,
+                    this.stepDefinition.id
+                )
                 const inputRegisters = initRegisters(inputEntitiesWithMeta, { ...syncContext, adapterId: AdapterSpecialIds.pushEntity })
                 await this.registerDataAccess.saveAll(inputRegisters)
             }

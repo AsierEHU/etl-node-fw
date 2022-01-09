@@ -123,15 +123,6 @@ const flowTest = (
                 expect(registerConfigPushed[0].entity).toEqual(entityConfigPushed)
             })
 
-            test("Not pending registers", async () => {
-                const flow1 = flowFactory.createFlowRunner(definition.id)
-                await flow1.run(defaultRunOptions)
-                const registers = await registerDataAccess.getAll()
-                registers.forEach(register => {
-                    expect(register.statusTag).not.toBe(RegisterStatusTag.pending)
-                })
-            })
-
         })
     })
 

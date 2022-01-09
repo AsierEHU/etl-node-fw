@@ -45,6 +45,8 @@ export class LocalAdapterLoader<ad extends LocalAdapterLoaderDefinition<any, any
                 statusMeta: null,
                 entity: outputEntityWithMeta.$entity,
                 meta: outputEntityWithMeta.$meta || null,
+                date: new Date(),
+                definitionId: this.adapterDefinition.id,
                 syncContext
             }
             return register
@@ -59,6 +61,8 @@ export class LocalAdapterLoader<ad extends LocalAdapterLoaderDefinition<any, any
                 statusMeta: error.message,
                 entity: null,
                 meta: null,
+                date: new Date(),
+                definitionId: this.adapterDefinition.id,
                 syncContext
             }
             return register

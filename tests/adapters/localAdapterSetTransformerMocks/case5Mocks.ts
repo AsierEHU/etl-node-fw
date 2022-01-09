@@ -38,6 +38,8 @@ const mockNewRegisters: Register[] = [
             successTotal: 1,
         },
         meta: null,
+        date: new Date(),
+        definitionId: case5Definition.id,
         syncContext: {
             flowId: "testFlow",
             stepId: "testStep",
