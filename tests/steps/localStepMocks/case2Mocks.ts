@@ -37,10 +37,10 @@ const mockFinalStatus: StepStatus = {
     timeFinished: null,
     statusSummary: {
         registerStats: {
-            registers_total: 7,
+            registers_total: 8,
             registers_success: 3,
             registers_failed: 2,
-            registers_invalid: 1,
+            registers_invalid: 2,
             registers_skipped: 1,
         },
         tryNumber: 4,

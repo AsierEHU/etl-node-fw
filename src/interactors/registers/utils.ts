@@ -27,7 +27,7 @@ export function isSetSourceType(sourceId: string | null): boolean {
 }
 
 function isEntityWithMeta(entity?: any): entity is MetaEntity {
-    return entity?.$entity != undefined
+    return entity?.$entity !== undefined
 }
 
 export const getWithMetaFormat = (entities: any[]): MetaEntity[] => {

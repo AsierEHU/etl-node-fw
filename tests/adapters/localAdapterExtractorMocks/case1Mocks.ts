@@ -17,6 +17,11 @@ const inputEntities = {
         },
         null,
         {
+            $entity: null,
+            $meta: "null entity",
+            $id: "userDefinedIdNull"
+        },
+        {
             field: "Raw Object text 2",
             y: 0,
         },
@@ -156,6 +161,28 @@ const mockNewRegisters: Register[] = [
         },
     },
     {
+        id: "4e804c38-a540-4929-bc0d-0f9c51a1c217",
+        entityType: "inputClass",
+        sourceAbsoluteId: "4e804c38-a540-4929-bc0d-0f9c51a1c217",
+        sourceRelativeId: "4e804c38-a540-4929-bc0d-0f9c51a1c217",
+        sourceEntityId: "userDefinedIdNull",
+        statusTag: RegisterStatusTag.invalid,
+        statusMeta: {
+            type: "null object",
+            action: "trigger alarm",
+            severity: "high",
+        },
+        entity: null,
+        meta: "null entity",
+        date: new Date(),
+        definitionId: case1Definition.id,
+        syncContext: {
+            flowId: "testFlow",
+            stepId: "testStep",
+            adapterId: "testAdapter",
+        },
+    },
+    {
         id: "b056be4c-595e-419d-aa2f-c6607cca738b",
         entityType: "inputClass",
         sourceAbsoluteId: "b056be4c-595e-419d-aa2f-c6607cca738b",
@@ -279,9 +306,9 @@ const mockInitialStatus: AdapterStatus = {
     timeFinished: null
 }
 const mockFinalSummary: RegisterStats = {
-    registers_total: 7,
+    registers_total: 8,
     registers_failed: 2,
-    registers_invalid: 1,
+    registers_invalid: 2,
     registers_skipped: 1,
     registers_success: 3,
 }
