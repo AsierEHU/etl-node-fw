@@ -140,7 +140,7 @@ const extractorDefinition: LocalAdapterExtractorDefinition<extractEntity> = {
     async entityValidate(entity: extractEntity | null) {
         if (entity == null) {
             return {
-                statusTag: ValidationStatusTag.invalid, //TODO: No devuelve invalid el registro
+                statusTag: ValidationStatusTag.invalid,
                 meta: {
                     type: "null object",
                 }

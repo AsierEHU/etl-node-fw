@@ -1,13 +1,13 @@
 {
   "name": "etl-node-fw",
-  "version": "1.0.2-alpha",
+  "version": "1.0.3-alpha",
   "description": "ETL Node Framework",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "scripts": {
     "build": "tsc",
     "test": "jest",
-    "pre-publish": "npm run build"
+    "publish": "npm run build && npm publish"
   },
   "author": "Asier López",
   "license": "MIT",
