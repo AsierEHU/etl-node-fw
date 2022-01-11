@@ -3,7 +3,7 @@ import { LocalStepDefinition, RegisterStats, StepStatus, StepStatusTag, AdapterR
 export const case1Definition: LocalStepDefinition = {
     id: "case1testLocalStep",
     adapterDefinitionId: "case1Extractor",
-    retartTries: 0,
+    maxRetries: 0,
     definitionType: "LocalStepDefinition",
     isInvalidRegistersSummary: function (statusSummary: RegisterStats): boolean {
         return false
@@ -39,7 +39,7 @@ const mockFinalStatus: StepStatus = {
             registers_invalid: 2,
             registers_skipped: 1,
         },
-        tryNumber: 1,
+        retries: 0,
         isInvalidRegistersSummary: false
     },
     syncContext: {

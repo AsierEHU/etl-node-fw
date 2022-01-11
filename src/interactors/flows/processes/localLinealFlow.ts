@@ -23,8 +23,8 @@ export class LocalLinealFlow<fd extends LocalLinealFlowDefinition> implements Fl
         flowRunOptions = cloneDeep(flowRunOptions)
         syncContext = cloneDeep(syncContext)
 
-        if (flowRunOptions?.flowPushConfig) {
-            const pushConfig = flowRunOptions?.flowPushConfig;
+        if (flowRunOptions?.flowConfig) {
+            const pushConfig = flowRunOptions?.flowConfig;
             const inputEntitiesWithMeta = getWithInitFormat(
                 [pushConfig],
                 reservedEntityTypes.flowConfig,

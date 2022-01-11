@@ -220,7 +220,7 @@ const loaderDefinition: LocalAdapterLoaderDefinition<transformEntity, loadEntity
 const extractorStepDefinition: LocalStepDefinition = {
     id: "extractStepDefinition", //uniqe definition id
     adapterDefinitionId: "extractEntityDefinition",
-    retartTries: 0, //In case of Adapter fails or any Register Fails, the number of retries
+    maxRetries: 0, //In case of Adapter fails or any Register Fails, the number of retries
     definitionType: "LocalStepDefinition",
     /**
      * Sometimes you need to tag an step as invalid, for example, if you get 0 entities, it is a 'success' result but is not Valid for your business.
@@ -236,7 +236,7 @@ const extractorStepDefinition: LocalStepDefinition = {
 const transformerStepDefinition: LocalStepDefinition = {
     id: "transformStepDefinition", //uniqe definition id
     adapterDefinitionId: "transformEntityDefinition",
-    retartTries: 1, //In case of Adapter fails or any Register Fails, the number of retries
+    maxRetries: 1, //In case of Adapter fails or any Register Fails, the number of retries
     definitionType: "LocalStepDefinition",
     /**
      * Sometimes you need to tag an step as invalid, for example, if you get 0 entities, it is a 'success' result but is not Valid for your business.
@@ -252,7 +252,7 @@ const transformerStepDefinition: LocalStepDefinition = {
 const loaderStepDefinition: LocalStepDefinition = {
     id: "loadStepDefinition", //uniqe definition id
     adapterDefinitionId: "loadEntityDefinition",
-    retartTries: 3, //In case of Adapter fails or any Register Fails, the number of retries
+    maxRetries: 3, //In case of Adapter fails or any Register Fails, the number of retries
     definitionType: "LocalStepDefinition",
     /**
      * Sometimes you need to tag an step as invalid, for example, if you get 0 entities, it is a 'success' result but is not Valid for your business.
@@ -337,7 +337,7 @@ const flowFactory = new FlowFactory(flowDefinitions, flowDependencies)
 async function run() {
     const flowRunner = flowFactory.createFlowRunner("testFlow1")
     await flowRunner.run({
-        flowPushConfig: {
+        flowConfig: {
             apiCallConfig: "testConfig"
         }
     })

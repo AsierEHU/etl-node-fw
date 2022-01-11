@@ -9,7 +9,7 @@ export interface Step<sd extends StepDefinition> {
 
 export type StepStatusSummary = {
     registerStats: RegisterStats
-    tryNumber: number,
+    retries: number,
     isInvalidRegistersSummary: boolean
 }
 

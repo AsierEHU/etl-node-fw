@@ -6,7 +6,7 @@ export abstract class LocalStepDefinition implements StepDefinition {
     abstract readonly adapterDefinitionId: string;
     abstract readonly definitionType: string;
     abstract readonly id: string
-    abstract readonly retartTries: number
+    abstract readonly maxRetries: number
     abstract isInvalidRegistersSummary(statusSummary: RegisterStats): boolean
 }
 

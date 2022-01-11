@@ -114,10 +114,10 @@ const flowTest = (
 
         describe("Registers test", () => {
 
-            test("runOptions:flowPushConfig", async () => {
+            test("runOptions:flowConfig", async () => {
                 const entityConfigPushed = { msg: "Push config test" }
                 const flow1 = flowFactory.createFlowRunner(definition.id)
-                const runOptions: FlowRunOptions = { ...defaultRunOptions, flowPushConfig: entityConfigPushed }
+                const runOptions: FlowRunOptions = { ...defaultRunOptions, flowConfig: entityConfigPushed }
                 await flow1.run(runOptions);
                 const registerConfigPushed = await registerDataAccess.getAll({ entityType: reservedEntityTypes.flowConfig })
                 expect(registerConfigPushed[0].entity).toEqual(entityConfigPushed)

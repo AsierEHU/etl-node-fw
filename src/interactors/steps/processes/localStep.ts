@@ -48,7 +48,7 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
                 registers_invalid: 0,
                 registers_skipped: 0,
             },
-            tryNumber: 0,
+            retries: -1,
             isInvalidRegistersSummary: false,
         }
 
@@ -59,7 +59,7 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
 
     private async tryRunAdapter(stepStatusSummary: StepStatusSummary, syncContext: SyncContext, adapterRunOptions?: AdapterRunOptions) {
 
-        stepStatusSummary.tryNumber++
+        stepStatusSummary.retries++
 
         try {
             const adapterRunner = this.adapterFactory.createAdapterRunner(this.stepDefinition.adapterDefinitionId)
@@ -68,12 +68,12 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
             const stepRegisterStatusSummary = stepStatusSummary.registerStats;
             this.fillSummary(stepRegisterStatusSummary, registerStats, adapterRunOptions?.onlyFailedEntities)
 
-            if (adapterStatus.statusTag == AdapterStatusTag.failed && this.canRetry(stepStatusSummary.tryNumber)) {
+            if (adapterStatus.statusTag == AdapterStatusTag.failed && this.canRetry(stepStatusSummary.retries)) {
                 const restartAdapterRunOptions = { ...adapterRunOptions, onlyFailedEntities: true }
                 await this.tryRunAdapter(stepStatusSummary, syncContext, restartAdapterRunOptions);
             }
             else {
-                if (registerStats && registerStats.registers_failed > 0 && this.canRetry(stepStatusSummary.tryNumber)) {
+                if (registerStats && registerStats.registers_failed > 0 && this.canRetry(stepStatusSummary.retries)) {
                     const restartAdapterRunOptions = { ...adapterRunOptions, onlyStepFailedEntities: true }
                     await this.tryRunAdapter(stepStatusSummary, syncContext, restartAdapterRunOptions);
                 }
@@ -83,7 +83,7 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
             }
 
         } catch (error: any) {
-            if (this.canRetry(stepStatusSummary.tryNumber)) {
+            if (this.canRetry(stepStatusSummary.retries)) {
                 await this.tryRunAdapter(stepStatusSummary, syncContext, adapterRunOptions);
             }
             else {
@@ -106,7 +106,7 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
         }
     }
 
-    private canRetry(tryNumber: number): boolean {
-        return tryNumber <= this.stepDefinition.retartTries
+    private canRetry(retries: number): boolean {
+        return retries < this.stepDefinition.maxRetries
     }
 }

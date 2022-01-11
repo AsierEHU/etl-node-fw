@@ -10,7 +10,7 @@ export interface Flow<fd extends FlowDefinition> {
 
 export type FlowRunOptions = {
     stepsRunOptions?: { stepDefinitionId: string, runOptions: StepRunOptions }[]
-    flowPushConfig?: any
+    flowConfig?: any
 }
 
 export type FlowStatusSummary = {
