@@ -189,7 +189,22 @@ const mockNewRegisters: Register[] = [
         sourceRelativeId: "b056be4c-595e-419d-aa2f-c6607cca738b",
         sourceEntityId: null,
         statusTag: RegisterStatusTag.success,
-        statusMeta: { note: "Fixed changing to 1" },
+        statusMeta: {
+            fixMeta: {
+                note: "Fixed changing to 1"
+            },
+            toFixEntity: {
+                entity: {
+                    field: "Raw Object text 2",
+                    y: 1,
+                },
+                validationMeta: {
+                    action: "trigger alarm",
+                    severity: "low",
+                    type: "0 error",
+                }
+            }
+        },
         entity: {
             field: "Raw Object text 2",
             y: 1,

@@ -58,7 +58,10 @@ export class LocalAdapterExtractor<ad extends LocalAdapterExtractorDefinition<an
                 if (fixedEntity) {
                     toFixRegister.entity = fixedEntity.entity;
                     toFixRegister.statusTag = RegisterStatusTag.success;
-                    toFixRegister.statusMeta = fixedEntity.meta
+                    toFixRegister.statusMeta = {
+                        toFixEntity,
+                        fixMeta: fixedEntity.meta
+                    }
                 } else {
                     toFixRegister.statusTag = RegisterStatusTag.invalid;
                 }
