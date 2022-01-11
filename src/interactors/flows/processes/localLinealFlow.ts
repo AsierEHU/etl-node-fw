@@ -53,20 +53,22 @@ export class LocalLinealFlow<fd extends LocalLinealFlowDefinition> implements Fl
 
             try {
                 const stepStatus = await stepRunner.run(syncContext, stepRunOptions)
-                flowStatusSummary.stepsPending--
-                switch (stepStatus.statusTag) {
-                    case StepStatusTag.failed:
-                        flowStatusSummary.stepsFailed++;
-                        break;
-                    case StepStatusTag.success:
-                        flowStatusSummary.stepsSuccess++;
-                        break;
-                    case StepStatusTag.invalid:
-                        flowStatusSummary.stepsInvalid++;
-                        break;
-                }
                 if (stepDefinitionFlow.successMandatory && stepStatus.statusTag != StepStatusTag.success)
                     break;
+                else {
+                    flowStatusSummary.stepsPending--
+                    switch (stepStatus.statusTag) {
+                        case StepStatusTag.failed:
+                            flowStatusSummary.stepsFailed++;
+                            break;
+                        case StepStatusTag.success:
+                            flowStatusSummary.stepsSuccess++;
+                            break;
+                        case StepStatusTag.invalid:
+                            flowStatusSummary.stepsInvalid++;
+                            break;
+                    }
+                }
 
             } catch (error) {
                 throw error

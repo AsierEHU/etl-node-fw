@@ -28,8 +28,8 @@ const mockFinalStatus: FlowStatus = {
         stepsSuccess: 1,
         stepsTotal: 3,
         stepsFailed: 0,
-        stepsInvalid: 1,
-        stepsPending: 1
+        stepsInvalid: 0,
+        stepsPending: 2
     },
     syncContext: { flowId: "testFlow" },
     statusTag: FlowStatusTag.failed,

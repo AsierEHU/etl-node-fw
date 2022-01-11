@@ -4,6 +4,7 @@
   "description": "ETL Node Framework",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
+  "keywords": ["etl","framework"],
   "scripts": {
     "build": "tsc",
     "test": "jest",
