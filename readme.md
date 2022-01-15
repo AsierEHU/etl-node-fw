@@ -1,4 +1,8 @@
 ## Introduction
+- https://github.com/AsierEHU/etl-node-fw
+- https://www.npmjs.com/package/etl-node-fw
+
+
 ETL Node Framework is a tool focused on ETL best practices.
 
 Observability by default:
@@ -13,20 +17,13 @@ Tools for:
 - Ensuring data quality
 - Managing bad data
 - Error handling
+---
 ## ETL Framework concepts
 ### Entities
 Input and Ouput raw payload. The information that you want to Extract, Transform and Load.
 ### Registers
 Meta information about the entities after being processed.
 Keep Sync context, data lineage and process status data.
-Tag the entities type.
-
-Special entity reserved [$]types Tags:
-- $flowConfig: Used for define Flow configuration
-
-Source data lineage types:
-- Row ["v4UUID"]: When the source entity is from a single row
-- Set ["set-(entityType1)-..."]: When the source entity is from one or more sets
 ### Adapters
 Run the Definition about how to ETL entities.
 Each adapter produce only one Entity type.
@@ -47,6 +44,8 @@ Can run adapters in "Push" and "Pull" mode.
 Implements some error handling tools like retries and force to define how the flow must continue in case of not success.
 ### Flows
 Define the order execution and dependencies between steps.
+
+---
 ## ETL Framework patterns
 - **Definitions**: Behaviour configuration. Acts like process documentation.
 - **Processes**: Tranform a definition into a result. Return summaraized results (monitoring).
@@ -54,7 +53,7 @@ Define the order execution and dependencies between steps.
 - **Factories**: Create new runners by definition.
 - **DataAccess**: Interface for handling Entities and Registers
 - **presenters**: Event channels with Status and Errors information.
-## Reference [WIP]
+---
 ## Examples / how it works [WIP]
 ``` ts
 import { AdapterFactory, AdapterStatus, FlowFactory, FlowStatus, LocalAdapterExtractorDefinition, LocalAdapterLoaderDefinition, LocalAdapterTransformerRowDefinition, LocalLinealFlowDefinition, LocalStepDefinition, RegisterStats, StepFactory, StepStatus, ToFixEntity, ValidationResult, ValidationStatusTag, VolatileRegisterDataAccess } from 'etl-node-fw'
@@ -347,6 +346,58 @@ async function run() {
 }
 run()
 ```
+---
+## Reference [WIP]
+### Register data structure
+``` ts
+{
+    id: string //unique identifier
+    entityType: string 
+    sourceRelativeId: string | null //relative (last register source) datalineage
+    sourceAbsoluteId: string | null //absolute (first register source) datalineage
+    sourceEntityId: string | null //user custom datalineage
+    statusTag: RegisterStatusTag 
+    //- pending: register pending to be proccessed,
+    //- success: register saved with success result -> not errors, validations passed,
+    //- failed: register saved with failed result -> unexpected/software error,
+    //- invalid: register saved with invalid result -> validation not passed,
+    //- skipped: register saved with skipped result -> tagged as not necessary by definition,
+    statusMeta: RegisterMeta //extra info about the register status
+    entity: object | null, //entity
+    meta: RegisterMeta, //user custom meta
+    date: Date, //creation date
+    definitionId: string //definition  trace
+    syncContext: SyncContext //process traces (flowId,stepId,AdapterId)
+}
+```
+Special entityType reserved:
+- $flowConfig: Used for define Flow configuration
+
+Source data lineage types:
+- Row ["v4UUID"]: When the source entity is from a single row
+- Set ["set-(entityType1)-..."]: When the source entity is from one or more sets
+### Status data structure
+Adapter, Step or Flow process status event.
+``` ts
+{
+    id: string //process unique identifier
+    definitionId: string //definition identifier
+    definitionType: string //definition type
+    outputType: string //process output entity type
+    statusTag: AdapterStatusTag
+    //- pending: process pending to be proccessed,
+    //- success: process finished with success result -> not software exceptions
+    //- failed: process finished with exceptions
+    //- invalid: process tagged invalid by definition
+    statusMeta: //extra info about the process status
+    timeStarted: Date | null
+    timeFinished: Date | null
+    statusSummary: any, //metrics about the process
+    runOptions: any //process input params
+    syncContext: SyncContext //process traces (flowId,stepId,AdapterId)
+}
+```
+---
 ## Default implementations overview
 ### Adapters
 - **LocalAdapter family**: For small sets running in one local computer
@@ -367,9 +418,11 @@ run()
 - **LocalLinealFlowRunner**: Check status for local flows. Sets "failed" status in case of any flow exception thrown. Flow finishing with pending for run steps will be considered an exception and tagged wit status "failed". 
     - "flowStatus" channel: for status change events.
     - "flowError" channel: for exceptions raised.
+---
 ## Extensibility [WIP]
 - Developing own ETL Elements
 - Testing
+---
 ## Next features [WIP]
 - Process in batch (reducers)
 - Tree flows (instead of lineal)
