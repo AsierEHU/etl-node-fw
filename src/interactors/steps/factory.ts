@@ -7,7 +7,7 @@ import { StepRunner } from "./runners/types"
 const srdt = {
     ["LocalStepRunner"]: {
         class: LocalStepRunner,
-        dependencies: ["adapterPresenter"],
+        dependencies: ["adapterPresenter", "registerDataAccess"],
     }
 }
 

@@ -1,6 +1,6 @@
-import { SyncContext } from "../../registers/types"
+import { RegisterStats, SyncContext } from "../../registers/types"
 import { StepDefinition } from "../definitions/types"
-import { StepStatusSummary, Step, StepRunOptions } from "../processes/types"
+import { Step, StepRunOptions } from "../processes/types"
 
 
 export enum StepStatusTag {
@@ -28,4 +28,9 @@ export type StepMeta = string | object | null
 export interface StepRunner {
     step: Step<StepDefinition>
     run(syncContext: SyncContext, runOptions?: StepRunOptions): Promise<StepStatus>
+}
+
+export type StepStatusSummary = {
+    registerStats: RegisterStats
+    retries: number,
 }

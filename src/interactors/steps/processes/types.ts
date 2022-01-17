@@ -1,16 +1,10 @@
 
-import { InputEntity, RegisterStats, SyncContext } from "../../registers/types";
+import { InputEntity, SyncContext } from "../../registers/types";
 import { StepDefinition } from "../definitions/types";
 
 export interface Step<sd extends StepDefinition> {
     stepDefinition: sd
-    run(syncContext: SyncContext, runOptions?: StepRunOptions): Promise<StepStatusSummary>
-}
-
-export type StepStatusSummary = {
-    registerStats: RegisterStats
-    retries: number,
-    isInvalidRegistersSummary: boolean
+    run(syncContext: SyncContext, runOptions?: StepRunOptions): Promise<void>
 }
 
 export type StepRunOptions = {

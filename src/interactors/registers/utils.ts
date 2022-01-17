@@ -81,7 +81,7 @@ export const initRegisters = (
     })
 }
 
-export const buildRegisterFromOthers = (registers: Register[], syncContext: SyncContext) => {
+export const buildChildRegisters = (registers: Register[], syncContext: SyncContext) => {
     const entitiesInitialValues = registers.map(reg => {
         const initialValue: RegisterInitValues = {
             entity: reg.entity,

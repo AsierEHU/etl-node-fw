@@ -38,7 +38,13 @@ const mockInitialStatus: AdapterStatus = {
     timeStarted: null,
     timeFinished: null
 }
-const mockFinalSummary = null
+const mockFinalSummary = {
+    registers_total: 0,
+    registers_success: 0,
+    registers_failed: 0,
+    registers_invalid: 0,
+    registers_skipped: 0,
+}
 const mockFinalStatus: AdapterStatus = {
     ...mockInitialStatus,
     statusSummary: mockFinalSummary,

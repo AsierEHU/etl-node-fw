@@ -1,4 +1,5 @@
 import { LocalStepDefinition, RegisterStats, StepStatus, StepStatusTag, AdapterRunOptions } from "../../../src"
+import { case1Definition } from "../../adapters/localAdapterExtractorMocks/case1Mocks"
 
 export const case3Definition: LocalStepDefinition = {
     id: "case3testLocalStep",
@@ -46,7 +47,6 @@ const mockFinalStatus: StepStatus = {
             registers_skipped: 1,
         },
         retries: 1,
-        isInvalidRegistersSummary: false
     }
 }
 
@@ -54,4 +54,6 @@ const mockAdapterRunOptions: AdapterRunOptions = {
     onlyFailedEntities: false
 }
 
-export const case3Mocks = { mockInitialStatus, mockFinalStatus, mockAdapterRunOptions }
+const adapterDefinitions = [case1Definition];
+
+export const case3Mocks = { mockInitialStatus, mockFinalStatus, mockAdapterRunOptions, adapterDefinitions }

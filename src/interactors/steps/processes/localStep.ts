@@ -4,8 +4,9 @@ import { AdapterRunOptions } from "../../adapters/processes/types";
 import { AdapterStatusTag } from "../../adapters/runners/types";
 import { AdapterSpecialIds, RegisterDataAccess, RegisterStats, reservedEntityTypes, SyncContext } from "../../registers/types";
 import { getWithInitFormat, initRegisters } from "../../registers/utils";
+import { AdvancedRegisterFetcher } from "../../registers/utilsDB";
 import { LocalStepDefinition } from "../definitions/types";
-import { Step, StepStatusSummary, StepRunOptions } from "./types";
+import { Step, StepRunOptions } from "./types";
 
 export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
 
@@ -39,74 +40,41 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
             }
             adapterRunOptions = { ...adapterRunOptions, usePushedEntityTypes: pushEntityTypes }
         }
-
-        const stepStatusSummary: StepStatusSummary = {
-            registerStats: {
-                registers_total: 0,
-                registers_success: 0,
-                registers_failed: 0,
-                registers_invalid: 0,
-                registers_skipped: 0,
-            },
-            retries: -1,
-            isInvalidRegistersSummary: false,
-        }
-
-        await this.tryRunAdapter(stepStatusSummary, syncContext, adapterRunOptions || undefined);
-
-        return cloneDeep(stepStatusSummary)
+        const tryNumber = -1
+        await this.tryRunAdapter(tryNumber, syncContext, adapterRunOptions || undefined);
     }
 
-    private async tryRunAdapter(stepStatusSummary: StepStatusSummary, syncContext: SyncContext, adapterRunOptions?: AdapterRunOptions) {
+    private async tryRunAdapter(tryNumber: number, syncContext: SyncContext, adapterRunOptions?: AdapterRunOptions) {
 
-        stepStatusSummary.retries++
+        tryNumber = tryNumber + 1
 
-        try {
-            const adapterRunner = this.adapterFactory.createAdapterRunner(this.stepDefinition.adapterDefinitionId)
-            const adapterStatus = await adapterRunner.run(syncContext, adapterRunOptions)
-            const registerStats = adapterStatus.statusSummary as RegisterStats;
-            const stepRegisterStatusSummary = stepStatusSummary.registerStats;
-            this.fillSummary(stepRegisterStatusSummary, registerStats, adapterRunOptions?.onlyFailedEntities)
+        const adapterRunner = this.adapterFactory.createAdapterRunner(this.stepDefinition.adapterDefinitionId)
+        const adapterStatus = await adapterRunner.run(syncContext, adapterRunOptions)
+        const registerStats = adapterStatus.statusSummary as RegisterStats;
 
-            if (adapterStatus.statusTag == AdapterStatusTag.failed && this.canRetry(stepStatusSummary.retries)) {
+        if (adapterStatus.statusTag == AdapterStatusTag.failed && this.canRetry(tryNumber)) {
+            const restartAdapterRunOptions = { ...adapterRunOptions, onlyFailedEntities: true }
+            //TODO: maybe have to run all the entities
+            await this.tryRunAdapter(tryNumber, syncContext, restartAdapterRunOptions);
+        }
+        else {
+            if (registerStats && registerStats.registers_failed > 0 && this.canRetry(tryNumber)) {
                 const restartAdapterRunOptions = { ...adapterRunOptions, onlyFailedEntities: true }
-                await this.tryRunAdapter(stepStatusSummary, syncContext, restartAdapterRunOptions);
+                await this.tryRunAdapter(tryNumber, syncContext, restartAdapterRunOptions);
             }
             else {
-                if (registerStats && registerStats.registers_failed > 0 && this.canRetry(stepStatusSummary.retries)) {
-                    const restartAdapterRunOptions = { ...adapterRunOptions, onlyStepFailedEntities: true }
-                    await this.tryRunAdapter(stepStatusSummary, syncContext, restartAdapterRunOptions);
+                const arg = new AdvancedRegisterFetcher(this.registerDataAccess);
+                const registerStats = await arg.getRegistersStepSummary(syncContext.stepId as string, true)
+                const isInvalidRegistersSummary = this.stepDefinition.isInvalidRegistersSummary(registerStats)
+                if (isInvalidRegistersSummary) {
+                    throw new Error("Invalid by definition")
                 }
-                else {
-                    stepStatusSummary.isInvalidRegistersSummary = this.stepDefinition.isInvalidRegistersSummary(stepRegisterStatusSummary)
-                }
-            }
-
-        } catch (error: any) {
-            if (this.canRetry(stepStatusSummary.retries)) {
-                await this.tryRunAdapter(stepStatusSummary, syncContext, adapterRunOptions);
-            }
-            else {
-                throw error
             }
         }
     }
 
 
-    private fillSummary(stepStatusSummary: RegisterStats, adapterStatusSummary: RegisterStats, onlyStepFailedEntities?: boolean) {
-        if (onlyStepFailedEntities) {
-            stepStatusSummary.registers_success += adapterStatusSummary.registers_success
-            stepStatusSummary.registers_failed = adapterStatusSummary.registers_failed
-        } else {
-            stepStatusSummary.registers_success = adapterStatusSummary.registers_success
-            stepStatusSummary.registers_failed = adapterStatusSummary.registers_failed
-            stepStatusSummary.registers_invalid = adapterStatusSummary.registers_invalid
-            stepStatusSummary.registers_skipped = adapterStatusSummary.registers_skipped
-            stepStatusSummary.registers_total = adapterStatusSummary.registers_total
-        }
-    }
-
-    private canRetry(retries: number): boolean {
-        return retries < this.stepDefinition.maxRetries
+    private canRetry(tryNumber: number): boolean {
+        return tryNumber < this.stepDefinition.maxRetries
     }
 }

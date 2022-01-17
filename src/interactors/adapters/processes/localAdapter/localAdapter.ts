@@ -1,6 +1,6 @@
 import { cloneDeep } from "lodash";
 import { RegisterDataAccess, Register, RegisterStatusTag, SyncContext, AdapterSpecialIds } from "../../../registers/types";
-import { buildRegisterFromOthers } from "../../../registers/utils";
+import { buildChildRegisters } from "../../../registers/utils";
 import { AdvancedRegisterFetcher } from "../../../registers/utilsDB";
 import { AdapterDefinition } from "../../definitions/types";
 import { Adapter, AdapterRunOptions } from "../types";
@@ -33,7 +33,7 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
             })
             const arg = new AdvancedRegisterFetcher(this.registerDataAccess);
             const oldInputRegisters = await arg.getRelativeRegisters(failedRegisters)
-            registers = buildRegisterFromOthers(oldInputRegisters, syncContext)
+            registers = buildChildRegisters(oldInputRegisters, syncContext)
         }
         else if (runOptions?.usePushedEntityTypes) {
             let pushedRegisters: Register[] = [];
@@ -48,7 +48,7 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
                 )
                 pushedRegisters = [...pushedRegisters, ...pushedRegistersInType]
             }
-            registers = buildRegisterFromOthers(pushedRegisters, syncContext)
+            registers = buildChildRegisters(pushedRegisters, syncContext)
         }
         else {
             registers = await this.getRegisters(syncContext)

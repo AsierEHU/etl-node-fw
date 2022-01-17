@@ -32,17 +32,18 @@ export class LocalAdapterRunner implements AdapterRunner {
 
         try {
             await this.adapter.run(adapterStatus.syncContext, runOptions)
-            const arf = new AdvancedRegisterFetcher(this.registerDataAccess)
-            adapterStatus.statusSummary = await arf.getRegistersSummary(adapterStatus.id)
             adapterStatus.statusTag = AdapterStatusTag.success
         } catch (error: any) {
             adapterStatus.statusTag = AdapterStatusTag.failed
             adapterStatus.statusMeta = error.message
             this.adapterPresenter.emit("adapterError", { error, statusId: adapterStatus.id })
         }
-
         adapterStatus.timeFinished = new Date()
+
+        const arf = new AdvancedRegisterFetcher(this.registerDataAccess)
+        adapterStatus.statusSummary = await arf.getRegistersAdapterSummary(adapterStatus.id)
         this.adapterPresenter.emit("adapterStatus", cloneDeep(adapterStatus))
+        
         return cloneDeep(adapterStatus);
     }
 

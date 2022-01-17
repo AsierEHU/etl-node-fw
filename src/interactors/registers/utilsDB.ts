@@ -85,7 +85,7 @@ export class AdvancedRegisterFetcher {
             const setRegisters = await this.registerDataAccess.getAll(
                 {
                     entityType: entityType,
-                    registerStatus: RegisterStatusTag.success
+                    registerStatus: RegisterStatusTag.success //TODO: coupled with setTransformed, this should be a param
                 }
             )
             targetRegisters.push(...setRegisters)
@@ -95,7 +95,7 @@ export class AdvancedRegisterFetcher {
         return targetRegisters
     }
 
-    async getRegistersSummary(adapterId: string): Promise<RegisterStats> {
+    async getRegistersAdapterSummary(adapterId: string): Promise<RegisterStats> {
         const outputRegisters = await this.registerDataAccess.getAll({ adapterId })
         const statusSummary = {
             registers_total: outputRegisters.length,
@@ -105,5 +105,32 @@ export class AdvancedRegisterFetcher {
             registers_skipped: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.skipped).length,
         };
         return statusSummary;
+    }
+
+    async getRegistersStepSummary(stepId: string, removeFailedRetries: boolean = false): Promise<RegisterStats> {
+        let outputRegisters = await this.registerDataAccess.getAll({ stepId })
+
+        if (removeFailedRetries) {
+            const failedRegisters = await this.registerDataAccess.getAll({ stepId, registerStatus: RegisterStatusTag.failed })
+            const uniquefailedRegisters = uniqBy(failedRegisters, "sourceRelativeId")
+            outputRegisters = outputRegisters.filter(register => register.statusTag != RegisterStatusTag.failed)
+            outputRegisters = [...outputRegisters, ...uniquefailedRegisters]
+        }
+
+        const statusSummary = {
+            registers_total: outputRegisters.length,
+            registers_success: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.success).length,
+            registers_failed: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.failed).length,
+            registers_invalid: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.invalid).length,
+            registers_skipped: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.skipped).length,
+        };
+
+        return statusSummary;
+    }
+
+    async getStepRetries(stepId: string) {
+        const failedRegisters = await this.registerDataAccess.getAll({ stepId, registerStatus: RegisterStatusTag.failed })
+        const retries = uniqBy(failedRegisters, "syncContext.adapterId").length - 1
+        return retries
     }
 }

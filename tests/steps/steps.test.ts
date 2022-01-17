@@ -1,10 +1,8 @@
 import { EventEmitter } from "stream";
-import { AdapterFactory, RegisterDataAccess, StepDefinition, StepFactory, SyncContext, StepStatus, AdapterRunOptions, VolatileRegisterDataAccess, RegisterStatusTag, StepStatusTag, StepRunOptions } from "../../src";
+import { AdapterFactory, RegisterDataAccess, StepDefinition, StepFactory, SyncContext, StepStatus, AdapterRunOptions, VolatileRegisterDataAccess, RegisterStatusTag, StepStatusTag, StepRunOptions, AdapterDefinition } from "../../src";
 import { testSources } from "../adapters/adapter.test";
-import { case1Definition } from "../adapters/localAdapterExtractorMocks/case1Mocks";
 import { stepMocks } from "./mocks";
 
-const adapterDefinitions = [case1Definition];
 let adapterFactory: AdapterFactory
 let adapterStatusCallback: any
 let registerDataAccess: RegisterDataAccess
@@ -28,7 +26,8 @@ const stepTest = (
     mocks: {
         mockInitialStatus: StepStatus,
         mockFinalStatus: StepStatus,
-        mockAdapterRunOptions: AdapterRunOptions
+        mockAdapterRunOptions: AdapterRunOptions,
+        adapterDefinitions: AdapterDefinition[]
     }
 ) => {
 
@@ -53,10 +52,10 @@ const stepTest = (
                 adapterPresenter: presenter,
                 registerDataAccess,
             }
-            adapterFactory = new AdapterFactory(adapterDefinitions, adapterDependencies)
+            adapterFactory = new AdapterFactory(mocks.adapterDefinitions, adapterDependencies)
             const stepDependencies = {
                 stepPresenter: presenter,
-                registerDataAccess: registerDataAccess,
+                registerDataAccess,
                 adapterFactory
             }
             stepFactory = new StepFactory(stepDefinitions, stepDependencies)
