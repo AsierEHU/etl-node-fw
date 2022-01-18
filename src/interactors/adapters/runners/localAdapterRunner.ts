@@ -31,13 +31,13 @@ export class LocalAdapterRunner implements AdapterRunner {
         const processStatus = this.buildProcessStatus(syncContext, runOptions)
         await this.processStatusDataAccess.save(processStatus)
         let presenterData = this.buildPresenterData(processStatus)
-        this.adapterPresenter.emit("adapterStatus", cloneDeep(presenterData))
+        this.adapterPresenter.emit("adapterStatus", presenterData)
 
         processStatus.statusTag = StatusTag.active
         processStatus.timeStarted = new Date()
         await this.processStatusDataAccess.save(processStatus)
         presenterData = this.buildPresenterData(processStatus)
-        this.adapterPresenter.emit("adapterStatus", cloneDeep(presenterData))
+        this.adapterPresenter.emit("adapterStatus", presenterData)
 
         try {
             await this.adapter.run(processStatus.syncContext, runOptions)
@@ -52,9 +52,9 @@ export class LocalAdapterRunner implements AdapterRunner {
         presenterData = this.buildPresenterData(processStatus)
         const arf = new AdvancedRegisterFetcher(this.registerDataAccess)
         presenterData.statusSummary = await arf.getRegistersAdapterSummary(processStatus.id)
-        this.adapterPresenter.emit("adapterStatus", cloneDeep(presenterData))
+        this.adapterPresenter.emit("adapterStatus", presenterData)
 
-        return cloneDeep(presenterData);
+        return presenterData;
     }
 
     private buildProcessStatus(syncContext: SyncContext, runOptions: any): ProcessStatus {
@@ -87,7 +87,7 @@ export class LocalAdapterRunner implements AdapterRunner {
             statusSummary: null,
             statusTag: processStatus.statusTag,
             statusMeta: processStatus.statusMeta,
-            syncContext: processStatus.syncContext
+            syncContext: { ...processStatus.syncContext }
         }
         return adapterStatus
     }

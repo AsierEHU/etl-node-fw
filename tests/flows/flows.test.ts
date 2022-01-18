@@ -4,14 +4,17 @@ import { flowMocks } from "./mocks";
 import { case1Definition } from "../steps/localStepMocks/case1Mocks";
 import { case2Definition } from "../steps/localStepMocks/case2Mocks";
 import { case3Definition } from "../steps/localStepMocks/case3Mocks";
-import { FlowStatus, FlowStatusTag } from "../../src/interactors/flows/runners/types";
+import { FlowStatus } from "../../src/interactors/flows/runners/types";
 import { testSources } from "../adapters/adapter.test";
-import { AdapterFactory, RegisterDataAccess, StepFactory, FlowDefinition, FlowFactory, FlowRunOptions, VolatileRegisterDataAccess, RegisterStatusTag, reservedEntityTypes } from "../../src";
+import { AdapterFactory, RegisterDataAccess, StepFactory, FlowDefinition, FlowFactory, FlowRunOptions, VolatileRegisterDataAccess, reservedEntityTypes, VolatileProcessStatusDataAccess } from "../../src";
+import { StatusTag } from "../../src/business/processStatus";
+import { ProcessStatusDataAccess } from "../../src/interactors/common/processes";
 
 const adapterDefinitions = [adapterCase1Definition];
 let adapterFactory: AdapterFactory
 let adapterStatusCallback: any
 let registerDataAccess: RegisterDataAccess
+let processStatusDataAccess: ProcessStatusDataAccess
 
 const stepDefinitions = [case1Definition, case2Definition, case3Definition]
 let stepFactory: StepFactory
@@ -58,15 +61,18 @@ const flowTest = (
             presenter.on("flowError", flowErrorCallback)
 
             registerDataAccess = new VolatileRegisterDataAccess()
+            processStatusDataAccess = new VolatileProcessStatusDataAccess()
             const adapterDependencies = {
                 adapterPresenter: presenter,
                 registerDataAccess,
+                processStatusDataAccess
             }
             adapterFactory = new AdapterFactory(adapterDefinitions, adapterDependencies)
 
             const stepDependencies = {
                 stepPresenter: presenter,
                 registerDataAccess,
+                processStatusDataAccess,
                 adapterFactory
             }
             stepFactory = new StepFactory(stepDefinitions, stepDependencies)
@@ -74,6 +80,7 @@ const flowTest = (
             const flowDependencies = {
                 flowPresenter: presenter,
                 registerDataAccess,
+                processStatusDataAccess,
                 stepFactory
             }
             flowFactory = new FlowFactory(flowDefinitions, flowDependencies)
@@ -84,7 +91,7 @@ const flowTest = (
             //TEST Not pending registers
             const registers = await registerDataAccess.getAll()
             registers.forEach(register => {
-                expect(register.statusTag).not.toBe(RegisterStatusTag.pending)
+                expect(register.statusTag).not.toBe(StatusTag.pending)
             })
 
             //TEST Relative and Absolute ids
@@ -102,7 +109,7 @@ const flowTest = (
                 expect(flowStatusCallback.mock.calls.length).toBe(3)
                 statusEqual(flowStatusCallback.mock.results[0].value, mocks.mockInitialStatus)
                 statusEqual(flowStatusCallback.mock.results[2].value, mocks.mockFinalStatus)
-                if (finalFlowStatus.statusTag == FlowStatusTag.failed) {
+                if (finalFlowStatus.statusTag == StatusTag.failed) {
                     expect(flowErrorCallback).toBeCalled()
                 }
                 else {

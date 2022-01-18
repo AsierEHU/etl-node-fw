@@ -6,7 +6,7 @@ import { RegisterDataAccess, reservedEntityTypes } from "../../registers/types";
 import { getWithInitFormat, initRegisters } from "../../registers/utils";
 import { StepFactory } from "../../steps/factory"
 import { LocalLinealFlowDefinition } from "../definitions/types";
-import { Flow, FlowRunOptions, FlowStatusSummary } from "./types"
+import { Flow, FlowRunOptions } from "./types"
 
 export class LocalLinealFlow<fd extends LocalLinealFlowDefinition> implements Flow<fd> {
 
@@ -20,7 +20,7 @@ export class LocalLinealFlow<fd extends LocalLinealFlowDefinition> implements Fl
         this.registerDataAccess = dependencies.registerDataAccess;
     }
 
-    async run(syncContext: SyncContext, flowRunOptions: FlowRunOptions): Promise<FlowStatusSummary> {
+    async run(syncContext: SyncContext, flowRunOptions: FlowRunOptions): Promise<void> {
         flowRunOptions = cloneDeep(flowRunOptions)
         syncContext = cloneDeep(syncContext)
 
@@ -34,13 +34,6 @@ export class LocalLinealFlow<fd extends LocalLinealFlowDefinition> implements Fl
             await this.registerDataAccess.saveAll(inputRegisters)
         }
 
-        const flowStatusSummary: FlowStatusSummary = {
-            stepsSuccess: 0,
-            stepsTotal: this.flowDefinition.stepsDefinitionFlow.length,
-            stepsFailed: 0,
-            stepsInvalid: 0,
-            stepsPending: this.flowDefinition.stepsDefinitionFlow.length,
-        }
         const stepsDefinitionsFlows = this.flowDefinition.stepsDefinitionFlow
         for (const stepDefinitionFlow of stepsDefinitionsFlows) {
             const stepDefinitionId = stepDefinitionFlow.id
@@ -52,30 +45,9 @@ export class LocalLinealFlow<fd extends LocalLinealFlowDefinition> implements Fl
                 stepRunOptions = { ...stepDefinitionFlow.runOptions, ...flowStepRunOptions?.runOptions };
             }
 
-            try {
-                const stepStatus = await stepRunner.run(syncContext, stepRunOptions)
-                if (stepDefinitionFlow.successMandatory && stepStatus.statusTag != StatusTag.success)
-                    break;
-                else {
-                    flowStatusSummary.stepsPending--
-                    switch (stepStatus.statusTag) {
-                        case StatusTag.failed:
-                            flowStatusSummary.stepsFailed++;
-                            break;
-                        case StatusTag.success:
-                            flowStatusSummary.stepsSuccess++;
-                            break;
-                        case StatusTag.invalid:
-                            flowStatusSummary.stepsInvalid++;
-                            break;
-                    }
-                }
-
-            } catch (error) {
-                throw error
-            }
+            const stepStatus = await stepRunner.run(syncContext, stepRunOptions)
+            if (stepDefinitionFlow.successMandatory && stepStatus.statusTag != StatusTag.success)
+                throw new Error(`Step ${stepDefinitionFlow.id} is mandatory success, but finished with status ${stepStatus.statusTag}`)
         }
-
-        return flowStatusSummary
     }
 }

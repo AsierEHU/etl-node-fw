@@ -55,7 +55,7 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
 
         if (adapterStatus.statusTag == StatusTag.failed && this.canRetry(tryNumber)) {
             const restartAdapterRunOptions = { ...adapterRunOptions, onlyFailedEntities: true }
-            //TODO: maybe have to run all the entities
+            //TODO: maybe have to run all the entities, removing inconsistencies
             await this.tryRunAdapter(tryNumber, syncContext, restartAdapterRunOptions);
         }
         else {

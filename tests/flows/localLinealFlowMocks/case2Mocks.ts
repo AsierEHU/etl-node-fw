@@ -1,4 +1,5 @@
 import { LocalLinealFlowDefinition, FlowStatus, FlowStatusTag } from "../../../src"
+import { StatusTag } from "../../../src/business/processStatus"
 
 export const case2Definition: LocalLinealFlowDefinition = {
     id: "case2testLocalLinealFlow",
@@ -14,7 +15,7 @@ const mockInitialStatus: FlowStatus = {
     timeFinished: null,
     statusSummary: null,
     syncContext: { flowId: "testFlow" },
-    statusTag: FlowStatusTag.pending,
+    statusTag: StatusTag.pending,
     statusMeta: null,
 }
 
@@ -26,14 +27,12 @@ const mockFinalStatus: FlowStatus = {
     timeFinished: null,
     statusSummary: {
         stepsSuccess: 1,
-        stepsTotal: 3,
         stepsFailed: 0,
-        stepsInvalid: 0,
-        stepsPending: 2
+        stepsInvalid: 1,
     },
     syncContext: { flowId: "testFlow" },
-    statusTag: FlowStatusTag.failed,
-    statusMeta: "Flow finished with pending steps",
+    statusTag: StatusTag.failed,
+    statusMeta: "Step case2testLocalStep is mandatory success, but finished with status invalid",
 }
 
 export const case2Mocks = { mockInitialStatus, mockFinalStatus }

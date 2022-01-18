@@ -8,7 +8,7 @@ import { FlowRunner } from "./runners/types"
 const frdt = {
     ["LocalLinealFlowRunner"]: {
         class: LocalLinealFlowRunner,
-        dependencies: ["flowPresenter"],
+        dependencies: ["flowPresenter", "processStatusDataAccess"],
     }
 }
 

@@ -31,13 +31,13 @@ export class LocalStepRunner implements StepRunner {
         const processStatus = this.buildProcessStatus(syncContext, runOptions)
         await this.processStatusDataAccess.save(processStatus)
         let presenterData = this.buildPresenterData(processStatus)
-        this.stepPresenter.emit("stepStatus", cloneDeep(presenterData))
+        this.stepPresenter.emit("stepStatus", presenterData)
 
         processStatus.statusTag = StatusTag.active
         processStatus.timeStarted = new Date()
         await this.processStatusDataAccess.save(processStatus)
         presenterData = this.buildPresenterData(processStatus)
-        this.stepPresenter.emit("stepStatus", cloneDeep(presenterData))
+        this.stepPresenter.emit("stepStatus", presenterData)
 
         try {
             await this.step.run(processStatus.syncContext, runOptions)
@@ -60,9 +60,9 @@ export class LocalStepRunner implements StepRunner {
             retries: await this.getStepRetries(processStatus.id),
         }
         presenterData.statusSummary = stepStatusSummary
-        this.stepPresenter.emit("stepStatus", cloneDeep(presenterData))
+        this.stepPresenter.emit("stepStatus", presenterData)
 
-        return cloneDeep(presenterData);
+        return presenterData;
     }
 
     private async getStepRetries(stepId: string) {
@@ -98,7 +98,7 @@ export class LocalStepRunner implements StepRunner {
             statusSummary: null,
             statusTag: processStatus.statusTag,
             statusMeta: processStatus.statusMeta,
-            syncContext: processStatus.syncContext
+            syncContext: { ...processStatus.syncContext }
         }
         return stepStatus
     }
