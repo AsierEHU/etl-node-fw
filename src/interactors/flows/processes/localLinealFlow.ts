@@ -1,6 +1,7 @@
 
 import { cloneDeep } from "lodash";
-import { RegisterDataAccess, reservedEntityTypes, SyncContext } from "../../registers/types";
+import { SyncContext } from "../../../business/register";
+import { RegisterDataAccess, reservedEntityTypes } from "../../registers/types";
 import { getWithInitFormat, initRegisters } from "../../registers/utils";
 import { StepFactory } from "../../steps/factory"
 import { StepStatusTag } from "../../steps/runners/types"

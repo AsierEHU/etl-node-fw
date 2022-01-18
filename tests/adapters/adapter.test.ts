@@ -1,5 +1,8 @@
 import EventEmitter from "events";
-import { AdapterDefinition, AdapterFactory, AdapterRunOptions, AdapterStatus, VolatileRegisterDataAccess, AdapterStatusTag, AdapterSpecialIds, Register, RegisterDataAccess, RegisterStatusTag } from "../../src";
+import { AdapterDefinition, AdapterFactory, AdapterRunOptions, AdapterStatus, VolatileRegisterDataAccess, AdapterSpecialIds, RegisterDataAccess, VolatileProcessStatusDataAccess } from "../../src";
+import { StatusTag } from "../../src/business/processStatus";
+import { Register, RegisterStatusTag } from "../../src/business/register";
+import { ProcessStatusDataAccess } from "../../src/interactors/common/processes";
 import { getWithInitFormat, initRegisters, isBySetSource, isOrigin, isByRowSource } from "../../src/interactors/registers/utils";
 import { adapterMocks } from "./mocks";
 
@@ -12,6 +15,7 @@ let adapterFactory: AdapterFactory
 let adapterStatusCallback: any
 let adapterErrorCallback: any
 let registerDataAccess: RegisterDataAccess
+let processStatusDataAccess: ProcessStatusDataAccess
 
 let syncContext = {
     flowId: "testFlow",
@@ -45,9 +49,11 @@ const adapterTest = (
             })
             adapterPresenter.on("adapterError", adapterErrorCallback)
             registerDataAccess = new VolatileRegisterDataAccess(mocks.mockInitialRegisters)
+            processStatusDataAccess = new VolatileProcessStatusDataAccess()
             const adapterDependencies = {
                 adapterPresenter,
                 registerDataAccess,
+                processStatusDataAccess
             }
             adapterFactory = new AdapterFactory(adapterDefinitions, adapterDependencies)
         });
@@ -76,7 +82,7 @@ const adapterTest = (
                 expect(adapterStatusCallback.mock.calls.length).toBe(3)
                 statusEqual(adapterStatusCallback.mock.results[0].value, mocks.mockInitialStatus)
                 statusEqual(adapterStatusCallback.mock.results[2].value, mocks.mockFinalStatus)
-                if (finalAdapterStatus.statusTag == AdapterStatusTag.failed) {
+                if (finalAdapterStatus.statusTag == StatusTag.failed) {
                     expect(adapterErrorCallback).toBeCalled()
                 }
                 else {

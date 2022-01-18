@@ -1,5 +1,6 @@
 import { uniqBy, uniq } from "lodash"
-import { EntityFetcher, SyncContext, RegisterDataAccess, RegisterDataFilter, Register, MetaEntity, RegisterStatusTag, RegisterStats, reservedEntityTypes } from "./types"
+import { SyncContext, Register, RegisterStatusTag } from "../../business/register"
+import { EntityFetcher, RegisterDataAccess, RegisterDataFilter, MetaEntity, RegisterStats, reservedEntityTypes } from "./types"
 import { getSetSourceIdTypes, isRowSourceType, isSetSourceType } from "./utils"
 
 export class ContextEntityFetcher implements EntityFetcher {

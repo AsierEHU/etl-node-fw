@@ -1,4 +1,4 @@
-import { SyncContext, Register, RegisterStatusTag } from "../../../registers/types";
+import { SyncContext, Register, RegisterStatusTag } from "../../../../business/register";
 import { getWithInitFormat, initRegisters } from "../../../registers/utils";
 import { ContextEntityFetcher } from "../../../registers/utilsDB";
 import { LocalAdapterExtractorDefinition } from "../../definitions/localAdapter/types";

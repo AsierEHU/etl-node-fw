@@ -1,4 +1,6 @@
-import { Register, reservedEntityTypes, RegisterStatusTag, LocalAdapterExtractorDefinition, ValidationStatusTag, ToFixEntity, AdapterStatus, AdapterStatusTag, RegisterStats } from "../../../src"
+import { LocalAdapterExtractorDefinition, ValidationStatusTag, ToFixEntity, AdapterStatus, RegisterStats, reservedEntityTypes } from "../../../src";
+import { StatusTag } from "../../../src/business/processStatus";
+import { Register, RegisterStatusTag } from "../../../src/business/register";
 
 type inputClass = {
     field: string,
@@ -69,7 +71,7 @@ const mockInitialStatus: AdapterStatus = {
     outputType: "inputClass",
     runOptions: null,
     statusSummary: null,
-    statusTag: AdapterStatusTag.pending,
+    statusTag: StatusTag.pending,
     statusMeta: null,
     syncContext: { adapterId: "testAdapter", stepId: "testStep", flowId: "testFlow" },
     timeStarted: null,
@@ -85,7 +87,7 @@ const mockFinalSummary: RegisterStats = {
 const mockFinalStatus: AdapterStatus = {
     ...mockInitialStatus,
     statusSummary: mockFinalSummary,
-    statusTag: AdapterStatusTag.success,
+    statusTag: StatusTag.success,
     timeStarted: null,
     timeFinished: null
 }

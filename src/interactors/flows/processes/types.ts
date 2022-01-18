@@ -1,4 +1,4 @@
-import { SyncContext } from "../../registers/types"
+import { SyncContext } from "../../../business/register"
 import { StepRunOptions } from "../../steps/processes/types"
 import { FlowDefinition } from "../definitions/types"
 

@@ -1,4 +1,5 @@
-import { SyncContext } from "../../registers/types"
+
+import { SyncContext } from "../../../business/register"
 import { FlowDefinition } from "../definitions/types"
 import { FlowStatusSummary, Flow, FlowRunOptions } from "../processes/types"
 

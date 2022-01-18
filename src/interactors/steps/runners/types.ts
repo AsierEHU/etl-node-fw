@@ -1,4 +1,5 @@
-import { RegisterStats, SyncContext } from "../../registers/types"
+import { SyncContext } from "../../../business/register"
+import { RegisterStats } from "../../registers/types"
 import { StepDefinition } from "../definitions/types"
 import { Step, StepRunOptions } from "../processes/types"
 

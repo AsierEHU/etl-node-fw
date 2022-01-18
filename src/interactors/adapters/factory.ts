@@ -11,7 +11,7 @@ import { AdapterDefinition } from "./definitions/types"
 const ardt = {
     ["LocalAdapterRunner"]: {
         class: LocalAdapterRunner,
-        dependencies: ["adapterPresenter", "registerDataAccess"],
+        dependencies: ["adapterPresenter", "registerDataAccess", "processStatusDataAccess"],
     }
 }
 

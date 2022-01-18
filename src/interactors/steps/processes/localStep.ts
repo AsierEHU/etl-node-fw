@@ -1,8 +1,9 @@
 import { cloneDeep } from "lodash";
+import { StatusTag } from "../../../business/processStatus";
+import { SyncContext } from "../../../business/register";
 import { AdapterFactory } from "../../adapters/factory";
 import { AdapterRunOptions } from "../../adapters/processes/types";
-import { AdapterStatusTag } from "../../adapters/runners/types";
-import { AdapterSpecialIds, RegisterDataAccess, RegisterStats, reservedEntityTypes, SyncContext } from "../../registers/types";
+import { AdapterSpecialIds, RegisterDataAccess, RegisterStats } from "../../registers/types";
 import { getWithInitFormat, initRegisters } from "../../registers/utils";
 import { AdvancedRegisterFetcher } from "../../registers/utilsDB";
 import { LocalStepDefinition } from "../definitions/types";
@@ -52,7 +53,7 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
         const adapterStatus = await adapterRunner.run(syncContext, adapterRunOptions)
         const registerStats = adapterStatus.statusSummary as RegisterStats;
 
-        if (adapterStatus.statusTag == AdapterStatusTag.failed && this.canRetry(tryNumber)) {
+        if (adapterStatus.statusTag == StatusTag.failed && this.canRetry(tryNumber)) {
             const restartAdapterRunOptions = { ...adapterRunOptions, onlyFailedEntities: true }
             //TODO: maybe have to run all the entities
             await this.tryRunAdapter(tryNumber, syncContext, restartAdapterRunOptions);

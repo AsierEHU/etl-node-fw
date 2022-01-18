@@ -1,4 +1,6 @@
-import { Register, LocalAdapterSetTransformerDefinition, RegisterStatusTag, AdapterStatus, AdapterStatusTag, RegisterStats } from "../../../src";
+import { LocalAdapterSetTransformerDefinition, AdapterStatus, RegisterStats } from "../../../src";
+import { StatusTag } from "../../../src/business/processStatus";
+import { Register, RegisterStatusTag } from "../../../src/business/register";
 import { case4Mocks } from "../localAdapterLoaderMocks/case4Mocks";
 
 type resultClass = {
@@ -59,7 +61,7 @@ const mockInitialStatus: AdapterStatus = {
     runOptions: null,
     statusSummary: null,
     syncContext: { adapterId: "testAdapter", stepId: "testStep", flowId: "testFlow" },
-    statusTag: AdapterStatusTag.pending,
+    statusTag: StatusTag.pending,
     statusMeta: null,
     timeStarted: null,
     timeFinished: null
@@ -74,7 +76,7 @@ const mockFinalSummary: RegisterStats = {
 const mockFinalStatus: AdapterStatus = {
     ...mockInitialStatus,
     statusSummary: mockFinalSummary,
-    statusTag: AdapterStatusTag.success,
+    statusTag: StatusTag.success,
     timeStarted: null,
     timeFinished: null
 }

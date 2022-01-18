@@ -1,4 +1,6 @@
-import { SyncContext, RegisterStats } from "../../registers/types"
+import { StatusTag } from "../../../business/processStatus"
+import { SyncContext } from "../../../business/register"
+import { RegisterStats } from "../../registers/types"
 import { AdapterDefinition } from "../definitions/types"
 import { Adapter, AdapterRunOptions } from "../processes/types"
 
@@ -12,21 +14,11 @@ export type AdapterStatus = {
     definitionId: string
     definitionType: string
     outputType: string
-    statusTag: AdapterStatusTag
-    statusMeta: AdapterMeta
+    statusTag: StatusTag
+    statusMeta: string | object | null
     timeStarted: Date | null
     timeFinished: Date | null
     statusSummary: RegisterStats | null,
     runOptions: AdapterRunOptions | null
     syncContext: SyncContext
-}
-
-export type AdapterMeta = string | object | null
-
-
-export enum AdapterStatusTag {
-    pending = "pending",
-    active = "active",
-    success = "success",
-    failed = "failed",
 }

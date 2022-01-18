@@ -1,4 +1,6 @@
-import { Register, LocalAdapterTransformerRowDefinition, RegisterStatusTag, AdapterStatus, AdapterStatusTag, RegisterStats } from "../../../src";
+import { LocalAdapterTransformerRowDefinition, AdapterStatus, RegisterStats } from "../../../src";
+import { StatusTag } from "../../../src/business/processStatus";
+import { Register, RegisterStatusTag } from "../../../src/business/register";
 import { case1Mocks } from "../localAdapterExtractorMocks/case1Mocks";
 
 type inputClass = {
@@ -127,7 +129,7 @@ const mockInitialStatus: AdapterStatus = {
     runOptions: null,
     statusSummary: null,
     syncContext: { adapterId: "testAdapter", stepId: "testStep", flowId: "testFlow" },
-    statusTag: AdapterStatusTag.pending,
+    statusTag: StatusTag.pending,
     statusMeta: null,
     timeStarted: null,
     timeFinished: null
@@ -142,7 +144,7 @@ const mockFinalSummary: RegisterStats = {
 const mockFinalStatus: AdapterStatus = {
     ...mockInitialStatus,
     statusSummary: mockFinalSummary,
-    statusTag: AdapterStatusTag.success,
+    statusTag: StatusTag.success,
     timeStarted: null,
     timeFinished: null
 }

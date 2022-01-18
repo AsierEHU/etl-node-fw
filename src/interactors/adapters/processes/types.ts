@@ -1,4 +1,5 @@
-import { SyncContext } from "../../registers/types";
+
+import { SyncContext } from "../../../business/register";
 import { AdapterDefinition } from "../definitions/types";
 
 export interface Adapter<ad extends AdapterDefinition> {

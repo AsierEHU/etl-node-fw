@@ -1,4 +1,4 @@
-import { RegisterStatusTag } from "../../../registers/types";
+import { RegisterStatusTag } from "../../../../business/register";
 import { ValidationResult, ValidationStatusTag } from "../../definitions/localAdapter/types";
 
 export const getValidationResultWithMeta = (validation: ValidationResult | ValidationStatusTag): ValidationResult => {

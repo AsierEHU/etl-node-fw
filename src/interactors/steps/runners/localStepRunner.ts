@@ -1,7 +1,8 @@
 import EventEmitter from 'events';
 import { cloneDeep } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
-import { RegisterDataAccess, SyncContext } from '../../registers/types';
+import { SyncContext } from '../../../business/register';
+import { RegisterDataAccess } from '../../registers/types';
 import { AdvancedRegisterFetcher } from '../../registers/utilsDB';
 import { StepDefinition } from '../definitions/types';
 import { Step, StepRunOptions } from '../processes/types';

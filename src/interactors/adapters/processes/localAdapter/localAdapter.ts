@@ -1,5 +1,6 @@
 import { cloneDeep } from "lodash";
-import { RegisterDataAccess, Register, RegisterStatusTag, SyncContext, AdapterSpecialIds } from "../../../registers/types";
+import { SyncContext, Register, RegisterStatusTag } from "../../../../business/register";
+import { RegisterDataAccess, AdapterSpecialIds } from "../../../registers/types";
 import { buildChildRegisters } from "../../../registers/utils";
 import { AdvancedRegisterFetcher } from "../../../registers/utilsDB";
 import { AdapterDefinition } from "../../definitions/types";

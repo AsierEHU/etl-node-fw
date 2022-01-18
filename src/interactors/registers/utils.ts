@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { RegisterInitValues, MetaEntity, Register, RegisterStatusTag, SyncContext, reservedEntityTypes, registerSourceType, RegisterDataFilter, AdapterSpecialIds } from "./types"
+import { Register, SyncContext, RegisterStatusTag } from '../../business/register';
+import { RegisterInitValues, MetaEntity, reservedEntityTypes, registerSourceType, RegisterDataFilter, AdapterSpecialIds } from "./types"
 
 export const isOrigin = (register: Register): boolean => {
     if (isByRowSource(register))

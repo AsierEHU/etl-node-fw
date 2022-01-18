@@ -1,7 +1,7 @@
-import { SyncContext, Register, RegisterStatusTag } from "../../../registers/types";
 import { LocalAdapter } from "./localAdapter";
 import { v4 as uuidv4 } from 'uuid';
 import { LocalAdapterTransformerRowDefinition } from "../../definitions/localAdapter/types";
+import { SyncContext, Register, RegisterStatusTag } from "../../../../business/register";
 
 export class LocalAdapterRowTransformer<ad extends LocalAdapterTransformerRowDefinition<any, any>> extends LocalAdapter<ad>{
 

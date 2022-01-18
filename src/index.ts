@@ -16,4 +16,5 @@ export * from "./interactors/flows/runners/types"
 export * from "./interactors/flows/processes/types"
 export * from "./interactors/flows/definitions/types"
 
-export { VolatileRegisterDataAccess } from "./dataAccess/volatile"
+export { VolatileRegisterDataAccess } from "./dataAccess/registerVolatile"
+export { VolatileProcessStatusDataAccess } from "./dataAccess/processStatusVolatile";
