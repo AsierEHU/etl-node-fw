@@ -1,4 +1,4 @@
-import { ProcessStatus } from "../../business/processStatus";
+import { ProcessStatus, ProcessType } from "../../business/processStatus";
 
 export interface ProcessStatusDataAccess {
     save: (status: ProcessStatus) => Promise<void>
@@ -10,5 +10,6 @@ export type ProcessStatusDataFilter = {
     flowId?: string,
     stepId?: string,
     adapterId?: string,
-    definitionId?: string
+    definitionId?: string,
+    type?: ProcessType
 }

@@ -57,12 +57,17 @@ export class LocalStepRunner implements StepRunner {
         const arg = new AdvancedRegisterFetcher(this.registerDataAccess);
         const stepStatusSummary: StepStatusSummary = {
             registerStats: await arg.getRegistersStepSummary(processStatus.id, true),
-            retries: await arg.getStepRetries(processStatus.id),
+            retries: await this.getStepRetries(processStatus.id),
         }
         presenterData.statusSummary = stepStatusSummary
         this.stepPresenter.emit("stepStatus", cloneDeep(presenterData))
 
         return cloneDeep(presenterData);
+    }
+
+    private async getStepRetries(stepId: string) {
+        const adaptersStatus = await this.processStatusDataAccess.getAll({ stepId, type: ProcessType.adapter })
+        return adaptersStatus.length - 1
     }
 
     private buildProcessStatus(syncContext: SyncContext, runOptions: any): ProcessStatus {

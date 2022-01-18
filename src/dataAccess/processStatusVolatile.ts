@@ -37,6 +37,8 @@ export class VolatileProcessStatusDataAccess implements ProcessStatusDataAccess 
             repoStatusList = repoStatusList.filter(repoStatus => repoStatus.syncContext.flowId == filter.flowId)
         if (filter?.definitionId)
             repoStatusList = repoStatusList.filter(repoStatus => repoStatus.definitionId == filter.definitionId)
+        if (filter?.type)
+            repoStatusList = repoStatusList.filter(repoStatus => repoStatus.processType == filter.type)
 
         return repoStatusList;
     };
