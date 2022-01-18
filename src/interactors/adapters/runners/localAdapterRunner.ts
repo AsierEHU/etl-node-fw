@@ -1,7 +1,7 @@
 import EventEmitter from 'events';
 import { cloneDeep } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
-import { ProcessStatus, StatusTag } from '../../../business/processStatus';
+import { ProcessStatus, ProcessType, StatusTag } from '../../../business/processStatus';
 import { SyncContext } from '../../../business/register';
 import { ProcessStatusDataAccess } from '../../common/processes';
 import { RegisterDataAccess } from '../../registers/types';
@@ -60,7 +60,7 @@ export class LocalAdapterRunner implements AdapterRunner {
     private buildProcessStatus(syncContext: SyncContext, runOptions: any): ProcessStatus {
         const id = uuidv4();
         const adapterDefinition = this.adapter.adapterDefinition;
-        const adapterStatus: ProcessStatus = {
+        const processStatus: ProcessStatus = {
             id,
             definitionId: adapterDefinition.id,
             statusTag: StatusTag.pending,
@@ -68,19 +68,26 @@ export class LocalAdapterRunner implements AdapterRunner {
             runOptions: runOptions,
             syncContext: { ...syncContext, adapterId: id },
             timeStarted: null,
-            timeFinished: null
+            timeFinished: null,
+            processType: ProcessType.adapter
         }
-        return adapterStatus
+        return processStatus
     }
 
     private buildPresenterData(processStatus: ProcessStatus): AdapterStatus {
         const adapterDefinition = this.adapter.adapterDefinition;
         const adapterStatus: AdapterStatus = {
-            ...processStatus,
+            id: processStatus.id,
+            runOptions: processStatus.runOptions,
+            timeStarted: processStatus.timeStarted,
+            timeFinished: processStatus.timeFinished,
             definitionId: adapterDefinition.id,
             definitionType: adapterDefinition.definitionType,
             outputType: adapterDefinition.outputType,
             statusSummary: null,
+            statusTag: processStatus.statusTag,
+            statusMeta: processStatus.statusMeta,
+            syncContext: processStatus.syncContext
         }
         return adapterStatus
     }

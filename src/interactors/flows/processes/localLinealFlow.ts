@@ -1,10 +1,10 @@
 
 import { cloneDeep } from "lodash";
+import { StatusTag } from "../../../business/processStatus";
 import { SyncContext } from "../../../business/register";
 import { RegisterDataAccess, reservedEntityTypes } from "../../registers/types";
 import { getWithInitFormat, initRegisters } from "../../registers/utils";
 import { StepFactory } from "../../steps/factory"
-import { StepStatusTag } from "../../steps/runners/types"
 import { LocalLinealFlowDefinition } from "../definitions/types";
 import { Flow, FlowRunOptions, FlowStatusSummary } from "./types"
 
@@ -54,18 +54,18 @@ export class LocalLinealFlow<fd extends LocalLinealFlowDefinition> implements Fl
 
             try {
                 const stepStatus = await stepRunner.run(syncContext, stepRunOptions)
-                if (stepDefinitionFlow.successMandatory && stepStatus.statusTag != StepStatusTag.success)
+                if (stepDefinitionFlow.successMandatory && stepStatus.statusTag != StatusTag.success)
                     break;
                 else {
                     flowStatusSummary.stepsPending--
                     switch (stepStatus.statusTag) {
-                        case StepStatusTag.failed:
+                        case StatusTag.failed:
                             flowStatusSummary.stepsFailed++;
                             break;
-                        case StepStatusTag.success:
+                        case StatusTag.success:
                             flowStatusSummary.stepsSuccess++;
                             break;
-                        case StepStatusTag.invalid:
+                        case StatusTag.invalid:
                             flowStatusSummary.stepsInvalid++;
                             break;
                     }

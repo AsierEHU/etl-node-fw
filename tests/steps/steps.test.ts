@@ -1,11 +1,15 @@
 import { EventEmitter } from "stream";
-import { AdapterFactory, RegisterDataAccess, StepDefinition, StepFactory, SyncContext, StepStatus, AdapterRunOptions, VolatileRegisterDataAccess, RegisterStatusTag, StepStatusTag, StepRunOptions, AdapterDefinition } from "../../src";
+import { AdapterFactory, RegisterDataAccess, StepDefinition, StepFactory, StepStatus, AdapterRunOptions, VolatileRegisterDataAccess, StepStatusTag, StepRunOptions, AdapterDefinition, VolatileProcessStatusDataAccess } from "../../src";
+import { StatusTag } from "../../src/business/processStatus";
+import { SyncContext, RegisterStatusTag } from "../../src/business/register";
+import { ProcessStatusDataAccess } from "../../src/interactors/common/processes";
 import { testSources } from "../adapters/adapter.test";
 import { stepMocks } from "./mocks";
 
 let adapterFactory: AdapterFactory
 let adapterStatusCallback: any
 let registerDataAccess: RegisterDataAccess
+let processStatusDataAccess: ProcessStatusDataAccess
 
 const stepDefinitions: StepDefinition[] = [];
 stepMocks.forEach(suite => {
@@ -48,15 +52,18 @@ const stepTest = (
             presenter.on("stepStatus", stepStatusCallback)
             presenter.on("stepError", stepErrorCallback)
             registerDataAccess = new VolatileRegisterDataAccess()
+            processStatusDataAccess = new VolatileProcessStatusDataAccess()
             const adapterDependencies = {
                 adapterPresenter: presenter,
                 registerDataAccess,
+                processStatusDataAccess
             }
             adapterFactory = new AdapterFactory(mocks.adapterDefinitions, adapterDependencies)
             const stepDependencies = {
                 stepPresenter: presenter,
                 registerDataAccess,
-                adapterFactory
+                processStatusDataAccess,
+                adapterFactory,
             }
             stepFactory = new StepFactory(stepDefinitions, stepDependencies)
         });
@@ -85,7 +92,7 @@ const stepTest = (
                 expect(stepStatusCallback.mock.calls.length).toBe(3)
                 statusEqual(stepStatusCallback.mock.results[0].value, mocks.mockInitialStatus)
                 statusEqual(stepStatusCallback.mock.results[2].value, mocks.mockFinalStatus)
-                if (finalStepStatus.statusTag == StepStatusTag.failed) {
+                if (finalStepStatus.statusTag == StatusTag.failed) {
                     expect(stepErrorCallback).toBeCalled()
                 }
                 else {

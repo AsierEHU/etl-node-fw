@@ -1,3 +1,4 @@
+import { StatusTag } from "../../../business/processStatus"
 import { SyncContext } from "../../../business/register"
 import { RegisterStats } from "../../registers/types"
 import { StepDefinition } from "../definitions/types"
@@ -16,15 +17,14 @@ export type StepStatus = {
     id: string
     definitionId: string
     definitionType: string
-    statusTag: StepStatusTag
-    statusMeta: StepMeta
+    statusTag: StatusTag
+    statusMeta: string | object | null
     syncContext: SyncContext
     timeStarted: Date | null
     timeFinished: Date | null
     statusSummary: StepStatusSummary | null
 }
 
-export type StepMeta = string | object | null
 
 export interface StepRunner {
     step: Step<StepDefinition>

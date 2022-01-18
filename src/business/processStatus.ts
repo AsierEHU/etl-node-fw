@@ -9,6 +9,7 @@ export type ProcessStatus = {
     timeFinished: Date | null
     runOptions: object | null
     syncContext: SyncContext
+    processType: ProcessType
 }
 
 export enum StatusTag {
@@ -17,4 +18,10 @@ export enum StatusTag {
     success = "success",
     invalid = "invalid",
     failed = "failed",
+}
+
+export enum ProcessType {
+    adapter = "adapter",
+    step = "step",
+    flow = "flow"
 }

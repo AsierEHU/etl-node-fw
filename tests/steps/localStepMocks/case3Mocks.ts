@@ -1,4 +1,5 @@
-import { LocalStepDefinition, RegisterStats, StepStatus, StepStatusTag, AdapterRunOptions } from "../../../src"
+import { LocalStepDefinition, RegisterStats, StepStatus, AdapterRunOptions } from "../../../src"
+import { StatusTag } from "../../../src/business/processStatus"
 import { case1Definition } from "../../adapters/localAdapterExtractorMocks/case1Mocks"
 
 export const case3Definition: LocalStepDefinition = {
@@ -20,7 +21,7 @@ const mockInitialStatus: StepStatus = {
     id: "testStep",
     statusSummary: null,
     syncContext: { stepId: "testStep", flowId: "testFlow" },
-    statusTag: StepStatusTag.pending,
+    statusTag: StatusTag.pending,
     statusMeta: null,
     timeStarted: null,
     timeFinished: null
@@ -30,7 +31,7 @@ const mockFinalStatus: StepStatus = {
     definitionId: "case3testLocalStep",
     definitionType: "LocalStepDefinition",
     id: "testStep",
-    statusTag: StepStatusTag.success,
+    statusTag: StatusTag.success,
     statusMeta: null,
     syncContext: {
         flowId: "testFlow",
