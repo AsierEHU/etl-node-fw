@@ -1,6 +1,6 @@
 
-import { LocalAdapterSetTransformerDefinition, AdapterStatus, RegisterStats } from "../../../src";
-import { StatusTag } from "../../../src/business/processStatus";
+import { LocalAdapterSetTransformerDefinition, AdapterPresenter, RegisterStats } from "../../../src";
+import { ProcessStatus, ProcessType, StatusTag } from "../../../src/business/processStatus";
 import { Register, RegisterStatusTag } from "../../../src/business/register";
 import { case4Mocks } from "../localAdapterLoaderMocks/case4Mocks";
 
@@ -50,7 +50,24 @@ const mockFinalRegisters: Register[] = [
     ...mockInitialRegisters,
     ...mockNewRegisters
 ]
-const mockInitialStatus: AdapterStatus = {
+const mockInitialStatus: ProcessStatus = {
+    definitionId: "case7SetTransformer",
+    id: "testAdapter",
+    runOptions: null,
+    syncContext: { adapterId: "testAdapter", stepId: "testStep", flowId: "testFlow" },
+    statusTag: StatusTag.pending,
+    statusMeta: null,
+    timeStarted: null,
+    timeFinished: null,
+    processType: ProcessType.adapter
+}
+const mockFinalStatus: ProcessStatus = {
+    ...mockInitialStatus,
+    statusTag: StatusTag.success,
+    timeStarted: new Date(),
+    timeFinished: new Date(),
+}
+const mockInitialPresenter: AdapterPresenter = {
     definitionId: "case7SetTransformer",
     definitionType: "LocalAdapterSetTransformerDefinition",
     id: "testAdapter",
@@ -70,12 +87,12 @@ const mockFinalSummary: RegisterStats = {
     registers_skipped: 0,
     registers_success: 0,
 }
-const mockFinalStatus: AdapterStatus = {
-    ...mockInitialStatus,
+const mockFinalPresenter: AdapterPresenter = {
+    ...mockInitialPresenter,
     statusSummary: mockFinalSummary,
     statusTag: StatusTag.success,
     timeStarted: null,
     timeFinished: null
 }
 
-export const case7Mocks = { mockInitialStatus, mockFinalStatus, mockFinalRegisters, mockInitialRegisters, inputEntities, mockNewRegisters }
+export const case7Mocks = { mockInitialStatus, mockFinalStatus, mockInitialPresenter, mockFinalPresenter, mockFinalRegisters, mockInitialRegisters, inputEntities, mockNewRegisters }

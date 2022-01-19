@@ -34,8 +34,8 @@ let defaultRunOptions: FlowRunOptions = {}
 const flowTest = (
     definition: FlowDefinition,
     mocks: {
-        mockInitialStatus: FlowStatus,
-        mockFinalStatus: FlowStatus
+        mockInitialPresenter: FlowStatus,
+        mockFinalPresenter: FlowStatus
     }
 ) => {
 
@@ -105,10 +105,10 @@ const flowTest = (
             test("Presenter calls", async () => {
                 const flow1 = flowFactory.createFlowRunner(definition.id)
                 const finalFlowStatus = await flow1.run(defaultRunOptions);
-                statusEqual(finalFlowStatus, mocks.mockFinalStatus)
+                presentersEqual(finalFlowStatus, mocks.mockFinalPresenter)
                 expect(flowStatusCallback.mock.calls.length).toBe(3)
-                statusEqual(flowStatusCallback.mock.results[0].value, mocks.mockInitialStatus)
-                statusEqual(flowStatusCallback.mock.results[2].value, mocks.mockFinalStatus)
+                presentersEqual(flowStatusCallback.mock.results[0].value, mocks.mockInitialPresenter)
+                presentersEqual(flowStatusCallback.mock.results[2].value, mocks.mockFinalPresenter)
                 if (finalFlowStatus.statusTag == StatusTag.failed) {
                     expect(flowErrorCallback).toBeCalled()
                 }
@@ -135,7 +135,7 @@ const flowTest = (
 
 }
 
-const statusEqual = (flowStatus: FlowStatus, mockStatus: FlowStatus) => {
+const presentersEqual = (flowStatus: FlowStatus, mockStatus: FlowStatus) => {
     expect(flowStatus.id).not.toBeNull()
     expect(flowStatus.syncContext.flowId).not.toBeNull()
     expect(flowStatus.id).toEqual(flowStatus.syncContext.flowId)

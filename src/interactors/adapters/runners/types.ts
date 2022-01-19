@@ -6,10 +6,10 @@ import { Adapter, AdapterRunOptions } from "../processes/types"
 
 export interface AdapterRunner {
     adapter: Adapter<AdapterDefinition>
-    run(syncContext: SyncContext, runOptions?: AdapterRunOptions): Promise<AdapterStatus>
+    run(syncContext: SyncContext, runOptions?: AdapterRunOptions): Promise<AdapterPresenter>
 }
 
-export type AdapterStatus = {
+export type AdapterPresenter = {
     id: string
     definitionId: string
     definitionType: string

@@ -1,6 +1,6 @@
 import EventEmitter from "events";
-import { AdapterDefinition, AdapterFactory, AdapterRunOptions, AdapterStatus, VolatileRegisterDataAccess, AdapterSpecialIds, RegisterDataAccess, VolatileProcessStatusDataAccess } from "../../src";
-import { StatusTag } from "../../src/business/processStatus";
+import { AdapterDefinition, AdapterFactory, AdapterRunOptions, AdapterPresenter, VolatileRegisterDataAccess, AdapterSpecialIds, RegisterDataAccess, VolatileProcessStatusDataAccess } from "../../src";
+import { ProcessStatus, StatusTag } from "../../src/business/processStatus";
 import { Register, RegisterStatusTag } from "../../src/business/register";
 import { ProcessStatusDataAccess } from "../../src/interactors/common/processes";
 import { getWithInitFormat, initRegisters, isBySetSource, isOrigin, isByRowSource } from "../../src/interactors/registers/utils";
@@ -27,8 +27,10 @@ let defaultRunOptions: AdapterRunOptions = {
 const adapterTest = (
     definition: AdapterDefinition,
     mocks: {
-        mockInitialStatus: AdapterStatus,
-        mockFinalStatus: AdapterStatus,
+        mockInitialStatus: ProcessStatus,
+        mockFinalStatus: ProcessStatus,
+        mockInitialPresenter: AdapterPresenter,
+        mockFinalPresenter: AdapterPresenter,
         mockNewRegisters: Register[],
         mockFinalRegisters: Register[],
         mockInitialRegisters: Register[],
@@ -75,13 +77,23 @@ const adapterTest = (
 
         describe("Status test", () => {
 
+            test("Process status", async () => {
+                const adapter1 = adapterFactory.createAdapterRunner(definition.id)
+                await adapter1.run(syncContext, defaultRunOptions);
+                const finalAdapterStatus = (await processStatusDataAccess.getAll())[0]
+                statusEqual(finalAdapterStatus, mocks.mockFinalStatus)
+            })
+        })
+
+        describe("Presenter test", () => {
+
             test("Presenter calls", async () => {
                 const adapter1 = adapterFactory.createAdapterRunner(definition.id)
                 const finalAdapterStatus = await adapter1.run(syncContext, defaultRunOptions);
-                statusEqual(finalAdapterStatus, mocks.mockFinalStatus)
+                presentersEqual(finalAdapterStatus, mocks.mockFinalPresenter)
                 expect(adapterStatusCallback.mock.calls.length).toBe(3)
-                statusEqual(adapterStatusCallback.mock.results[0].value, mocks.mockInitialStatus)
-                statusEqual(adapterStatusCallback.mock.results[2].value, mocks.mockFinalStatus)
+                presentersEqual(adapterStatusCallback.mock.results[0].value, mocks.mockInitialPresenter)
+                presentersEqual(adapterStatusCallback.mock.results[2].value, mocks.mockFinalPresenter)
                 if (finalAdapterStatus.statusTag == StatusTag.failed) {
                     expect(adapterErrorCallback).toBeCalled()
                 }
@@ -180,7 +192,20 @@ export const testSources = async (register: Register, registerDataAccess: Regist
     else throw Error("Unexpected source")
 }
 
-const statusEqual = (adapterStatus: AdapterStatus, mockStatus: AdapterStatus) => {
+const statusEqual = (adapterStatus: ProcessStatus, mockStatus: ProcessStatus) => {
+    expect(adapterStatus.id).not.toBeNull()
+    expect(adapterStatus.syncContext.adapterId).not.toBeNull()
+    expect(adapterStatus.id).toEqual(adapterStatus.syncContext.adapterId)
+    adapterStatus.id = mockStatus.id
+    adapterStatus.syncContext.adapterId = mockStatus.syncContext.adapterId
+    adapterStatus.runOptions = mockStatus.runOptions
+    adapterStatus.timeFinished = mockStatus.timeFinished
+    adapterStatus.timeStarted = mockStatus.timeStarted
+    expect(adapterStatus).toEqual(mockStatus)
+}
+
+
+const presentersEqual = (adapterStatus: AdapterPresenter, mockStatus: AdapterPresenter) => {
     expect(adapterStatus.id).not.toBeNull()
     expect(adapterStatus.syncContext.adapterId).not.toBeNull()
     expect(adapterStatus.id).toEqual(adapterStatus.syncContext.adapterId)

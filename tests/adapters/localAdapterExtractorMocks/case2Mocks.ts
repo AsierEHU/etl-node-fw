@@ -1,5 +1,5 @@
-import { LocalAdapterExtractorDefinition, ValidationStatusTag, ToFixEntity, AdapterStatus } from "../../../src";
-import { StatusTag } from "../../../src/business/processStatus";
+import { LocalAdapterExtractorDefinition, ValidationStatusTag, ToFixEntity, AdapterPresenter } from "../../../src";
+import { ProcessStatus, ProcessType, StatusTag } from "../../../src/business/processStatus";
 import { Register } from "../../../src/business/register";
 
 type inputClass = {
@@ -27,7 +27,25 @@ const mockFinalRegisters: Register[] = [
     ...mockInitialRegisters,
     ...mockNewRegisters
 ]
-const mockInitialStatus: AdapterStatus = {
+const mockInitialStatus: ProcessStatus = {
+    definitionId: "case2Extractor",
+    id: "testAdapter",
+    runOptions: null,
+    syncContext: { adapterId: "testAdapter", stepId: "testStep", flowId: "testFlow" },
+    statusTag: StatusTag.pending,
+    statusMeta: null,
+    timeStarted: null,
+    timeFinished: null,
+    processType: ProcessType.adapter
+}
+const mockFinalStatus: ProcessStatus = {
+    ...mockInitialStatus,
+    statusTag: StatusTag.failed,
+    statusMeta: "Getting entities error",
+    timeStarted: new Date(),
+    timeFinished: new Date(),
+}
+const mockInitialPresenter: AdapterPresenter = {
     definitionId: "case2Extractor",
     definitionType: "LocalAdapterExtractorDefinition",
     id: "testAdapter",
@@ -47,8 +65,8 @@ const mockFinalSummary = {
     registers_invalid: 0,
     registers_skipped: 0,
 }
-const mockFinalStatus: AdapterStatus = {
-    ...mockInitialStatus,
+const mockFinalPresenter: AdapterPresenter = {
+    ...mockInitialPresenter,
     statusSummary: mockFinalSummary,
     statusTag: StatusTag.failed,
     statusMeta: "Getting entities error",
@@ -56,4 +74,4 @@ const mockFinalStatus: AdapterStatus = {
     timeFinished: null
 }
 
-export const case2Mocks = { mockInitialStatus, mockFinalStatus, mockFinalRegisters, inputEntities, mockInitialRegisters, mockNewRegisters }
+export const case2Mocks = { mockInitialStatus, mockFinalStatus, mockInitialPresenter, mockFinalPresenter, mockFinalRegisters, inputEntities, mockInitialRegisters, mockNewRegisters }

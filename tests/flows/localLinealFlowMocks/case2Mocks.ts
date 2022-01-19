@@ -7,7 +7,7 @@ export const case2Definition: LocalLinealFlowDefinition = {
     stepsDefinitionFlow: [{ id: "case1testLocalStep" }, { id: "case2testLocalStep", successMandatory: true }, { id: "case3testLocalStep" }]
 }
 
-const mockInitialStatus: FlowStatus = {
+const mockInitialPresenter: FlowStatus = {
     definitionId: "case2testLocalLinealFlow",
     definitionType: "LocalLinealFlowDefinition",
     id: "testFlow",
@@ -19,7 +19,7 @@ const mockInitialStatus: FlowStatus = {
     statusMeta: null,
 }
 
-const mockFinalStatus: FlowStatus = {
+const mockFinalPresenter: FlowStatus = {
     definitionId: "case2testLocalLinealFlow",
     definitionType: "LocalLinealFlowDefinition",
     id: "testFlow",
@@ -35,4 +35,4 @@ const mockFinalStatus: FlowStatus = {
     statusMeta: "Step case2testLocalStep is mandatory success, but finished with status invalid",
 }
 
-export const case2Mocks = { mockInitialStatus, mockFinalStatus }
+export const case2Mocks = { mockInitialPresenter, mockFinalPresenter }

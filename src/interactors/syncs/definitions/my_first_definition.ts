@@ -7,7 +7,7 @@
 
 // //type FlowPresenter = (flowStatus: FlowStatus)=>Promise<void> //output data
 // //type StepPresenter = (StepStatus: StepStatus)=>Promise<void> //output data
-// //type EntityPresenter<e extends object> = (AdapterStatus: AdapterStatus<e>) =>Promise<void> //output data
+// //type EntityPresenter<e extends object> = (AdapterPresenter: AdapterPresenter<e>) =>Promise<void> //output data
 
 // // class FlowEventEmitter extends events.EventEmitter{
 // //     emit()

@@ -28,8 +28,8 @@ let defaultRunOptions: {}
 const stepTest = (
     definition: StepDefinition,
     mocks: {
-        mockInitialStatus: StepStatus,
-        mockFinalStatus: StepStatus,
+        mockInitialPresenter: StepStatus,
+        mockFinalPresenter: StepStatus,
         mockAdapterRunOptions: AdapterRunOptions,
         adapterDefinitions: AdapterDefinition[]
     }
@@ -88,10 +88,10 @@ const stepTest = (
             test("Presenter calls", async () => {
                 const step1 = stepFactory.createStepRunner(definition.id)
                 const finalStepStatus = await step1.run(syncContext, defaultRunOptions);
-                statusEqual(finalStepStatus, mocks.mockFinalStatus)
+                presentersEqual(finalStepStatus, mocks.mockFinalPresenter)
                 expect(stepStatusCallback.mock.calls.length).toBe(3)
-                statusEqual(stepStatusCallback.mock.results[0].value, mocks.mockInitialStatus)
-                statusEqual(stepStatusCallback.mock.results[2].value, mocks.mockFinalStatus)
+                presentersEqual(stepStatusCallback.mock.results[0].value, mocks.mockInitialPresenter)
+                presentersEqual(stepStatusCallback.mock.results[2].value, mocks.mockFinalPresenter)
                 if (finalStepStatus.statusTag == StatusTag.failed) {
                     expect(stepErrorCallback).toBeCalled()
                 }
@@ -128,7 +128,7 @@ const stepTest = (
 
 }
 
-const statusEqual = (stepStatus: StepStatus, mockStatus: StepStatus) => {
+const presentersEqual = (stepStatus: StepStatus, mockStatus: StepStatus) => {
     expect(stepStatus.id).not.toBeNull()
     expect(stepStatus.syncContext.stepId).not.toBeNull()
     expect(stepStatus.id).toEqual(stepStatus.syncContext.stepId)

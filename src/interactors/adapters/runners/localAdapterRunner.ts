@@ -8,7 +8,7 @@ import { RegisterDataAccess } from '../../registers/types';
 import { AdvancedRegisterFetcher } from '../../registers/utilsDB';
 import { AdapterDefinition } from '../definitions/types';
 import { Adapter, AdapterRunOptions } from '../processes/types';
-import { AdapterRunner, AdapterStatus } from './types';
+import { AdapterRunner, AdapterPresenter } from './types';
 
 export class LocalAdapterRunner implements AdapterRunner {
 
@@ -74,9 +74,9 @@ export class LocalAdapterRunner implements AdapterRunner {
         return processStatus
     }
 
-    private buildPresenterData(processStatus: ProcessStatus): AdapterStatus {
+    private buildPresenterData(processStatus: ProcessStatus): AdapterPresenter {
         const adapterDefinition = this.adapter.adapterDefinition;
-        const adapterStatus: AdapterStatus = {
+        const adapterStatus: AdapterPresenter = {
             id: processStatus.id,
             runOptions: processStatus.runOptions,
             timeStarted: processStatus.timeStarted,

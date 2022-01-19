@@ -15,7 +15,7 @@ export const case3Definition: LocalStepDefinition = {
     }
 }
 
-const mockInitialStatus: StepStatus = {
+const mockInitialPresenter: StepStatus = {
     definitionId: "case3testLocalStep",
     definitionType: "LocalStepDefinition",
     id: "testStep",
@@ -27,7 +27,7 @@ const mockInitialStatus: StepStatus = {
     timeFinished: null
 }
 
-const mockFinalStatus: StepStatus = {
+const mockFinalPresenter: StepStatus = {
     definitionId: "case3testLocalStep",
     definitionType: "LocalStepDefinition",
     id: "testStep",
@@ -57,4 +57,4 @@ const mockAdapterRunOptions: AdapterRunOptions = {
 
 const adapterDefinitions = [case1Definition];
 
-export const case3Mocks = { mockInitialStatus, mockFinalStatus, mockAdapterRunOptions, adapterDefinitions }
+export const case3Mocks = { mockInitialPresenter, mockFinalPresenter, mockAdapterRunOptions, adapterDefinitions }
