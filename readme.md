@@ -56,7 +56,7 @@ Define the order execution and dependencies between steps.
 ---
 ## Examples / how it works [WIP]
 ``` ts
-import { AdapterFactory, AdapterPresenter, FlowFactory, FlowPresenter, LocalAdapterExtractorDefinition, LocalAdapterLoaderDefinition, LocalAdapterTransformerRowDefinition, LocalLinealFlowDefinition, LocalStepDefinition, RegisterStats, StepFactory, StepPresenter, ToFixEntity, ValidationResult, ValidationStatusTag, VolatileRegisterDataAccess } from 'etl-node-fw'
+import { AdapterFactory, AdapterPresenter, FlowFactory, FlowPresenter, LocalAdapterExtractorDefinition, LocalAdapterLoaderDefinition, LocalAdapterTransformerRowDefinition, LocalLinealFlowDefinition, LocalStepDefinition, RegisterStats, StepFactory, StepPresenter, ToFixEntity, ValidationResult, ValidationStatusTag, VolatileProcessStatusDataAccess, VolatileRegisterDataAccess } from 'etl-node-fw'
 import EventEmitter from 'events'
 
 /********************************
@@ -284,6 +284,7 @@ const testFlow1Definition: LocalLinealFlowDefinition = {
 
 const presenter = new EventEmitter()
 const registerDataAccess = new VolatileRegisterDataAccess()
+const processStatusDataAccess = new VolatileProcessStatusDataAccess()
 
 //Adapter dependencies
 presenter.on("adapterStatus", (adapterStatus: AdapterPresenter) => {
@@ -295,6 +296,7 @@ presenter.on("adapterError", (adapterError) => {
 const adapterDependencies = {
     adapterPresenter: presenter,
     registerDataAccess,
+    processStatusDataAccess
 }
 const adapterDefinitions = [extractorDefinition, transformerDefinition, loaderDefinition]
 const adapterFactory = new AdapterFactory(adapterDefinitions, adapterDependencies)
@@ -309,6 +311,7 @@ presenter.on("stepError", (stepError) => {
 const stepDependencies = {
     stepPresenter: presenter,
     registerDataAccess: registerDataAccess,
+    processStatusDataAccess,
     adapterFactory
 }
 const stepDefinitions = [extractorStepDefinition, transformerStepDefinition, loaderStepDefinition]
@@ -324,6 +327,7 @@ presenter.on("flowError", (flowError) => {
 const flowDependencies = {
     flowPresenter: presenter,
     registerDataAccess,
+    processStatusDataAccess,
     stepFactory
 }
 const flowDefinitions = [testFlow1Definition]
@@ -340,9 +344,15 @@ async function run() {
             apiCallConfig: "testConfig"
         }
     })
+
     const registers = await registerDataAccess.getAll()
     console.log(registers)
     //8 Registers (1 flowConfig, 3 extracted, 2 transformed, 2 loaded)
+
+    const processesStatus = await processStatusDataAccess.getAll()
+    console.log(processesStatus)
+    //7 entries: 'testFlow1,'extractStepDefinition','extractEntityDefinition',
+    // 'transformStepDefinition',''transformEntityDefinition','loadStepDefinition','loadEntityDefinition'
 }
 run()
 ```
@@ -429,3 +439,4 @@ Adapter, Step or Flow process status event.
 - Document store
 - SQL store
 - Stage tables adapters
+- Continue process from last state
