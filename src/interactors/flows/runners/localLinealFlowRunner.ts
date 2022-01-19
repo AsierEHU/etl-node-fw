@@ -5,7 +5,7 @@ import { ProcessStatus, StatusTag, ProcessType } from '../../../business/process
 import { ProcessStatusDataAccess } from '../../common/processes';
 import { FlowDefinition } from '../definitions/types';
 import { Flow, FlowRunOptions } from '../processes/types';
-import { FlowRunner, FlowStatus, FlowStatusSummary, } from './types';
+import { FlowRunner, FlowPresenter, FlowStatusSummary, } from './types';
 
 export class LocalLinealFlowRunner implements FlowRunner {
 
@@ -68,9 +68,9 @@ export class LocalLinealFlowRunner implements FlowRunner {
         return processStatus
     }
 
-    private buildPresenterData(processStatus: ProcessStatus): FlowStatus {
+    private buildPresenterData(processStatus: ProcessStatus): FlowPresenter {
         const flowDefinition = this.flow.flowDefinition;
-        const stepStatus: FlowStatus = {
+        const stepStatus: FlowPresenter = {
             id: processStatus.id,
             timeStarted: processStatus.timeStarted,
             timeFinished: processStatus.timeFinished,

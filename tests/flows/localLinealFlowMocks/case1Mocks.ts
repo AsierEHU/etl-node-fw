@@ -1,5 +1,5 @@
-import { LocalLinealFlowDefinition, FlowStatus, FlowStatusTag } from "../../../src"
-import { StatusTag } from "../../../src/business/processStatus"
+import { LocalLinealFlowDefinition, FlowPresenter, FlowStatusTag } from "../../../src"
+import { ProcessStatus, ProcessType, StatusTag } from "../../../src/business/processStatus"
 
 export const case1Definition: LocalLinealFlowDefinition = {
     id: "case1testLocalLinealFlow",
@@ -7,7 +7,26 @@ export const case1Definition: LocalLinealFlowDefinition = {
     stepsDefinitionFlow: [{ id: "case1testLocalStep" }, { id: "case3testLocalStep" }]
 }
 
-const mockInitialPresenter: FlowStatus = {
+const mockInitialStatus: ProcessStatus = {
+    definitionId: "case1testLocalLinealFlow",
+    id: "testFlow",
+    runOptions: null,
+    syncContext: { flowId: "testFlow" },
+    statusTag: StatusTag.pending,
+    statusMeta: null,
+    timeStarted: null,
+    timeFinished: null,
+    processType: ProcessType.flow
+}
+
+const mockFinalStatus: ProcessStatus = {
+    ...mockInitialStatus,
+    statusTag: StatusTag.success,
+    timeStarted: new Date(),
+    timeFinished: new Date(),
+}
+
+const mockInitialPresenter: FlowPresenter = {
     definitionId: "case1testLocalLinealFlow",
     definitionType: "LocalLinealFlowDefinition",
     id: "testFlow",
@@ -19,7 +38,7 @@ const mockInitialPresenter: FlowStatus = {
     timeFinished: null
 }
 
-const mockFinalPresenter: FlowStatus = {
+const mockFinalPresenter: FlowPresenter = {
     definitionId: "case1testLocalLinealFlow",
     definitionType: "LocalLinealFlowDefinition",
     id: "testFlow",
@@ -35,4 +54,4 @@ const mockFinalPresenter: FlowStatus = {
     statusMeta: null,
 }
 
-export const case1Mocks = { mockInitialPresenter, mockFinalPresenter }
+export const case1Mocks = { mockInitialStatus, mockFinalStatus, mockInitialPresenter, mockFinalPresenter }

@@ -5,7 +5,7 @@
 // import { EntityFetcher } from "../types/dataAccess"
 // import { FlowDefinition, FlowDefinitionOptions, StepDefinition, Sync } from "../types/entities"
 
-// //type FlowPresenter = (flowStatus: FlowStatus)=>Promise<void> //output data
+// //type FlowPresenter = (flowStatus: FlowPresenter)=>Promise<void> //output data
 // //type StepPresenter = (StepPresenter: StepPresenter)=>Promise<void> //output data
 // //type EntityPresenter<e extends object> = (AdapterPresenter: AdapterPresenter<e>) =>Promise<void> //output data
 

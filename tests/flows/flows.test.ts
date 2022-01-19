@@ -4,10 +4,10 @@ import { flowMocks } from "./mocks";
 import { case1Definition } from "../steps/localStepMocks/case1Mocks";
 import { case2Definition } from "../steps/localStepMocks/case2Mocks";
 import { case3Definition } from "../steps/localStepMocks/case3Mocks";
-import { FlowStatus } from "../../src/interactors/flows/runners/types";
+import { FlowPresenter } from "../../src/interactors/flows/runners/types";
 import { testSources } from "../adapters/adapter.test";
 import { AdapterFactory, RegisterDataAccess, StepFactory, FlowDefinition, FlowFactory, FlowRunOptions, VolatileRegisterDataAccess, reservedEntityTypes, VolatileProcessStatusDataAccess } from "../../src";
-import { StatusTag } from "../../src/business/processStatus";
+import { ProcessStatus, ProcessType, StatusTag } from "../../src/business/processStatus";
 import { ProcessStatusDataAccess } from "../../src/interactors/common/processes";
 
 const adapterDefinitions = [adapterCase1Definition];
@@ -34,8 +34,10 @@ let defaultRunOptions: FlowRunOptions = {}
 const flowTest = (
     definition: FlowDefinition,
     mocks: {
-        mockInitialPresenter: FlowStatus,
-        mockFinalPresenter: FlowStatus
+        mockInitialStatus: ProcessStatus,
+        mockFinalStatus: ProcessStatus,
+        mockInitialPresenter: FlowPresenter,
+        mockFinalPresenter: FlowPresenter
     }
 ) => {
 
@@ -102,6 +104,17 @@ const flowTest = (
 
         describe("Status test", () => {
 
+            test("Process status", async () => {
+                const flow1 = flowFactory.createFlowRunner(definition.id)
+                await flow1.run(defaultRunOptions);
+                const finalFlowStatus = (await processStatusDataAccess.getAll({ type: ProcessType.flow }))[0]
+                statusEqual(finalFlowStatus, mocks.mockFinalStatus)
+            })
+        })
+
+
+        describe("Presenter test", () => {
+
             test("Presenter calls", async () => {
                 const flow1 = flowFactory.createFlowRunner(definition.id)
                 const finalFlowStatus = await flow1.run(defaultRunOptions);
@@ -135,7 +148,18 @@ const flowTest = (
 
 }
 
-const presentersEqual = (flowStatus: FlowStatus, mockStatus: FlowStatus) => {
+const statusEqual = (flowStatus: ProcessStatus, mockStatus: ProcessStatus) => {
+    expect(flowStatus.id).not.toBeNull()
+    expect(flowStatus.syncContext.flowId).not.toBeNull()
+    expect(flowStatus.id).toEqual(flowStatus.syncContext.flowId)
+    flowStatus.id = mockStatus.id
+    flowStatus.syncContext.flowId = mockStatus.id
+    flowStatus.timeFinished = mockStatus.timeFinished
+    flowStatus.timeStarted = mockStatus.timeStarted
+    expect(flowStatus).toEqual(mockStatus)
+}
+
+const presentersEqual = (flowStatus: FlowPresenter, mockStatus: FlowPresenter) => {
     expect(flowStatus.id).not.toBeNull()
     expect(flowStatus.syncContext.flowId).not.toBeNull()
     expect(flowStatus.id).toEqual(flowStatus.syncContext.flowId)

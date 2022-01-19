@@ -28,7 +28,7 @@ export class LocalStepRunner implements StepRunner {
         runOptions = cloneDeep(runOptions)
         syncContext = cloneDeep(syncContext)
 
-        const processStatus = this.buildProcessStatus(syncContext, runOptions)
+        const processStatus = this.buildProcessStatus(syncContext)
         await this.processStatusDataAccess.save(processStatus)
         let presenterData = this.buildPresenterData(processStatus)
         this.stepPresenter.emit("stepStatus", presenterData)
@@ -70,7 +70,7 @@ export class LocalStepRunner implements StepRunner {
         return adaptersStatus.length - 1
     }
 
-    private buildProcessStatus(syncContext: SyncContext, runOptions: any): ProcessStatus {
+    private buildProcessStatus(syncContext: SyncContext): ProcessStatus {
         const id = uuidv4();
         const stepDefinition = this.step.stepDefinition;
         const processStatus: ProcessStatus = {
@@ -78,7 +78,7 @@ export class LocalStepRunner implements StepRunner {
             definitionId: stepDefinition.id,
             statusTag: StatusTag.pending,
             statusMeta: null,
-            runOptions: runOptions,
+            runOptions: null,
             syncContext: { ...syncContext, stepId: id },
             timeStarted: null,
             timeFinished: null,

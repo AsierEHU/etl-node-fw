@@ -11,7 +11,7 @@ export enum FlowStatusTag {
     failed = "failed",
 }
 
-export type FlowStatus = {
+export type FlowPresenter = {
     id: string
     definitionId: string
     definitionType: string
@@ -31,5 +31,5 @@ export type FlowStatusSummary = {
 
 export interface FlowRunner {
     flow: Flow<FlowDefinition>
-    run(runOptions?: FlowRunOptions): Promise<FlowStatus>
+    run(runOptions?: FlowRunOptions): Promise<FlowPresenter>
 }

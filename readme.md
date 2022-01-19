@@ -56,7 +56,7 @@ Define the order execution and dependencies between steps.
 ---
 ## Examples / how it works [WIP]
 ``` ts
-import { AdapterFactory, AdapterPresenter, FlowFactory, FlowStatus, LocalAdapterExtractorDefinition, LocalAdapterLoaderDefinition, LocalAdapterTransformerRowDefinition, LocalLinealFlowDefinition, LocalStepDefinition, RegisterStats, StepFactory, StepPresenter, ToFixEntity, ValidationResult, ValidationStatusTag, VolatileRegisterDataAccess } from 'etl-node-fw'
+import { AdapterFactory, AdapterPresenter, FlowFactory, FlowPresenter, LocalAdapterExtractorDefinition, LocalAdapterLoaderDefinition, LocalAdapterTransformerRowDefinition, LocalLinealFlowDefinition, LocalStepDefinition, RegisterStats, StepFactory, StepPresenter, ToFixEntity, ValidationResult, ValidationStatusTag, VolatileRegisterDataAccess } from 'etl-node-fw'
 import EventEmitter from 'events'
 
 /********************************
@@ -315,7 +315,7 @@ const stepDefinitions = [extractorStepDefinition, transformerStepDefinition, loa
 const stepFactory = new StepFactory(stepDefinitions, stepDependencies)
 
 //Flow dependencies
-presenter.on("flowStatus", (flowStatus: FlowStatus) => {
+presenter.on("flowStatus", (flowStatus: FlowPresenter) => {
     console.log(flowStatus)
 })
 presenter.on("flowError", (flowError) => {

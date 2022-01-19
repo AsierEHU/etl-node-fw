@@ -17,7 +17,7 @@ export const case2Definition: LocalStepDefinition = {
 const mockInitialStatus: ProcessStatus = {
     definitionId: "case2testLocalStep",
     id: "testStep",
-    runOptions: undefined,
+    runOptions: null,
     syncContext: { stepId: "testStep", flowId: "testFlow" },
     statusTag: StatusTag.pending,
     statusMeta: null,
