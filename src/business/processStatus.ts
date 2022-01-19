@@ -7,7 +7,7 @@ export type ProcessStatus = {
     statusMeta: string | object | null
     timeStarted: Date | null
     timeFinished: Date | null
-    runOptions: object | null
+    runOptions: any
     syncContext: SyncContext
     processType: ProcessType
 }

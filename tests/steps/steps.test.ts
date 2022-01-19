@@ -1,6 +1,6 @@
 import { EventEmitter } from "stream";
-import { AdapterFactory, RegisterDataAccess, StepDefinition, StepFactory, StepStatus, AdapterRunOptions, VolatileRegisterDataAccess, StepStatusTag, StepRunOptions, AdapterDefinition, VolatileProcessStatusDataAccess } from "../../src";
-import { StatusTag } from "../../src/business/processStatus";
+import { AdapterFactory, RegisterDataAccess, StepDefinition, StepFactory, StepPresenter, AdapterRunOptions, VolatileRegisterDataAccess, StepStatusTag, StepRunOptions, AdapterDefinition, VolatileProcessStatusDataAccess } from "../../src";
+import { ProcessStatus, ProcessType, StatusTag } from "../../src/business/processStatus";
 import { SyncContext, RegisterStatusTag } from "../../src/business/register";
 import { ProcessStatusDataAccess } from "../../src/interactors/common/processes";
 import { testSources } from "../adapters/adapter.test";
@@ -28,8 +28,10 @@ let defaultRunOptions: {}
 const stepTest = (
     definition: StepDefinition,
     mocks: {
-        mockInitialPresenter: StepStatus,
-        mockFinalPresenter: StepStatus,
+        mockInitialStatus: ProcessStatus,
+        mockFinalStatus: ProcessStatus,
+        mockInitialPresenter: StepPresenter,
+        mockFinalPresenter: StepPresenter,
         mockAdapterRunOptions: AdapterRunOptions,
         adapterDefinitions: AdapterDefinition[]
     }
@@ -82,8 +84,17 @@ const stepTest = (
             }
         })
 
-
         describe("Status test", () => {
+
+            test("Process status", async () => {
+                const step1 = stepFactory.createStepRunner(definition.id)
+                await step1.run(syncContext, defaultRunOptions);
+                const finalStepStatus = (await processStatusDataAccess.getAll({ type: ProcessType.step }))[0]
+                statusEqual(finalStepStatus, mocks.mockFinalStatus)
+            })
+        })
+
+        describe("Presenter test", () => {
 
             test("Presenter calls", async () => {
                 const step1 = stepFactory.createStepRunner(definition.id)
@@ -128,7 +139,18 @@ const stepTest = (
 
 }
 
-const presentersEqual = (stepStatus: StepStatus, mockStatus: StepStatus) => {
+const statusEqual = (stepStatus: ProcessStatus, mockStatus: ProcessStatus) => {
+    expect(stepStatus.id).not.toBeNull()
+    expect(stepStatus.syncContext.stepId).not.toBeNull()
+    expect(stepStatus.id).toEqual(stepStatus.syncContext.stepId)
+    stepStatus.id = mockStatus.id
+    stepStatus.syncContext.stepId = mockStatus.id
+    stepStatus.timeFinished = mockStatus.timeFinished
+    stepStatus.timeStarted = mockStatus.timeStarted
+    expect(stepStatus).toEqual(mockStatus)
+}
+
+const presentersEqual = (stepStatus: StepPresenter, mockStatus: StepPresenter) => {
     expect(stepStatus.id).not.toBeNull()
     expect(stepStatus.syncContext.stepId).not.toBeNull()
     expect(stepStatus.id).toEqual(stepStatus.syncContext.stepId)

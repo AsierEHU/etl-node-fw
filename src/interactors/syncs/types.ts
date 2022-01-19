@@ -2,7 +2,7 @@
 
 // //------------- Entities ---------------
 
-// import { FlowData, StepStatus } from "./data"
+// import { FlowData, StepPresenter } from "./data"
 
 
 // //EVENTOS para calcular?????????

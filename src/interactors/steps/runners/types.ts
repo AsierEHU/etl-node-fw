@@ -13,7 +13,7 @@ export enum StepStatusTag {
     failed = "failed",
 }
 
-export type StepStatus = {
+export type StepPresenter = {
     id: string
     definitionId: string
     definitionType: string
@@ -28,7 +28,7 @@ export type StepStatus = {
 
 export interface StepRunner {
     step: Step<StepDefinition>
-    run(syncContext: SyncContext, runOptions?: StepRunOptions): Promise<StepStatus>
+    run(syncContext: SyncContext, runOptions?: StepRunOptions): Promise<StepPresenter>
 }
 
 export type StepStatusSummary = {

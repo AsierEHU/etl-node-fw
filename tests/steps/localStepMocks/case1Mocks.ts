@@ -1,5 +1,5 @@
-import { LocalStepDefinition, RegisterStats, StepStatus, AdapterRunOptions } from "../../../src"
-import { StatusTag } from "../../../src/business/processStatus"
+import { LocalStepDefinition, RegisterStats, StepPresenter, AdapterRunOptions } from "../../../src"
+import { ProcessStatus, ProcessType, StatusTag } from "../../../src/business/processStatus"
 import { case1Definition as case1AdapterDefinition } from "../../adapters/localAdapterExtractorMocks/case1Mocks"
 
 export const case1Definition: LocalStepDefinition = {
@@ -13,7 +13,26 @@ export const case1Definition: LocalStepDefinition = {
     adapterRunOptions: null
 }
 
-const mockInitialPresenter: StepStatus = {
+const mockInitialStatus: ProcessStatus = {
+    definitionId: "case1testLocalStep",
+    id: "testStep",
+    runOptions: undefined,
+    syncContext: { stepId: "testStep", flowId: "testFlow" },
+    statusTag: StatusTag.pending,
+    statusMeta: null,
+    timeStarted: null,
+    timeFinished: null,
+    processType: ProcessType.step
+}
+
+const mockFinalStatus: ProcessStatus = {
+    ...mockInitialStatus,
+    statusTag: StatusTag.success,
+    timeStarted: new Date(),
+    timeFinished: new Date(),
+}
+
+const mockInitialPresenter: StepPresenter = {
     definitionId: "case1testLocalStep",
     definitionType: "LocalStepDefinition",
     id: "testStep",
@@ -25,7 +44,7 @@ const mockInitialPresenter: StepStatus = {
     timeFinished: null
 }
 
-const mockFinalPresenter: StepStatus = {
+const mockFinalPresenter: StepPresenter = {
     definitionId: "case1testLocalStep",
     definitionType: "LocalStepDefinition",
     id: "testStep",
@@ -53,4 +72,4 @@ const mockAdapterRunOptions: AdapterRunOptions = {}
 
 const adapterDefinitions = [case1AdapterDefinition];
 
-export const case1Mocks = { mockInitialPresenter, mockFinalPresenter, mockAdapterRunOptions, adapterDefinitions }
+export const case1Mocks = { mockInitialStatus, mockFinalStatus, mockInitialPresenter, mockFinalPresenter, mockAdapterRunOptions, adapterDefinitions }

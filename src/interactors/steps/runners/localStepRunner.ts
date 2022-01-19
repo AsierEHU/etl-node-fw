@@ -8,7 +8,7 @@ import { RegisterDataAccess } from '../../registers/types';
 import { AdvancedRegisterFetcher } from '../../registers/utilsDB';
 import { StepDefinition } from '../definitions/types';
 import { Step, StepRunOptions } from '../processes/types';
-import { StepRunner, StepStatus, StepStatusSummary } from './types';
+import { StepRunner, StepPresenter, StepStatusSummary } from './types';
 
 export class LocalStepRunner implements StepRunner {
 
@@ -87,9 +87,9 @@ export class LocalStepRunner implements StepRunner {
         return processStatus
     }
 
-    private buildPresenterData(processStatus: ProcessStatus): StepStatus {
+    private buildPresenterData(processStatus: ProcessStatus): StepPresenter {
         const stepDefinition = this.step.stepDefinition;
-        const stepStatus: StepStatus = {
+        const stepStatus: StepPresenter = {
             id: processStatus.id,
             timeStarted: processStatus.timeStarted,
             timeFinished: processStatus.timeFinished,
