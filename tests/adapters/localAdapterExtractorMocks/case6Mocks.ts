@@ -1,4 +1,4 @@
-import { LocalAdapterExtractorDefinition, ValidationStatusTag, ToFixEntity, AdapterPresenter, RegisterStats, reservedEntityTypes } from "../../../src";
+import { LocalAdapterExtractorDefinition, ValidationStatusTag, ToFixEntity, AdapterPresenter, RegisterStats, ReservedEntityTypes } from "../../../src";
 import { ProcessStatus, ProcessType, StatusTag } from "../../../src/business/processStatus";
 import { Register, RegisterStatusTag } from "../../../src/business/register";
 
@@ -23,7 +23,7 @@ export const case6Definition: LocalAdapterExtractorDefinition<inputClass> = {
 }
 const mockInitialRegisters: Register[] = [{
     id: "fb7bc93a-17c1-467c-951d-58bf119c1955",
-    entityType: reservedEntityTypes.flowConfig,
+    entityType: ReservedEntityTypes.flowConfig,
     sourceAbsoluteId: "fb7bc93a-17c1-467c-951d-58bf119c1955",
     sourceRelativeId: "fb7bc93a-17c1-467c-951d-58bf119c1955",
     sourceEntityId: null,

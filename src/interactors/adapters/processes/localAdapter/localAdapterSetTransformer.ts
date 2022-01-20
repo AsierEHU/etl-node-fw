@@ -1,4 +1,4 @@
-import { generateSetSourceId, getWithInitFormat } from "../../../registers/utils";
+import { buildSetRegister, getWithInitFormat } from "../../../registers/utils";
 import { LocalAdapter } from "./localAdapter";
 import { v4 as uuidv4 } from 'uuid';
 import { LocalAdapterSetTransformerDefinition } from "../../definitions/localAdapter/types";
@@ -26,11 +26,15 @@ export class LocalAdapterSetTransformer<ad extends LocalAdapterSetTransformerDef
     async processRegisters(inputRegisters: Register[], syncContext: SyncContext) {
         if (!inputRegisters.length)
             return
-        const outputRegisters = await this.transformSets(inputRegisters, syncContext);
+        const inputRegistersIds = inputRegisters.map(reg => reg.id)
+        const setRegister = buildSetRegister(inputRegistersIds, syncContext, this.adapterDefinition.id)
+        const outputRegisters = await this.transformSets(setRegister.id, inputRegisters, syncContext);
+        await this.registerDataAccess.save(setRegister)
         await this.registerDataAccess.saveAll(outputRegisters)
     }
 
-    private async transformSets(inputRegisters: Register[], syncContext: SyncContext): Promise<Register[]> {
+
+    private async transformSets(setRegisterId: string, inputRegisters: Register[], syncContext: SyncContext): Promise<Register[]> {
         const sets: { [type: string]: any[] } = {}
         for (const inputType of this.adapterDefinition.inputTypes) {
             sets[inputType] = []
@@ -39,7 +43,7 @@ export class LocalAdapterSetTransformer<ad extends LocalAdapterSetTransformerDef
             const inputType = inputRegister.entityType
             sets[inputType].push(inputRegister.entity)
         }
-        const sourceId = generateSetSourceId(this.adapterDefinition.inputTypes)
+        const sourceId = setRegisterId
         try {
             const outputEntities = await this.adapterDefinition.setsProcess(sets)
             const outputEntitiesInitialValues = getWithInitFormat(

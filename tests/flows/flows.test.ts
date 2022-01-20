@@ -6,7 +6,7 @@ import { case2Definition } from "../steps/localStepMocks/case2Mocks";
 import { case3Definition } from "../steps/localStepMocks/case3Mocks";
 import { FlowPresenter } from "../../src/interactors/flows/runners/types";
 import { testSources } from "../adapters/adapter.test";
-import { AdapterFactory, RegisterDataAccess, StepFactory, FlowDefinition, FlowFactory, FlowRunOptions, VolatileRegisterDataAccess, reservedEntityTypes, VolatileProcessStatusDataAccess } from "../../src";
+import { AdapterFactory, RegisterDataAccess, StepFactory, FlowDefinition, FlowFactory, FlowRunOptions, VolatileRegisterDataAccess, ReservedEntityTypes, VolatileProcessStatusDataAccess } from "../../src";
 import { ProcessStatus, ProcessType, StatusTag } from "../../src/business/processStatus";
 import { ProcessStatusDataAccess } from "../../src/interactors/common/processes";
 
@@ -139,7 +139,7 @@ const flowTest = (
                 const flow1 = flowFactory.createFlowRunner(definition.id)
                 const runOptions: FlowRunOptions = { ...defaultRunOptions, flowConfig: entityConfigPushed }
                 await flow1.run(runOptions);
-                const registerConfigPushed = await registerDataAccess.getAll({ entityType: reservedEntityTypes.flowConfig })
+                const registerConfigPushed = await registerDataAccess.getAll({ entityType: ReservedEntityTypes.flowConfig })
                 expect(registerConfigPushed[0].entity).toEqual(entityConfigPushed)
             })
 

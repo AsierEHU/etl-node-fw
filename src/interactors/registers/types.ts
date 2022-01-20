@@ -45,8 +45,9 @@ export type RegisterStats = {
 
 export type InputEntity<e extends object> = MetaEntity | null | e
 
-export enum reservedEntityTypes {
-    flowConfig = "$flowConfig"
+export enum ReservedEntityTypes {
+    flowConfig = "$flowConfig",
+    setRegister = "$setRegister"
 }
 
 export enum AdapterSpecialIds {

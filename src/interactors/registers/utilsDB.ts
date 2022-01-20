@@ -1,7 +1,6 @@
-import { uniqBy, uniq } from "lodash"
+import { uniqBy } from "lodash"
 import { SyncContext, Register, RegisterStatusTag } from "../../business/register"
-import { EntityFetcher, RegisterDataAccess, RegisterDataFilter, MetaEntity, RegisterStats, reservedEntityTypes } from "./types"
-import { getSetSourceIdTypes, isRowSourceType, isSetSourceType } from "./utils"
+import { EntityFetcher, RegisterDataAccess, RegisterDataFilter, MetaEntity, RegisterStats, ReservedEntityTypes } from "./types"
 
 export class ContextEntityFetcher implements EntityFetcher {
 
@@ -31,7 +30,7 @@ export class ContextEntityFetcher implements EntityFetcher {
 
     async getFlowConfig() {
         const configPushedRegisters = await this.registerDataAccess.getAll({
-            entityType: reservedEntityTypes.flowConfig,
+            entityType: ReservedEntityTypes.flowConfig,
             flowId: this.syncContext.flowId
         })
         return configPushedRegisters[0]?.entity
@@ -60,44 +59,29 @@ export class AdvancedRegisterFetcher {
 
     private async getSourceRegisters(sourceType: 'sourceRelativeId' | 'sourceAbsoluteId', baseRegisters: Register[]) {
         const uniqueBaseRegisters = uniqBy(baseRegisters, sourceType)
-        const targetRegistersIds = uniqueBaseRegisters.map(baseRegister => baseRegister[sourceType]) as string[]
+        const sourceRegistersIds = uniqueBaseRegisters.map(baseRegister => baseRegister[sourceType]) as string[]
 
-        const setRegisterIds = [];
-        const rowRegisterIds = [];
+        let sourceRegisters = await this.registerDataAccess.getAll(undefined, sourceRegistersIds)
+        let sourceRegistersFromSet: Register[] = []
 
-        for (const targetRegistersId of targetRegistersIds) {
-            if (isSetSourceType(targetRegistersId)) {
-                setRegisterIds.push(targetRegistersId)
-            } else if (isRowSourceType(targetRegistersId)) {
-                rowRegisterIds.push(targetRegistersId)
-            } else {
-                throw Error("Unknown source type")
+        for (const sourceRegister of sourceRegisters) {
+            if (sourceRegister.entityType === ReservedEntityTypes.setRegister) {
+                const registersFromSetIds = sourceRegister.entity as string[]
+                const registersFromSet = await this.registerDataAccess.getAll(undefined, registersFromSetIds)
+                sourceRegistersFromSet = [...sourceRegistersFromSet, ...registersFromSet]
             }
         }
 
-        let setRegisterTypes: string[] = []
-        for (const setRegisterId of setRegisterIds) {
-            setRegisterTypes.push(...getSetSourceIdTypes(setRegisterId))
-        }
-        setRegisterTypes = uniq(setRegisterTypes)
+        sourceRegisters = sourceRegisters.filter(reg => reg.entityType !== ReservedEntityTypes.setRegister)
+        sourceRegisters = [...sourceRegisters, ...sourceRegistersFromSet]
+        sourceRegisters = uniqBy(sourceRegisters, "id")
 
-        let targetRegisters = await this.registerDataAccess.getAll(undefined, rowRegisterIds)
-        for (const entityType of setRegisterTypes) {
-            const setRegisters = await this.registerDataAccess.getAll(
-                {
-                    entityType: entityType,
-                    registerStatus: RegisterStatusTag.success //TODO: coupled with setTransformed, this should be a param
-                }
-            )
-            targetRegisters.push(...setRegisters)
-        }
-        targetRegisters = uniqBy(targetRegisters, "id")
-
-        return targetRegisters
+        return sourceRegisters
     }
 
-    async getRegistersAdapterSummary(adapterId: string): Promise<RegisterStats> {
-        const outputRegisters = await this.registerDataAccess.getAll({ adapterId })
+    async getRegistersAdapterSummary(adapterId: string): Promise<RegisterStats> { //TODO: Is entitiesSummary
+        let outputRegisters = await this.registerDataAccess.getAll({ adapterId })
+        outputRegisters = outputRegisters.filter(reg => reg.entityType !== ReservedEntityTypes.setRegister)
         const statusSummary = {
             registers_total: outputRegisters.length,
             registers_success: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.success).length,
@@ -108,8 +92,9 @@ export class AdvancedRegisterFetcher {
         return statusSummary;
     }
 
-    async getRegistersStepSummary(stepId: string, removeFailedRetries: boolean = false): Promise<RegisterStats> {
+    async getRegistersStepSummary(stepId: string, removeFailedRetries: boolean = false): Promise<RegisterStats> { //TODO: Is entitiesSummary
         let outputRegisters = await this.registerDataAccess.getAll({ stepId })
+        outputRegisters = outputRegisters.filter(reg => reg.entityType !== ReservedEntityTypes.setRegister)
 
         if (removeFailedRetries) {
             const failedRegisters = await this.registerDataAccess.getAll({ stepId, registerStatus: RegisterStatusTag.failed })

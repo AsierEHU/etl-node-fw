@@ -2,7 +2,7 @@
 import { cloneDeep } from "lodash";
 import { StatusTag } from "../../../business/processStatus";
 import { SyncContext } from "../../../business/register";
-import { RegisterDataAccess, reservedEntityTypes } from "../../registers/types";
+import { RegisterDataAccess, ReservedEntityTypes } from "../../registers/types";
 import { getWithInitFormat, initRegisters } from "../../registers/utils";
 import { StepFactory } from "../../steps/factory"
 import { LocalLinealFlowDefinition } from "../definitions/types";
@@ -28,7 +28,7 @@ export class LocalLinealFlow<fd extends LocalLinealFlowDefinition> implements Fl
             const pushConfig = flowRunOptions?.flowConfig;
             const inputEntitiesWithMeta = getWithInitFormat(
                 [pushConfig],
-                reservedEntityTypes.flowConfig,
+                ReservedEntityTypes.flowConfig,
                 this.flowDefinition.id)
             const inputRegisters = initRegisters(inputEntitiesWithMeta, syncContext)
             await this.registerDataAccess.saveAll(inputRegisters)

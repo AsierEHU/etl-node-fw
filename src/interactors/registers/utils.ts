@@ -1,30 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Register, SyncContext, RegisterStatusTag } from '../../business/register';
-import { RegisterInitValues, MetaEntity, reservedEntityTypes, registerSourceType, RegisterDataFilter, AdapterSpecialIds } from "./types"
+import { RegisterInitValues, MetaEntity, ReservedEntityTypes, registerSourceType, AdapterSpecialIds } from "./types"
 
 export const isOrigin = (register: Register): boolean => {
-    if (isByRowSource(register))
-        return register.id == register.sourceAbsoluteId && register.id == register.sourceRelativeId
-    else if (isBySetSource(register))
-        return register.sourceAbsoluteId == register.sourceRelativeId
-    else
-        throw Error("Unknown register source type")
-}
-
-export function isByRowSource(register: Register): boolean {
-    return isRowSourceType(register.sourceRelativeId)
-}
-
-export function isRowSourceType(sourceId: string | null): boolean {
-    return sourceId != null && !sourceId.startsWith(registerSourceType.set)
-}
-
-export function isBySetSource(register: Register): boolean {
-    return isSetSourceType(register.sourceRelativeId)
-}
-
-export function isSetSourceType(sourceId: string | null): boolean {
-    return sourceId != null && sourceId.startsWith(registerSourceType.set)
+    if (register.entityType === ReservedEntityTypes.setRegister) {
+        return false
+    } else {
+        return register.id === register.sourceAbsoluteId && register.id === register.sourceRelativeId
+    }
 }
 
 function isEntityWithMeta(entity?: any): entity is MetaEntity {
@@ -62,7 +45,7 @@ export const initRegisters = (
 ): Register[] => {
     return inputEntities.map((entity) => {
         const inputEntityId = uuidv4();
-        const initialStatus = syncContext.adapterId == AdapterSpecialIds.pushEntity || entity.entityType == reservedEntityTypes.flowConfig ?
+        const initialStatus = syncContext.adapterId == AdapterSpecialIds.pushEntity || entity.entityType == ReservedEntityTypes.flowConfig ?
             RegisterStatusTag.success : RegisterStatusTag.pending
         return {
             id: inputEntityId,
@@ -98,17 +81,20 @@ export const buildChildRegisters = (registers: Register[], syncContext: SyncCont
     return initRegisters(entitiesInitialValues, syncContext)
 }
 
-export const generateSetSourceId = (setTypes: string[]): string => {
-    const sourceId = setTypes.reduce((id, setType) => {
-        return id + "-" + setType
-    }, registerSourceType.set)
-
-    return sourceId
-}
-
-export const getSetSourceIdTypes = (setSourceId: string): string[] => {
-    const [set, ...types] = setSourceId.split("-")
-    if (set != registerSourceType.set)
-        throw Error("Not SET source type")
-    return types
+export const buildSetRegister = (inputRegistersIds: string[], syncContext: SyncContext, definitionId: string): Register => {
+    const id = uuidv4()
+    return {
+        id,
+        entityType: ReservedEntityTypes.setRegister,
+        sourceAbsoluteId: id,
+        sourceRelativeId: id,
+        sourceEntityId: null,
+        statusTag: RegisterStatusTag.success,
+        statusMeta: null,
+        entity: inputRegistersIds,
+        meta: null,
+        date: new Date(),
+        definitionId,
+        syncContext,
+    }
 }

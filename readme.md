@@ -382,11 +382,29 @@ run()
 ```
 Special entityType reserved:
 - $flowConfig: Used for define Flow configuration
+- $setRegister: Used for define a Set of registers
 
-Source data lineage types:
-- Row ["v4UUID"]: When the source entity is from a single row
-- Set ["set-(entityType1)-..."]: When the source entity is from one or more sets
 ### Status data structure
+Adapter, Step or Flow process status entry.
+``` ts
+{
+    id: string //process unique identifier
+    definitionId: string //definition identifier
+    statusTag: ProcessStatus
+    //- pending: process pending to be proccessed,
+    //- success: process finished with success result -> not software exceptions
+    //- failed: process finished with exceptions
+    //- invalid: process tagged invalid by definition
+    statusMeta: //extra info about the process status
+    timeStarted: Date | null
+    timeFinished: Date | null
+    runOptions: any //process input params
+    syncContext: SyncContext //process traces (flowId,stepId,AdapterId)
+    processType: ProcessType //flow,step,adapter
+}
+```
+---
+### Presenter data structure
 Adapter, Step or Flow process status event.
 ``` ts
 {
@@ -394,7 +412,7 @@ Adapter, Step or Flow process status event.
     definitionId: string //definition identifier
     definitionType: string //definition type
     outputType: string //process output entity type
-    statusTag: AdapterStatusTag
+    statusTag: ProcessStatus
     //- pending: process pending to be proccessed,
     //- success: process finished with success result -> not software exceptions
     //- failed: process finished with exceptions

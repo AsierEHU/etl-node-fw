@@ -1,9 +1,9 @@
 import EventEmitter from "events";
-import { AdapterDefinition, AdapterFactory, AdapterRunOptions, AdapterPresenter, VolatileRegisterDataAccess, AdapterSpecialIds, RegisterDataAccess, VolatileProcessStatusDataAccess } from "../../src";
+import { AdapterDefinition, AdapterFactory, AdapterRunOptions, AdapterPresenter, VolatileRegisterDataAccess, AdapterSpecialIds, RegisterDataAccess, VolatileProcessStatusDataAccess, ReservedEntityTypes } from "../../src";
 import { ProcessStatus, StatusTag } from "../../src/business/processStatus";
 import { Register, RegisterStatusTag } from "../../src/business/register";
 import { ProcessStatusDataAccess } from "../../src/interactors/common/processes";
-import { getWithInitFormat, initRegisters, isBySetSource, isOrigin, isByRowSource } from "../../src/interactors/registers/utils";
+import { getWithInitFormat, initRegisters, isOrigin } from "../../src/interactors/registers/utils";
 import { adapterMocks } from "./mocks";
 
 
@@ -69,9 +69,9 @@ const adapterTest = (
             })
 
             //TEST Relative and Absolute ids
-            for (const register of registers) {
-                await testSources(register, registerDataAccess);
-            }
+            // for (const register of registers) {
+            //     await testSources(register, registerDataAccess);
+            // }
         })
 
 
@@ -125,11 +125,12 @@ const adapterTest = (
                 const adapter2 = adapterFactory.createAdapterRunner(definition.id)
                 await adapter2.run(syncContext, { ...defaultRunOptions, onlyFailedEntities: true });
                 const registers = await registerDataAccess.getAll()
+                const registersWithoutSpecials = registers.filter(reg => reg.entityType !== ReservedEntityTypes.setRegister)
                 const mockRegistersWithRetries = [
                     ...mocks.mockFinalRegisters,
                     ...mocks.mockFinalRegisters.filter(reg => reg.statusTag == RegisterStatusTag.failed && reg.entityType == definition.outputType)
-                ]
-                registersEqual(registers, mockRegistersWithRetries)
+                ].filter(reg => reg.entityType !== ReservedEntityTypes.setRegister)
+                registersEqual(registersWithoutSpecials, mockRegistersWithRetries)
             })
 
             test("runOptions:usePushedEntityTypes", async () => {
@@ -158,38 +159,27 @@ const adapterTest = (
 }
 
 export const testSources = async (register: Register, registerDataAccess: RegisterDataAccess) => {
-    if (isBySetSource(register)) {
-        if (register.id == register.sourceAbsoluteId && register.id == register.sourceRelativeId) {
-            throw Error("Imposible case")
+    if (register.entityType === ReservedEntityTypes.setRegister) {
+        expect(isOrigin(register)).toBe(false)
+        const registersInSetIds = register.entity as string[]
+        const registersInSet = await registerDataAccess.getAll(undefined, registersInSetIds)
+        if (!registersInSet.length) {
+            throw new Error("Origin not found, set register is empty")
         }
-        else if (register.sourceRelativeId == register.sourceAbsoluteId) {
+        registersInSet.forEach(relativeRegister => {
+            testSources(relativeRegister, registerDataAccess)
+        })
+    } else {
+        if (register.id === register.sourceAbsoluteId && register.id === register.sourceRelativeId) {
             expect(isOrigin(register)).toBe(true)
-        } else if (register.sourceRelativeId != register.sourceAbsoluteId) {
+        } else {
             expect(isOrigin(register)).toBe(false)
-            const relativeRegister = await registerDataAccess.get(register.sourceRelativeId as string) as Register
-            await testSources(relativeRegister, registerDataAccess)
-        }
-        else {
-            throw new Error("Unexpected case")
-        }
-    } else if (isByRowSource(register)) {
-        if (register.id == register.sourceAbsoluteId && register.id == register.sourceRelativeId) {
-            expect(isOrigin(register)).toBe(true)
-        }
-        else if (register.sourceRelativeId == register.sourceAbsoluteId) {
-            expect(isOrigin(register)).toBe(false)
-            const relativeRegister = await registerDataAccess.get(register.sourceRelativeId as string) as Register
-            expect(isOrigin(relativeRegister)).toBe(true)
-        } else if (register.sourceRelativeId != register.sourceAbsoluteId) {
-            expect(isOrigin(register)).toBe(false)
-            const relativeRegister = await registerDataAccess.get(register.sourceRelativeId as string) as Register
-            await testSources(relativeRegister, registerDataAccess)
-        }
-        else {
-            throw new Error("Unexpected case")
+            const relativeRegister = await registerDataAccess.get(register.sourceRelativeId as string)
+            if (!relativeRegister)
+                throw new Error("Origin not found, relative registers not found")
+            testSources(relativeRegister, registerDataAccess)
         }
     }
-    else throw Error("Unexpected source")
 }
 
 const statusEqual = (adapterStatus: ProcessStatus, mockStatus: ProcessStatus) => {
@@ -237,6 +227,12 @@ const registerEqual = (register: Register, mockFinalRegister: Register) => {
     register.sourceAbsoluteId = mockFinalRegister.sourceAbsoluteId
     register.sourceRelativeId = mockFinalRegister.sourceRelativeId
     register.syncContext.adapterId = mockFinalRegister.syncContext.adapterId
+
+    expect(register.entityType).toEqual(mockFinalRegister.entityType)
+    if (register.entityType === ReservedEntityTypes.setRegister) {
+        register.entity = mockFinalRegister.entity
+    }
+
     expect(register).toEqual(mockFinalRegister)
 }
 

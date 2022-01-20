@@ -1,5 +1,5 @@
 
-import { LocalAdapterSetTransformerDefinition, AdapterPresenter, RegisterStats } from "../../../src";
+import { LocalAdapterSetTransformerDefinition, AdapterPresenter, RegisterStats, ReservedEntityTypes } from "../../../src";
 import { ProcessStatus, ProcessType, StatusTag } from "../../../src/business/processStatus";
 import { Register, RegisterStatusTag } from "../../../src/business/register";
 import { case4Mocks } from "../localAdapterLoaderMocks/case4Mocks";
@@ -27,6 +27,24 @@ export const case7Definition: LocalAdapterSetTransformerDefinition<result2Class>
     }
 }
 const mockNewRegisters: Register[] = [
+    {
+        id: "set-ebd1c577-a6aa-40b1-bdee-52f3ee0ea755",
+        entityType: ReservedEntityTypes.setRegister,
+        sourceAbsoluteId: "set-ebd1c577-a6aa-40b1-bdee-52f3ee0ea755",
+        sourceRelativeId: "set-ebd1c577-a6aa-40b1-bdee-52f3ee0ea755",
+        sourceEntityId: null,
+        statusTag: RegisterStatusTag.success,
+        statusMeta: null,
+        entity: [],
+        meta: null,
+        date: new Date(),
+        definitionId: case7Definition.id,
+        syncContext: {
+            flowId: "testFlow",
+            stepId: "testStep",
+            adapterId: "testAdapter",
+        },
+    },
     {
         id: "ebd1c577-a6aa-40b1-bdee-52f3ee0ea644",
         entityType: "result2Class",
