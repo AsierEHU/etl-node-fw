@@ -1,3 +1,4 @@
+import { cloneDeep } from "lodash";
 import { EventEmitter } from "stream";
 import { AdapterFactory, RegisterDataAccess, StepDefinition, StepFactory, StepPresenter, AdapterRunOptions, VolatileRegisterDataAccess, StepStatusTag, StepRunOptions, AdapterDefinition, VolatileProcessStatusDataAccess } from "../../src";
 import { ProcessStatus, ProcessType, StatusTag } from "../../src/business/processStatus";
@@ -140,6 +141,7 @@ const stepTest = (
 }
 
 const statusEqual = (stepStatus: ProcessStatus, mockStatus: ProcessStatus) => {
+    stepStatus = cloneDeep(stepStatus)
     expect(stepStatus.id).not.toBeNull()
     expect(stepStatus.syncContext.stepId).not.toBeNull()
     expect(stepStatus.id).toEqual(stepStatus.syncContext.stepId)
@@ -151,6 +153,7 @@ const statusEqual = (stepStatus: ProcessStatus, mockStatus: ProcessStatus) => {
 }
 
 const presentersEqual = (stepStatus: StepPresenter, mockStatus: StepPresenter) => {
+    stepStatus = cloneDeep(stepStatus)
     expect(stepStatus.id).not.toBeNull()
     expect(stepStatus.syncContext.stepId).not.toBeNull()
     expect(stepStatus.id).toEqual(stepStatus.syncContext.stepId)

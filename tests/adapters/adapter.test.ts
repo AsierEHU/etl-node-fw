@@ -1,4 +1,5 @@
 import EventEmitter from "events";
+import { cloneDeep } from "lodash";
 import { AdapterDefinition, AdapterFactory, AdapterRunOptions, AdapterPresenter, VolatileRegisterDataAccess, AdapterSpecialIds, RegisterDataAccess, VolatileProcessStatusDataAccess, ReservedEntityTypes } from "../../src";
 import { ProcessStatus, StatusTag } from "../../src/business/processStatus";
 import { Register, RegisterStatusTag } from "../../src/business/register";
@@ -159,6 +160,7 @@ const adapterTest = (
 }
 
 export const testSources = async (register: Register, registerDataAccess: RegisterDataAccess) => {
+
     if (register.entityType === ReservedEntityTypes.setRegister) {
         expect(isOrigin(register)).toBe(false)
         const registersInSetIds = register.entity as string[]
@@ -166,9 +168,9 @@ export const testSources = async (register: Register, registerDataAccess: Regist
         if (!registersInSet.length) {
             throw new Error("Origin not found, set register is empty")
         }
-        registersInSet.forEach(relativeRegister => {
-            testSources(relativeRegister, registerDataAccess)
-        })
+        for (const relativeRegister of registersInSet) {
+            await testSources(relativeRegister, registerDataAccess)
+        }
     } else {
         if (register.id === register.sourceAbsoluteId && register.id === register.sourceRelativeId) {
             expect(isOrigin(register)).toBe(true)
@@ -177,12 +179,13 @@ export const testSources = async (register: Register, registerDataAccess: Regist
             const relativeRegister = await registerDataAccess.get(register.sourceRelativeId as string)
             if (!relativeRegister)
                 throw new Error("Origin not found, relative registers not found")
-            testSources(relativeRegister, registerDataAccess)
+            await testSources(relativeRegister, registerDataAccess)
         }
     }
 }
 
 const statusEqual = (adapterStatus: ProcessStatus, mockStatus: ProcessStatus) => {
+    adapterStatus = cloneDeep(adapterStatus)
     expect(adapterStatus.id).not.toBeNull()
     expect(adapterStatus.syncContext.adapterId).not.toBeNull()
     expect(adapterStatus.id).toEqual(adapterStatus.syncContext.adapterId)
@@ -196,6 +199,7 @@ const statusEqual = (adapterStatus: ProcessStatus, mockStatus: ProcessStatus) =>
 
 
 const presentersEqual = (adapterStatus: AdapterPresenter, mockStatus: AdapterPresenter) => {
+    adapterStatus = cloneDeep(adapterStatus)
     expect(adapterStatus.id).not.toBeNull()
     expect(adapterStatus.syncContext.adapterId).not.toBeNull()
     expect(adapterStatus.id).toEqual(adapterStatus.syncContext.adapterId)
@@ -212,17 +216,18 @@ const registersEqual = (registers: Register[], mockFinalRegisters: Register[]) =
     if (registers.length == mockFinalRegisters.length)
         registers.forEach((register, index) => {
             const mockRegister = mockFinalRegisters[index]
-            expect(register.date).not.toBeNull()
-            register.date = mockRegister.date
             registerEqual(register, mockRegister)
         })
 }
 
 const registerEqual = (register: Register, mockFinalRegister: Register) => {
+    register = cloneDeep(register)
     expect(register.id).not.toBeNull()
     expect(register.syncContext.adapterId).not.toBeNull()
     expect(register.sourceAbsoluteId).not.toBeNull()
     expect(register.sourceRelativeId).not.toBeNull()
+    expect(register.date).not.toBeNull()
+    register.date = mockFinalRegister.date
     register.id = mockFinalRegister.id
     register.sourceAbsoluteId = mockFinalRegister.sourceAbsoluteId
     register.sourceRelativeId = mockFinalRegister.sourceRelativeId

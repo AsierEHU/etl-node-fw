@@ -9,6 +9,7 @@ import { testSources } from "../adapters/adapter.test";
 import { AdapterFactory, RegisterDataAccess, StepFactory, FlowDefinition, FlowFactory, FlowRunOptions, VolatileRegisterDataAccess, ReservedEntityTypes, VolatileProcessStatusDataAccess } from "../../src";
 import { ProcessStatus, ProcessType, StatusTag } from "../../src/business/processStatus";
 import { ProcessStatusDataAccess } from "../../src/interactors/common/processes";
+import { cloneDeep } from "lodash";
 
 const adapterDefinitions = [adapterCase1Definition];
 let adapterFactory: AdapterFactory
@@ -149,6 +150,7 @@ const flowTest = (
 }
 
 const statusEqual = (flowStatus: ProcessStatus, mockStatus: ProcessStatus) => {
+    flowStatus = cloneDeep(flowStatus)
     expect(flowStatus.id).not.toBeNull()
     expect(flowStatus.syncContext.flowId).not.toBeNull()
     expect(flowStatus.id).toEqual(flowStatus.syncContext.flowId)
@@ -160,6 +162,7 @@ const statusEqual = (flowStatus: ProcessStatus, mockStatus: ProcessStatus) => {
 }
 
 const presentersEqual = (flowStatus: FlowPresenter, mockStatus: FlowPresenter) => {
+    flowStatus = cloneDeep(flowStatus)
     expect(flowStatus.id).not.toBeNull()
     expect(flowStatus.syncContext.flowId).not.toBeNull()
     expect(flowStatus.id).toEqual(flowStatus.syncContext.flowId)
