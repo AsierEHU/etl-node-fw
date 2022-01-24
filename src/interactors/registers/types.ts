@@ -5,6 +5,7 @@ export interface RegisterDataAccess {
     saveAll: (registers: Register[]) => Promise<void>
     get: (id: string) => Promise<Register | null>
     getAll: (filter?: RegisterDataFilter, registersIds?: string[]) => Promise<Register[]>
+    removeAll: (filter?: RegisterDataFilter, registersIds?: string[]) => Promise<void>
 }
 
 export type RegisterDataFilter = {

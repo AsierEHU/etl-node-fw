@@ -57,4 +57,27 @@ export class VolatileRegisterDataAccess implements RegisterDataAccess {
         return repoRegisters;
     };
 
+    async removeAll(filter?: RegisterDataFilter | undefined, registersIds?: string[] | undefined) {
+
+        let repoRegisters = Object.values(this.repo);
+
+        if (filter?.adapterId)
+            repoRegisters = repoRegisters.filter(repoRegister => repoRegister.syncContext.adapterId == filter.adapterId)
+        if (filter?.stepId)
+            repoRegisters = repoRegisters.filter(repoRegister => repoRegister.syncContext.stepId == filter.stepId)
+        if (filter?.flowId)
+            repoRegisters = repoRegisters.filter(repoRegister => repoRegister.syncContext.flowId == filter.flowId)
+        if (filter?.entityType)
+            repoRegisters = repoRegisters.filter(repoRegister => repoRegister.entityType == filter.entityType)
+        if (filter?.registerStatus)
+            repoRegisters = repoRegisters.filter(repoRegister => repoRegister.statusTag == filter.registerStatus)
+
+        const repoRegisterIds = repoRegisters.map(reg => reg.id)
+        registersIds = registersIds || []
+
+        for (const id of [...repoRegisterIds, ...registersIds]) {
+            delete this.repo[id]
+        }
+    }
+
 }

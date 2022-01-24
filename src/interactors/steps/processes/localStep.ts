@@ -26,21 +26,11 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
         syncContext = cloneDeep(syncContext)
 
         let adapterRunOptions = this.stepDefinition.adapterRunOptions
-
         if (runOptions?.pushEntities) {
-            const pushEntityTypes = Object.keys(runOptions?.pushEntities)
-            for (const pushEntityType of pushEntityTypes) {
-                const pushEntities = runOptions?.pushEntities[pushEntityType]
-                const inputEntitiesWithMeta = getWithInitFormat(
-                    pushEntities,
-                    pushEntityType,
-                    this.stepDefinition.id
-                )
-                const inputRegisters = initRegisters(inputEntitiesWithMeta, { ...syncContext, adapterId: AdapterSpecialIds.pushEntity })
-                await this.registerDataAccess.saveAll(inputRegisters)
-            }
+            const pushEntityTypes = await this.savePushedEntities(runOptions?.pushEntities, syncContext)
             adapterRunOptions = { ...adapterRunOptions, usePushedEntityTypes: pushEntityTypes }
         }
+
         const tryNumber = -1
         await this.tryRunAdapter(tryNumber, syncContext, adapterRunOptions || undefined);
     }
@@ -53,10 +43,13 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
         const adapterStatus = await adapterRunner.run(syncContext, adapterRunOptions)
         const registerStats = adapterStatus.statusSummary as RegisterStats;
 
-        if (adapterStatus.statusTag == StatusTag.failed && this.canRetry(tryNumber)) {
-            const restartAdapterRunOptions = { ...adapterRunOptions, onlyFailedEntities: true }
-            //TODO: maybe have to run all the entities, removing inconsistencies
-            await this.tryRunAdapter(tryNumber, syncContext, restartAdapterRunOptions);
+        if (adapterStatus.statusTag === StatusTag.failed) {
+            if (this.canRetry(tryNumber)) {
+                await this.removeAdapterRegisters(adapterStatus.id)
+                await this.tryRunAdapter(tryNumber, syncContext, adapterRunOptions);
+            } else {
+                throw new Error("Adapter failed")
+            }
         }
         else {
             if (registerStats && registerStats.registers_failed > 0 && this.canRetry(tryNumber)) {
@@ -74,8 +67,26 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
         }
     }
 
+    private async savePushedEntities(pushEntities: { [type: string]: any[] }, syncContext: SyncContext) {
+        const pushEntityTypes = Object.keys(pushEntities)
+        for (const pushEntityType of pushEntityTypes) {
+            const pushEntity = pushEntities[pushEntityType]
+            const inputEntitiesWithMeta = getWithInitFormat(
+                pushEntity,
+                pushEntityType,
+                this.stepDefinition.id
+            )
+            const inputRegisters = initRegisters(inputEntitiesWithMeta, { ...syncContext, adapterId: AdapterSpecialIds.pushEntity })
+            await this.registerDataAccess.saveAll(inputRegisters)
+        }
+        return pushEntityTypes
+    }
 
     private canRetry(tryNumber: number): boolean {
         return tryNumber < this.stepDefinition.maxRetries
+    }
+
+    private async removeAdapterRegisters(adapterId: string) {
+        await this.registerDataAccess.removeAll({ adapterId })
     }
 }
