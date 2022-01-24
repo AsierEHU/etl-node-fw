@@ -1,7 +1,6 @@
 import { cloneDeep } from "lodash";
 import { SyncContext, Register, RegisterStatusTag } from "../../../../business/register";
 import { RegisterDataAccess, AdapterSpecialIds } from "../../../registers/types";
-import { buildChildRegisters } from "../../../registers/utils";
 import { AdvancedRegisterFetcher } from "../../../registers/utilsDB";
 import { AdapterDefinition } from "../../definitions/types";
 import { Adapter, AdapterRunOptions } from "../types";
@@ -20,7 +19,7 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
         runOptions = cloneDeep(runOptions)
         syncContext = cloneDeep(syncContext)
         const registers = await this.buildInitialRegisters(syncContext, runOptions);
-        await this.processRegisters(registers, syncContext);
+        await this.processRegisters(registers, syncContext, runOptions);
     }
 
     private async buildInitialRegisters(syncContext: SyncContext, runOptions?: AdapterRunOptions): Promise<Register[]> {
@@ -34,7 +33,7 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
             })
             const arg = new AdvancedRegisterFetcher(this.registerDataAccess);
             const oldInputRegisters = await arg.getRelativeRegisters(failedRegisters)
-            registers = buildChildRegisters(oldInputRegisters, syncContext)
+            registers = oldInputRegisters
         }
         else if (runOptions?.usePushedEntityTypes) {
             let pushedRegisters: Register[] = [];
@@ -49,7 +48,7 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
                 )
                 pushedRegisters = [...pushedRegisters, ...pushedRegistersInType]
             }
-            registers = buildChildRegisters(pushedRegisters, syncContext)
+            registers = pushedRegisters
         }
         else {
             registers = await this.getRegisters(syncContext)
@@ -60,6 +59,6 @@ export abstract class LocalAdapter<ad extends AdapterDefinition> implements Adap
 
     protected abstract getRegisters(syncContext: SyncContext): Promise<Register[]>
 
-    protected abstract processRegisters(registers: Register[], syncContext: SyncContext): Promise<void>
+    protected abstract processRegisters(registers: Register[], syncContext: SyncContext, runOptions?: AdapterRunOptions): Promise<void>
 
 }

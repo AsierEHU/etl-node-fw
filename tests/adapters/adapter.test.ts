@@ -70,9 +70,9 @@ const adapterTest = (
             })
 
             //TEST Relative and Absolute ids
-            // for (const register of registers) {
-            //     await testSources(register, registerDataAccess);
-            // }
+            for (const register of registers) {
+                await testSources(register, registerDataAccess);
+            }
         })
 
 
@@ -178,7 +178,7 @@ export const testSources = async (register: Register, registerDataAccess: Regist
             expect(isOrigin(register)).toBe(false)
             const relativeRegister = await registerDataAccess.get(register.sourceRelativeId as string)
             if (!relativeRegister)
-                throw new Error("Origin not found, relative registers not found")
+                throw new Error("Origin not found, relative register not found")
             await testSources(relativeRegister, registerDataAccess)
         }
     }

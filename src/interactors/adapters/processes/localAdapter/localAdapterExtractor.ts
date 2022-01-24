@@ -1,7 +1,8 @@
 import { SyncContext, Register, RegisterStatusTag } from "../../../../business/register";
-import { getWithInitFormat, initRegisters } from "../../../registers/utils";
+import { cloneRegisters, getWithInitFormat, initRegisters } from "../../../registers/utils";
 import { ContextEntityFetcher } from "../../../registers/utilsDB";
 import { LocalAdapterExtractorDefinition } from "../../definitions/localAdapter/types";
+import { AdapterRunOptions } from "../types";
 import { LocalAdapter } from "./localAdapter";
 import { getValidationResultWithMeta, validationTagToRegisterTag } from "./utils";
 
@@ -26,7 +27,11 @@ export class LocalAdapterExtractor<ad extends LocalAdapterExtractorDefinition<an
         return registers;
     }
 
-    async processRegisters(outputRegisters: Register[]) {
+    async processRegisters(outputRegisters: Register[], syncContext: SyncContext, runOptions?: AdapterRunOptions) {
+
+        if (runOptions?.onlyFailedEntities || runOptions?.usePushedEntityTypes) {
+            outputRegisters = cloneRegisters(outputRegisters, syncContext)
+        }
         await this.validateRegisters(outputRegisters);
         await this.fixRegisters(outputRegisters);
         await this.registerDataAccess.saveAll(outputRegisters)

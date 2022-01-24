@@ -1,4 +1,4 @@
-import { LocalLinealFlowDefinition, FlowPresenter, FlowStatusTag } from "../../../src"
+import { LocalLinealFlowDefinition, FlowPresenter } from "../../../src"
 import { ProcessStatus, ProcessType, StatusTag } from "../../../src/business/processStatus"
 
 export const case1Definition: LocalLinealFlowDefinition = {

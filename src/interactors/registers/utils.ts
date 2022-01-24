@@ -65,13 +65,29 @@ export const initRegisters = (
     })
 }
 
-export const buildChildRegisters = (registers: Register[], syncContext: SyncContext) => {
+export const cloneToChildRegister = (registers: Register[], syncContext: SyncContext) => {
     const entitiesInitialValues = registers.map(reg => {
         const initialValue: RegisterInitValues = {
             entity: reg.entity,
             meta: reg.meta,
             sourceAbsoluteId: reg.sourceAbsoluteId || undefined,
             sourceRelativeId: reg.id,
+            sourceEntityId: reg.sourceEntityId || undefined,
+            entityType: reg.entityType,
+            definitionId: reg.definitionId
+        }
+        return initialValue
+    })
+    return initRegisters(entitiesInitialValues, syncContext)
+}
+
+export const cloneRegisters = (registers: Register[], syncContext: SyncContext) => {
+    const entitiesInitialValues = registers.map(reg => {
+        const initialValue: RegisterInitValues = {
+            entity: reg.entity,
+            meta: reg.meta,
+            sourceAbsoluteId: reg.sourceAbsoluteId || undefined,
+            sourceRelativeId: reg.sourceRelativeId || undefined,
             sourceEntityId: reg.sourceEntityId || undefined,
             entityType: reg.entityType,
             definitionId: reg.definitionId
