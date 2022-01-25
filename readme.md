@@ -359,7 +359,7 @@ run()
 ---
 ## Reference [WIP]
 ### Architecture
-![Architecture](./doc/Architecture.svg)
+![Architecture](https://github.com/AsierEHU/etl-node-fw/blob/master/doc/Architecture.svg?raw=true)
 ### Register data structure
 ``` ts
 {
@@ -427,7 +427,7 @@ Adapter, Step or Flow process status event.
 }
 ```
 ### DataLineage
-![DataLineage](./doc/DataLineage.svg)
+![DataLineage](https://github.com/AsierEHU/etl-node-fw/blob/master/doc/DataLineage.svg?raw=true)
 ---
 ## Default implementations overview
 ### Adapters
