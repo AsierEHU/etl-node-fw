@@ -358,6 +358,8 @@ run()
 ```
 ---
 ## Reference [WIP]
+### Architecture
+![Architecture](./doc/Architecture.svg)
 ### Register data structure
 ``` ts
 {
@@ -403,7 +405,6 @@ Adapter, Step or Flow process status entry.
     processType: ProcessType //flow,step,adapter
 }
 ```
----
 ### Presenter data structure
 Adapter, Step or Flow process status event.
 ``` ts
@@ -425,6 +426,8 @@ Adapter, Step or Flow process status event.
     syncContext: SyncContext //process traces (flowId,stepId,AdapterId)
 }
 ```
+### DataLineage
+![DataLineage](./doc/DataLineage.svg)
 ---
 ## Default implementations overview
 ### Adapters
