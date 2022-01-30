@@ -20,7 +20,7 @@ export class LocalLinealFlow<fd extends LocalLinealFlowDefinition> implements Fl
         this.registerDataAccess = dependencies.registerDataAccess;
     }
 
-    async run(syncContext: SyncContext, flowRunOptions: FlowRunOptions): Promise<void> {
+    async run(syncContext: SyncContext, flowRunOptions?: FlowRunOptions): Promise<void> {
         flowRunOptions = cloneDeep(flowRunOptions)
         syncContext = cloneDeep(syncContext)
 
@@ -39,7 +39,7 @@ export class LocalLinealFlow<fd extends LocalLinealFlowDefinition> implements Fl
             const stepDefinitionId = stepDefinitionFlow.id
             const stepRunner = this.stepFactory.createStepRunner(stepDefinitionId)
 
-            const flowStepRunOptions = flowRunOptions.stepsRunOptions?.filter(sro => sro.stepDefinitionId == stepDefinitionId)[0]
+            const flowStepRunOptions = flowRunOptions?.stepsRunOptions?.filter(sro => sro.stepDefinitionId == stepDefinitionId)[0] || undefined
             let stepRunOptions = undefined;
             if (flowStepRunOptions || stepDefinitionFlow.runOptions) {
                 stepRunOptions = { ...stepDefinitionFlow.runOptions, ...flowStepRunOptions?.runOptions };

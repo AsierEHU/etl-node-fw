@@ -1,6 +1,6 @@
 {
   "name": "etl-node-fw",
-  "version": "1.0.12-alpha",
+  "version": "1.0.13-alpha",
   "description": "ETL Node Framework",
   "main": "dist/index.js",
   "files": [
@@ -11,8 +11,12 @@
     "etl",
     "framework"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AsierEHU/etl-node-fw.git"
+  },
   "scripts": {
-    "build": "tsc",
+    "build": "rimraf dist; exit 0 && tsc",
     "test": "jest",
     "up": "npm run build && npm run test && npm publish"
   },

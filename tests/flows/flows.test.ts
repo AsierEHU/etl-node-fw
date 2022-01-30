@@ -29,7 +29,7 @@ let flowFactory: FlowFactory
 let flowStatusCallback: any
 let flowErrorCallback: any
 
-let defaultRunOptions: FlowRunOptions = {}
+let defaultRunOptions: any = undefined
 
 
 const flowTest = (

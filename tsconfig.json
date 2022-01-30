@@ -100,5 +100,6 @@
   },
   "exclude": [
       "tests",
+      "examples"
   ]
 }
