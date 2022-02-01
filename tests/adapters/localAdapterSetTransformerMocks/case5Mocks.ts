@@ -1,6 +1,6 @@
-import { LocalAdapterSetTransformerDefinition, AdapterPresenter, RegisterStats, ReservedEntityTypes } from "../../../src";
+import { LocalAdapterSetTransformerDefinition, AdapterPresenter, RegisterStats } from "../../../src";
 import { ProcessStatus, ProcessType, StatusTag } from "../../../src/business/processStatus";
-import { Register, RegisterStatusTag } from "../../../src/business/register";
+import { Register, RegisterStatusTag, ReservedEntityTypes } from "../../../src/business/register";
 
 type resultClass = {
     success: boolean,

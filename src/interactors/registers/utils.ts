@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Register, SyncContext, RegisterStatusTag } from '../../business/register';
-import { RegisterInitValues, MetaEntity, ReservedEntityTypes, registerSourceType, AdapterSpecialIds } from "./types"
+import { Register, SyncContext, RegisterStatusTag, AdapterSpecialIds, ReservedEntityTypes } from '../../business/register';
+import { RegisterInitValues, MetaEntity } from "./types"
 
 export const isOrigin = (register: Register): boolean => {
     if (register.entityType === ReservedEntityTypes.setRegister) {

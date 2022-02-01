@@ -1,8 +1,8 @@
 import EventEmitter from "events";
 import { cloneDeep } from "lodash";
-import { AdapterDefinition, AdapterFactory, AdapterRunOptions, AdapterPresenter, VolatileRegisterDataAccess, AdapterSpecialIds, RegisterDataAccess, VolatileProcessStatusDataAccess, ReservedEntityTypes } from "../../src";
+import { AdapterDefinition, AdapterFactory, AdapterRunOptions, AdapterPresenter, VolatileRegisterDataAccess, RegisterDataAccess, VolatileProcessStatusDataAccess } from "../../src";
 import { ProcessStatus, StatusTag } from "../../src/business/processStatus";
-import { Register, RegisterStatusTag } from "../../src/business/register";
+import { AdapterSpecialIds, Register, RegisterStatusTag, ReservedEntityTypes } from "../../src/business/register";
 import { ProcessStatusDataAccess } from "../../src/interactors/common/processes";
 import { getWithInitFormat, initRegisters, isOrigin } from "../../src/interactors/registers/utils";
 import { adapterMocks } from "./mocks";
@@ -164,7 +164,7 @@ export const testSources = async (register: Register, registerDataAccess: Regist
     if (register.entityType === ReservedEntityTypes.setRegister) {
         expect(isOrigin(register)).toBe(false)
         const registersInSetIds = register.entity as string[]
-        const registersInSet = await registerDataAccess.getAll(undefined, registersInSetIds)
+        const registersInSet = await registerDataAccess.getAll({ registersIds: registersInSetIds })
         if (!registersInSet.length) {
             throw new Error("Origin not found, set register is empty")
         }

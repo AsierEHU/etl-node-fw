@@ -1,4 +1,4 @@
-import { Register } from "../business/register";
+import { Register, ReservedEntityTypes } from "../business/register";
 import { RegisterDataAccess, RegisterDataFilter } from "../interactors/registers/types";
 
 export class VolatileRegisterDataAccess implements RegisterDataAccess {
@@ -31,36 +31,29 @@ export class VolatileRegisterDataAccess implements RegisterDataAccess {
         }
     };
 
-    async getAll(filter?: RegisterDataFilter, registersIds?: string[]) {
-
-        if (registersIds) {
-            const registers = [];
-            for (const id of registersIds) {
-                registers.push(await this.get(id))
-            }
-            return registers;
-        }
-
-        let repoRegisters = Object.values(this.repo);
-
-        if (filter?.adapterId)
-            repoRegisters = repoRegisters.filter(repoRegister => repoRegister.syncContext.adapterId == filter.adapterId)
-        if (filter?.stepId)
-            repoRegisters = repoRegisters.filter(repoRegister => repoRegister.syncContext.stepId == filter.stepId)
-        if (filter?.flowId)
-            repoRegisters = repoRegisters.filter(repoRegister => repoRegister.syncContext.flowId == filter.flowId)
-        if (filter?.entityType)
-            repoRegisters = repoRegisters.filter(repoRegister => repoRegister.entityType == filter.entityType)
-        if (filter?.registerStatus)
-            repoRegisters = repoRegisters.filter(repoRegister => repoRegister.statusTag == filter.registerStatus)
-
+    async getAll(filter?: RegisterDataFilter) {
+        const repoRegisters = this.applyFiltersAndOptions(filter)
         return repoRegisters;
     };
 
-    async removeAll(filter?: RegisterDataFilter | undefined, registersIds?: string[] | undefined) {
+    async removeAll(filter?: RegisterDataFilter) {
+        const repoRegisters = this.applyFiltersAndOptions(filter)
+        const repoRegisterIds = repoRegisters.map(reg => reg.id)
+        for (const id of repoRegisterIds) {
+            delete this.repo[id]
+        }
+    }
 
+    private applyFiltersAndOptions(filter?: RegisterDataFilter) {
         let repoRegisters = Object.values(this.repo);
 
+        if (filter?.excludeOptions?.excludeReservedEntityTypes) {
+            const reservedEntityTypes = [ReservedEntityTypes.flowConfig, ReservedEntityTypes.setRegister]
+            repoRegisters = repoRegisters.filter(repoRegister => !reservedEntityTypes.includes(repoRegister.entityType as ReservedEntityTypes))
+        }
+
+        if (filter?.registersIds)
+            repoRegisters = repoRegisters.filter(repoRegister => filter.registersIds?.includes(repoRegister.id))
         if (filter?.adapterId)
             repoRegisters = repoRegisters.filter(repoRegister => repoRegister.syncContext.adapterId == filter.adapterId)
         if (filter?.stepId)
@@ -72,12 +65,13 @@ export class VolatileRegisterDataAccess implements RegisterDataAccess {
         if (filter?.registerStatus)
             repoRegisters = repoRegisters.filter(repoRegister => repoRegister.statusTag == filter.registerStatus)
 
-        const repoRegisterIds = repoRegisters.map(reg => reg.id)
-        registersIds = registersIds || []
-
-        for (const id of [...repoRegisterIds, ...registersIds]) {
-            delete this.repo[id]
+        if (filter?.excludeOptions?.excludeEntityPayload) {
+            repoRegisters = repoRegisters.map(reg => {
+                return { ...reg, entity: null }
+            })
         }
+
+        return repoRegisters
     }
 
 }

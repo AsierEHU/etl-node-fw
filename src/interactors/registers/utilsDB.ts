@@ -1,6 +1,6 @@
 import { uniqBy } from "lodash"
-import { SyncContext, Register, RegisterStatusTag } from "../../business/register"
-import { EntityFetcher, RegisterDataAccess, RegisterDataFilter, MetaEntity, RegisterStats, ReservedEntityTypes } from "./types"
+import { SyncContext, Register, RegisterStatusTag, ReservedEntityTypes } from "../../business/register"
+import { EntityFetcher, RegisterDataAccess, RegisterDataFilter, MetaEntity, RegisterStats } from "./types"
 
 export class ContextEntityFetcher implements EntityFetcher {
 
@@ -14,7 +14,7 @@ export class ContextEntityFetcher implements EntityFetcher {
         this.fetchHistory = []
     }
 
-    async getEntities(filter?: RegisterDataFilter) {
+    async getMetaEntities(filter?: RegisterDataFilter) {
         filter = { ...filter, ...this.syncContext }
         this.fetchHistory.push(filter)
         const registers = await this.registerDataAccess.getAll(filter)
@@ -61,13 +61,13 @@ export class AdvancedRegisterFetcher {
         const uniqueBaseRegisters = uniqBy(baseRegisters, sourceType)
         const sourceRegistersIds = uniqueBaseRegisters.map(baseRegister => baseRegister[sourceType]) as string[]
 
-        let sourceRegisters = await this.registerDataAccess.getAll(undefined, sourceRegistersIds)
+        let sourceRegisters = await this.registerDataAccess.getAll({ registersIds: sourceRegistersIds })
         let sourceRegistersFromSet: Register[] = []
 
         for (const sourceRegister of sourceRegisters) {
             if (sourceRegister.entityType === ReservedEntityTypes.setRegister) {
                 const registersFromSetIds = sourceRegister.entity as string[]
-                const registersFromSet = await this.registerDataAccess.getAll(undefined, registersFromSetIds)
+                const registersFromSet = await this.registerDataAccess.getAll({ registersIds: registersFromSetIds })
                 sourceRegistersFromSet = [...sourceRegistersFromSet, ...registersFromSet]
             }
         }
@@ -79,9 +79,8 @@ export class AdvancedRegisterFetcher {
         return sourceRegisters
     }
 
-    async getRegistersAdapterSummary(adapterId: string): Promise<RegisterStats> { //TODO: Is entitiesSummary
-        let outputRegisters = await this.registerDataAccess.getAll({ adapterId })
-        outputRegisters = outputRegisters.filter(reg => reg.entityType !== ReservedEntityTypes.setRegister)
+    async getRegistersAdapterSummary(adapterId: string): Promise<RegisterStats> {
+        const outputRegisters = await this.registerDataAccess.getAll({ adapterId, excludeOptions: { excludeReservedEntityTypes: true, excludeEntityPayload: true } })
         const statusSummary = {
             registers_total: outputRegisters.length,
             registers_success: outputRegisters.filter(register => register.statusTag == RegisterStatusTag.success).length,
@@ -92,12 +91,11 @@ export class AdvancedRegisterFetcher {
         return statusSummary;
     }
 
-    async getRegistersStepSummary(stepId: string, removeFailedRetries: boolean = false): Promise<RegisterStats> { //TODO: Is entitiesSummary
-        let outputRegisters = await this.registerDataAccess.getAll({ stepId })
-        outputRegisters = outputRegisters.filter(reg => reg.entityType !== ReservedEntityTypes.setRegister)
+    async getRegistersStepSummary(stepId: string, excludeFailedRetries: boolean = false): Promise<RegisterStats> {
+        let outputRegisters = await this.registerDataAccess.getAll({ stepId, excludeOptions: { excludeReservedEntityTypes: true, excludeEntityPayload: true } })
 
-        if (removeFailedRetries) {
-            const failedRegisters = await this.registerDataAccess.getAll({ stepId, registerStatus: RegisterStatusTag.failed })
+        if (excludeFailedRetries) {
+            const failedRegisters = await this.registerDataAccess.getAll({ stepId, registerStatus: RegisterStatusTag.failed, excludeOptions: { excludeEntityPayload: true } })
             const uniquefailedRegisters = uniqBy(failedRegisters, "sourceRelativeId")
             outputRegisters = outputRegisters.filter(register => register.statusTag != RegisterStatusTag.failed)
             outputRegisters = [...outputRegisters, ...uniquefailedRegisters]

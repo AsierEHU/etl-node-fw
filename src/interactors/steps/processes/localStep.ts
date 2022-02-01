@@ -1,9 +1,9 @@
 import { cloneDeep } from "lodash";
 import { StatusTag } from "../../../business/processStatus";
-import { SyncContext } from "../../../business/register";
+import { AdapterSpecialIds, SyncContext } from "../../../business/register";
 import { AdapterFactory } from "../../adapters/factory";
 import { AdapterRunOptions } from "../../adapters/processes/types";
-import { AdapterSpecialIds, RegisterDataAccess, RegisterStats } from "../../registers/types";
+import { RegisterDataAccess, RegisterStats } from "../../registers/types";
 import { getWithInitFormat, initRegisters } from "../../registers/utils";
 import { AdvancedRegisterFetcher } from "../../registers/utilsDB";
 import { LocalStepDefinition } from "../definitions/types";

@@ -4,8 +4,8 @@ export interface RegisterDataAccess {
     save: (register: Register) => Promise<void>
     saveAll: (registers: Register[]) => Promise<void>
     get: (id: string) => Promise<Register | null>
-    getAll: (filter?: RegisterDataFilter, registersIds?: string[]) => Promise<Register[]>
-    removeAll: (filter?: RegisterDataFilter, registersIds?: string[]) => Promise<void>
+    getAll: (filter?: RegisterDataFilter) => Promise<Register[]>
+    removeAll: (filter?: RegisterDataFilter) => Promise<void>
 }
 
 export type RegisterDataFilter = {
@@ -13,7 +13,12 @@ export type RegisterDataFilter = {
     stepId?: string,
     adapterId?: string,
     entityType?: string,
-    registerStatus?: RegisterStatusTag
+    registerStatus?: RegisterStatusTag,
+    registersIds?: string[],
+    excludeOptions?: {
+        excludeReservedEntityTypes?: boolean,
+        excludeEntityPayload?: boolean,
+    }
 }
 
 export type MetaEntity = {
@@ -22,7 +27,7 @@ export type MetaEntity = {
     $id?: string
 }
 export interface EntityFetcher {
-    getEntities: (filter?: RegisterDataFilter) => Promise<MetaEntity[]>
+    getMetaEntities: (filter?: RegisterDataFilter) => Promise<MetaEntity[]>
     getFlowConfig: () => Promise<any>
 }
 
@@ -45,17 +50,3 @@ export type RegisterStats = {
 }
 
 export type InputEntity<e extends object> = MetaEntity | null | e
-
-export enum ReservedEntityTypes {
-    flowConfig = "$flowConfig",
-    setRegister = "$setRegister"
-}
-
-export enum AdapterSpecialIds {
-    pushEntity = "$pushEntity"
-}
-
-export enum registerSourceType {
-    row = "row",
-    set = "set"
-}

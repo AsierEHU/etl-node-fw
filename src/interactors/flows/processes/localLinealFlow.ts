@@ -1,8 +1,8 @@
 
 import { cloneDeep } from "lodash";
 import { StatusTag } from "../../../business/processStatus";
-import { SyncContext } from "../../../business/register";
-import { RegisterDataAccess, ReservedEntityTypes } from "../../registers/types";
+import { ReservedEntityTypes, SyncContext } from "../../../business/register";
+import { RegisterDataAccess } from "../../registers/types";
 import { getWithInitFormat, initRegisters } from "../../registers/utils";
 import { StepFactory } from "../../steps/factory"
 import { LocalLinealFlowDefinition } from "../definitions/types";
