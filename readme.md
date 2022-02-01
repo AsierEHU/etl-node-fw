@@ -54,7 +54,7 @@ Define the order execution and dependencies between steps.
 - **DataAccess**: Interface for handling Entities and Registers
 - **presenters**: Event channels with Status and Errors information.
 ---
-## Examples / how it works [WIP]
+## Examples / how it works
 See [examples](https://github.com/AsierEHU/etl-node-fw/tree/master/examples) folder.
 
 ---
@@ -155,10 +155,14 @@ Adapter, Step or Flow process status event.
 - Developing own ETL Elements
 - Testing
 ---
-## Next features [WIP]
-- Process in batch (reducers)
-- Tree flows (instead of lineal)
+## Next features
+- Reporting Tool
+- Continue process from last state
+- Reference DOC
 - Document store
 - SQL store
 - Stage tables adapters
-- Continue process from last state
+- Process in batch (reducers)
+- Tree flows (instead of lineal)
+
+
