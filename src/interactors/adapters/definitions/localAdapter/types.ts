@@ -1,4 +1,5 @@
-import { EntityFetcher, InputEntity } from "../../../registers/types";
+
+import { RegisterDataFilter } from "../../../registers/types";
 import { AdapterDefinition } from "../types";
 
 export abstract class LocalAdapterExtractorDefinition<output extends object> implements AdapterDefinition {
@@ -55,4 +56,17 @@ export type ToFixEntity<e extends object> = {
 export type FixedEntity<e extends object> = {
     entity: e,
     meta: any
+}
+
+export type InputEntity<e extends object> = MetaEntity | null | e
+
+export type MetaEntity = {
+    $entity: object | null,
+    $meta?: any,
+    $id?: string
+}
+
+export interface EntityFetcher {
+    getMetaEntities: (filter?: RegisterDataFilter) => Promise<MetaEntity[]>
+    getFlowConfig: () => Promise<any>
 }

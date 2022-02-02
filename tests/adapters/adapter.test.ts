@@ -3,8 +3,9 @@ import { cloneDeep } from "lodash";
 import { AdapterDefinition, AdapterFactory, AdapterRunOptions, AdapterPresenter, VolatileRegisterDataAccess, RegisterDataAccess, VolatileProcessStatusDataAccess } from "../../src";
 import { ProcessStatus, StatusTag } from "../../src/business/processStatus";
 import { AdapterSpecialIds, Register, RegisterStatusTag, ReservedEntityTypes } from "../../src/business/register";
+import { getWithInitFormat } from "../../src/interactors/adapters/processes/localAdapter/utils";
 import { ProcessStatusDataAccess } from "../../src/interactors/common/processes";
-import { getWithInitFormat, initRegisters, isOrigin } from "../../src/interactors/registers/utils";
+import { initRegisters, isOrigin } from "../../src/interactors/registers/utils";
 import { adapterMocks } from "./mocks";
 
 

@@ -1,6 +1,6 @@
 
 import { SyncContext } from "../../../business/register";
-import { InputEntity } from "../../registers/types";
+import { InputEntity } from "../../adapters/definitions/localAdapter/types";
 import { StepDefinition } from "../definitions/types";
 
 export interface Step<sd extends StepDefinition> {

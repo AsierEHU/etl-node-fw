@@ -1,46 +1,8 @@
 import { uniqBy } from "lodash"
-import { SyncContext, Register, RegisterStatusTag, ReservedEntityTypes } from "../../business/register"
-import { EntityFetcher, RegisterDataAccess, RegisterDataFilter, MetaEntity, RegisterStats } from "./types"
+import { Register, RegisterStatusTag, ReservedEntityTypes } from "../../business/register"
+import { RegisterDataAccess, RegisterStats } from "./types"
 
-export class ContextEntityFetcher implements EntityFetcher {
 
-    private readonly syncContext: SyncContext
-    private readonly registerDataAccess: RegisterDataAccess
-    private readonly fetchHistory: RegisterDataFilter[]
-
-    constructor(syncContext: SyncContext, registerDataAccess: RegisterDataAccess) {
-        this.syncContext = syncContext
-        this.registerDataAccess = registerDataAccess
-        this.fetchHistory = []
-    }
-
-    async getMetaEntities(filter?: RegisterDataFilter) {
-        filter = { ...filter, ...this.syncContext }
-        this.fetchHistory.push(filter)
-        const registers = await this.registerDataAccess.getAll(filter)
-        return registers.map(register => {
-            const metaEntity: MetaEntity = {
-                $entity: register.entity,
-                $meta: register.meta,
-                $id: register.sourceEntityId || undefined,
-            }
-            return metaEntity
-        })
-    }
-
-    async getFlowConfig() {
-        const configPushedRegisters = await this.registerDataAccess.getAll({
-            entityType: ReservedEntityTypes.flowConfig,
-            flowId: this.syncContext.flowId
-        })
-        return configPushedRegisters[0]?.entity
-    }
-
-    getHistory(): RegisterDataFilter[] {
-        return this.fetchHistory;
-    }
-
-}
 export class AdvancedRegisterFetcher {
 
     private readonly registerDataAccess: RegisterDataAccess

@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Register, SyncContext, RegisterStatusTag, AdapterSpecialIds, ReservedEntityTypes } from '../../business/register';
-import { RegisterInitValues, MetaEntity } from "./types"
+import { RegisterInitValues } from "./types"
 
 export const isOrigin = (register: Register): boolean => {
     if (register.entityType === ReservedEntityTypes.setRegister) {
@@ -8,36 +8,6 @@ export const isOrigin = (register: Register): boolean => {
     } else {
         return register.id === register.sourceAbsoluteId && register.id === register.sourceRelativeId
     }
-}
-
-function isEntityWithMeta(entity?: any): entity is MetaEntity {
-    return entity?.$entity !== undefined
-}
-
-export const getWithMetaFormat = (entities: any[]): MetaEntity[] => {
-    return entities.map(entity => {
-        if (isEntityWithMeta(entity)) {
-            return entity
-        }
-        else {
-            return {
-                $entity: entity
-            }
-        }
-    })
-}
-
-export const getWithInitFormat = (entities: any[], entityType: string, definitionId: string): RegisterInitValues[] => {
-    const entitiesWithMeta = getWithMetaFormat(entities);
-    return entitiesWithMeta.map(entityWithMeta => {
-        return {
-            entity: entityWithMeta.$entity,
-            entityType,
-            sourceEntityId: entityWithMeta.$id,
-            meta: entityWithMeta.$meta,
-            definitionId
-        }
-    })
 }
 
 export const initRegisters = (

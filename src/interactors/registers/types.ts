@@ -21,16 +21,6 @@ export type RegisterDataFilter = {
     }
 }
 
-export type MetaEntity = {
-    $entity: object | null,
-    $meta?: any,
-    $id?: string
-}
-export interface EntityFetcher {
-    getMetaEntities: (filter?: RegisterDataFilter) => Promise<MetaEntity[]>
-    getFlowConfig: () => Promise<any>
-}
-
 export type RegisterInitValues = {
     entity: object | null,
     entityType: string,
@@ -49,4 +39,3 @@ export type RegisterStats = {
     registers_skipped: number
 }
 
-export type InputEntity<e extends object> = MetaEntity | null | e

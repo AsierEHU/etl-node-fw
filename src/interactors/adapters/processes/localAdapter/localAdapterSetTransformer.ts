@@ -1,8 +1,9 @@
-import { buildSetRegister, getWithInitFormat } from "../../../registers/utils";
+import { buildSetRegister } from "../../../registers/utils";
 import { LocalAdapter } from "./localAdapter";
 import { v4 as uuidv4 } from 'uuid';
 import { LocalAdapterSetTransformerDefinition } from "../../definitions/localAdapter/types";
 import { SyncContext, Register, RegisterStatusTag } from "../../../../business/register";
+import { getWithInitFormat } from "./utils";
 
 export class LocalAdapterSetTransformer<ad extends LocalAdapterSetTransformerDefinition<any>> extends LocalAdapter<ad>{
 

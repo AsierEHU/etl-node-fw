@@ -1,6 +1,5 @@
-import { getWithMetaFormat } from "../../../registers/utils";
 import { LocalAdapter } from "./localAdapter";
-import { getValidationResultWithMeta, validationTagToRegisterTag } from "./utils";
+import { getValidationResultWithMeta, getWithMetaFormat, validationTagToRegisterTag } from "./utils";
 import { v4 as uuidv4 } from 'uuid';
 import { LocalAdapterLoaderDefinition } from "../../definitions/localAdapter/types";
 import { SyncContext, Register, RegisterStatusTag } from "../../../../business/register";
