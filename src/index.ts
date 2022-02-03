@@ -1,4 +1,6 @@
 export * from "./interactors/common/registers";
+export * from "./interactors/common/processes";
+
 export * from "./interactors/reports/types"
 
 export * from "./interactors/adapters/factory"
