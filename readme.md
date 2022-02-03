@@ -61,6 +61,8 @@ See [examples](https://github.com/AsierEHU/etl-node-fw/tree/master/examples) fol
 ## Reference [WIP]
 ### Architecture
 ![Architecture](https://github.com/AsierEHU/etl-node-fw/blob/master/doc/Architecture.svg?raw=true)
+### Flow Example
+![Flow Example](https://github.com/AsierEHU/etl-node-fw/blob/master/doc/FlowExample.svg?raw=true)
 ### Register data structure
 ``` ts
 {
@@ -127,8 +129,15 @@ Adapter, Step or Flow process status event.
     syncContext: SyncContext //process traces (flowId,stepId,AdapterId)
 }
 ```
-### DataLineage
+---
+## Observability
+### Registers DataLineage
 ![DataLineage](https://github.com/AsierEHU/etl-node-fw/blob/master/doc/DataLineage.svg?raw=true)
+### Registers reporting
+![Reporting Registers](https://github.com/AsierEHU/etl-node-fw/blob/master/doc/ReportingRegisters.svg?raw=true)
+### Processes reporting
+![Reporting Processes](https://github.com/AsierEHU/etl-node-fw/blob/master/doc/ReportingProcesses.svg?raw=true)
+
 ---
 ## Default implementations overview
 ### Adapters
