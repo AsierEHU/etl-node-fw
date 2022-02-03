@@ -3,7 +3,7 @@ import { RegisterStatusTag } from "../../business/register";
 import { RegisterDataAccess } from "../common/registers";
 
 
-export class RegistersFlowTraceReport {
+export class RegistersHistoricalReport {
 
     private readonly registerDataAccess: RegisterDataAccess
 
@@ -11,7 +11,7 @@ export class RegistersFlowTraceReport {
         this.registerDataAccess = dependencies.registerDataAccess
     }
 
-    async getReport(flowId: string, entityId: string): Promise<any> {
+    async getReport(flowDefinitionId: string, stepDefinitionId: string, entityId: string): Promise<any> {
 
     }
 }
