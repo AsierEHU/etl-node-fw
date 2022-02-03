@@ -3,8 +3,8 @@ import { cloneDeep } from "lodash";
 import { StatusTag } from "../../../business/processStatus";
 import { ReservedEntityTypes, SyncContext } from "../../../business/register";
 import { getWithInitFormat } from "../../adapters/processes/localAdapter/utils";
-import { RegisterDataAccess } from "../../registers/types";
-import { initRegisters } from "../../registers/utils";
+import { RegisterDataAccess } from "../../common/registers";
+import { initRegisters } from "../../../business/registerUtils";
 import { StepFactory } from "../../steps/factory"
 import { LocalLinealFlowDefinition } from "../definitions/types";
 import { Flow, FlowRunOptions } from "./types"

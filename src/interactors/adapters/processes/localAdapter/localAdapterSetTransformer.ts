@@ -1,4 +1,4 @@
-import { buildSetRegister } from "../../../registers/utils";
+import { buildSetRegister } from "../../../../business/registerUtils";
 import { LocalAdapter } from "./localAdapter";
 import { v4 as uuidv4 } from 'uuid';
 import { LocalAdapterSetTransformerDefinition } from "../../definitions/localAdapter/types";

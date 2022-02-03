@@ -4,11 +4,12 @@ import { AdapterSpecialIds, SyncContext } from "../../../business/register";
 import { AdapterFactory } from "../../adapters/factory";
 import { getWithInitFormat } from "../../adapters/processes/localAdapter/utils";
 import { AdapterRunOptions } from "../../adapters/processes/types";
-import { RegisterDataAccess, RegisterStats } from "../../registers/types";
-import { initRegisters } from "../../registers/utils";
-import { AdvancedRegisterFetcher } from "../../registers/utilsDB";
+import { RegisterDataAccess } from "../../common/registers";
+import { initRegisters } from "../../../business/registerUtils";
 import { LocalStepDefinition } from "../definitions/types";
 import { Step, StepRunOptions } from "./types";
+import { RegistersStepMetricsReport } from "../../reports/registersStepMetricsReport";
+import { RegisterStats } from "../../reports/types";
 
 export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
 
@@ -58,8 +59,8 @@ export class LocalStep<sd extends LocalStepDefinition> implements Step<sd>{
                 await this.tryRunAdapter(tryNumber, syncContext, restartAdapterRunOptions);
             }
             else {
-                const arg = new AdvancedRegisterFetcher(this.registerDataAccess);
-                const registerStats = await arg.getRegistersStepSummary(syncContext.stepId as string, true)
+                const report = new RegistersStepMetricsReport({ registerDataAccess: this.registerDataAccess })
+                const registerStats = await report.getReport(syncContext.stepId as string, true)
                 const isInvalidRegistersSummary = this.stepDefinition.isInvalidRegistersSummary(registerStats)
                 if (isInvalidRegistersSummary) {
                     throw new Error("Invalid by definition")

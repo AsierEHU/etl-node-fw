@@ -1,6 +1,7 @@
 
 import { RegisterStatusTag, ReservedEntityTypes, SyncContext } from "../../../../business/register";
-import { RegisterDataAccess, RegisterDataFilter, RegisterInitValues } from "../../../registers/types";
+import { RegisterInitValues } from "../../../../business/registerUtils";
+import { RegisterDataAccess, RegisterDataFilter } from "../../../common/registers";
 import { EntityFetcher, MetaEntity, ValidationResult, ValidationStatusTag } from "../../definitions/localAdapter/types";
 
 export const getValidationResultWithMeta = (validation: ValidationResult | ValidationStatusTag): ValidationResult => {

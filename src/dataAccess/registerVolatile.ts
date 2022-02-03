@@ -1,5 +1,5 @@
 import { Register, ReservedEntityTypes } from "../business/register";
-import { RegisterDataAccess, RegisterDataFilter } from "../interactors/registers/types";
+import { RegisterDataAccess, RegisterDataFilter } from "../interactors/common/registers";
 
 export class VolatileRegisterDataAccess implements RegisterDataAccess {
 

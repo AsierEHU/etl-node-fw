@@ -1,6 +1,6 @@
 import { StatusTag } from "../../../business/processStatus"
 import { SyncContext } from "../../../business/register"
-import { RegisterStats } from "../../registers/types"
+import { RegisterStats } from "../../reports/types"
 import { StepDefinition } from "../definitions/types"
 import { Step, StepRunOptions } from "../processes/types"
 

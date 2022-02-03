@@ -1,5 +1,5 @@
 
-import { RegisterDataFilter } from "../../../registers/types";
+import { RegisterDataFilter } from "../../../common/registers";
 import { AdapterDefinition } from "../types";
 
 export abstract class LocalAdapterExtractorDefinition<output extends object> implements AdapterDefinition {

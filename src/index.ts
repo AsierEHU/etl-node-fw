@@ -1,4 +1,5 @@
-export * from "./interactors/registers/types";
+export * from "./interactors/common/registers";
+export * from "./interactors/reports/types"
 
 export * from "./interactors/adapters/factory"
 export * from "./interactors/adapters/runners/types"

@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Register, SyncContext, RegisterStatusTag, AdapterSpecialIds, ReservedEntityTypes } from '../../business/register';
-import { RegisterInitValues } from "./types"
+import { Register, SyncContext, RegisterStatusTag, AdapterSpecialIds, ReservedEntityTypes } from './register';
 
 export const isOrigin = (register: Register): boolean => {
     if (register.entityType === ReservedEntityTypes.setRegister) {
@@ -9,6 +8,17 @@ export const isOrigin = (register: Register): boolean => {
         return register.id === register.sourceAbsoluteId && register.id === register.sourceRelativeId
     }
 }
+
+export type RegisterInitValues = {
+    entity: object | null,
+    entityType: string,
+    definitionId: string,
+    meta?: any,
+    sourceAbsoluteId?: string,
+    sourceRelativeId?: string,
+    sourceEntityId?: string,
+}
+
 
 export const initRegisters = (
     inputEntities: RegisterInitValues[], syncContext: SyncContext

@@ -4,8 +4,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { ProcessStatus, ProcessType, StatusTag } from '../../../business/processStatus';
 import { SyncContext } from '../../../business/register';
 import { ProcessStatusDataAccess } from '../../common/processes';
-import { RegisterDataAccess } from '../../registers/types';
-import { AdvancedRegisterFetcher } from '../../registers/utilsDB';
+import { RegisterDataAccess } from '../../common/registers';
+import { RegistersAdapterMetricsReport } from '../../reports/registersAdapterMetricsReport';
 import { AdapterDefinition } from '../definitions/types';
 import { Adapter, AdapterRunOptions } from '../processes/types';
 import { AdapterRunner, AdapterPresenter } from './types';
@@ -50,8 +50,8 @@ export class LocalAdapterRunner implements AdapterRunner {
         processStatus.timeFinished = new Date()
         await this.processStatusDataAccess.save(processStatus)
         presenterData = this.buildPresenterData(processStatus)
-        const arf = new AdvancedRegisterFetcher(this.registerDataAccess)
-        presenterData.statusSummary = await arf.getRegistersAdapterSummary(processStatus.id)
+        const report = new RegistersAdapterMetricsReport({ registerDataAccess: this.registerDataAccess })
+        presenterData.statusSummary = await report.getReport(processStatus.id)
         this.adapterPresenter.emit("adapterStatus", presenterData)
 
         return presenterData;

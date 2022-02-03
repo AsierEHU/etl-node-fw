@@ -1,6 +1,6 @@
 import { StatusTag } from "../../../business/processStatus"
 import { SyncContext } from "../../../business/register"
-import { RegisterStats } from "../../registers/types"
+import { RegisterStats } from "../../reports/types"
 import { AdapterDefinition } from "../definitions/types"
 import { Adapter, AdapterRunOptions } from "../processes/types"
 

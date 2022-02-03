@@ -1,5 +1,5 @@
 import { SyncContext, Register, RegisterStatusTag } from "../../../../business/register";
-import { cloneRegisters, initRegisters } from "../../../registers/utils";
+import { cloneRegisters, initRegisters } from "../../../../business/registerUtils";
 import { LocalAdapterExtractorDefinition } from "../../definitions/localAdapter/types";
 import { AdapterRunOptions } from "../types";
 import { LocalAdapter } from "./localAdapter";

@@ -1,5 +1,5 @@
 import { AdapterRunOptions } from "../../adapters/processes/types";
-import { RegisterStats } from "../../registers/types";
+import { RegisterStats } from "../../reports/types";
 
 export abstract class LocalStepDefinition implements StepDefinition {
     abstract readonly adapterRunOptions: AdapterRunOptions | null;
@@ -16,3 +16,4 @@ export interface StepDefinition {
     readonly adapterDefinitionId: string
     readonly adapterRunOptions: AdapterRunOptions | null
 }
+

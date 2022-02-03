@@ -4,8 +4,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { StatusTag, ProcessStatus, ProcessType } from '../../../business/processStatus';
 import { SyncContext } from '../../../business/register';
 import { ProcessStatusDataAccess } from '../../common/processes';
-import { RegisterDataAccess } from '../../registers/types';
-import { AdvancedRegisterFetcher } from '../../registers/utilsDB';
+import { RegisterDataAccess } from '../../common/registers';
+import { RegistersStepMetricsReport } from '../../reports/registersStepMetricsReport';
 import { StepDefinition } from '../definitions/types';
 import { Step, StepRunOptions } from '../processes/types';
 import { StepRunner, StepPresenter, StepStatusSummary } from './types';
@@ -54,9 +54,9 @@ export class LocalStepRunner implements StepRunner {
         processStatus.timeFinished = new Date()
         await this.processStatusDataAccess.save(processStatus)
         presenterData = this.buildPresenterData(processStatus)
-        const arg = new AdvancedRegisterFetcher(this.registerDataAccess);
+        const report = new RegistersStepMetricsReport({ registerDataAccess: this.registerDataAccess })
         const stepStatusSummary: StepStatusSummary = {
-            registerStats: await arg.getRegistersStepSummary(processStatus.id, true),
+            registerStats: await report.getReport(processStatus.id, true),
             retries: await this.getStepRetries(processStatus.id),
         }
         presenterData.statusSummary = stepStatusSummary
