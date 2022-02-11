@@ -1,8 +1,3 @@
-export * from "./interactors/common/registers";
-export * from "./interactors/common/processes";
-
-export * from "./interactors/reports/types"
-
 export * from "./interactors/adapters/factory"
 export * from "./interactors/adapters/runners/types"
 export * from "./interactors/adapters/processes/types"
@@ -19,5 +14,10 @@ export * from "./interactors/flows/runners/types"
 export * from "./interactors/flows/processes/types"
 export * from "./interactors/flows/definitions/types"
 
+export * from "./interactors/common/registers";
+export * from "./interactors/common/processes";
 export { VolatileRegisterDataAccess } from "./dataAccess/registerVolatile"
 export { VolatileProcessStatusDataAccess } from "./dataAccess/processStatusVolatile";
+
+export * from "./interactors/reports/types"
+export { RegistersHistoricalReport } from "./interactors/reports/registersHistoricalReport"

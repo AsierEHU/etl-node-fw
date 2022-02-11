@@ -5,3 +5,7 @@ export type RegisterStats = {
     registers_invalid: number
     registers_skipped: number
 }
+
+export interface Report {
+    getReport(config: any): Promise<any>
+}

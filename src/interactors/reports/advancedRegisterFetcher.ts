@@ -10,15 +10,17 @@ export class AdvancedRegisterFetcher {
         this.registerDataAccess = registerDataAccess
     }
 
+    //TODO: mover a un report de get parent registers
     async getRelativeRegisters(baseRegisters: Register[]): Promise<Register[]> {
         return this.getSourceRegisters('sourceRelativeId', baseRegisters)
     }
 
-    async getAbsoluteRegisters(baseRegisters: Register[]): Promise<Register[]> {
-        return this.getSourceRegisters('sourceAbsoluteId', baseRegisters)
-    }
+    // async getAbsoluteRegisters(baseRegisters: Register[]): Promise<Register[]> {
+    //     return this.getSourceRegisters('sourceAbsoluteId', baseRegisters)
+    // }
 
-    private async getSourceRegisters(sourceType: 'sourceRelativeId' | 'sourceAbsoluteId', baseRegisters: Register[]) {
+    //TODO: absoluteRegisters devolvería toda una traza y el resultado no sería el esperado
+    private async getSourceRegisters(sourceType: 'sourceRelativeId' /*| 'sourceAbsoluteId'*/, baseRegisters: Register[]) {
         const uniqueBaseRegisters = uniqBy(baseRegisters, sourceType)
         const sourceRegistersIds = uniqueBaseRegisters.map(baseRegister => baseRegister[sourceType]) as string[]
 
